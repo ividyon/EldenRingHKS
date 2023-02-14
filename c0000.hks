@@ -1,9 +1,9 @@
 ﻿------------------------------------------
--- Fixed decompiled c0000.hks for Elden Ring
+-- Fixed decompiled c0000.hks for ELDEN RING
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 5 for ER version 1.08.1
+-- Version 6 for ER version 1.08.1
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -14,6 +14,7 @@
 --              proper act/env naming instead of IDs, proper spacing, useful comments
 -- 2023-01-27 - Minor oversight fixes
 -- 2023-01-27 - Put on GitHub via philiquaz' initiative
+-- 2023-02-14 - Minor comment changes
 ------------------------------------------
 -- Core: Functions
 ------------------------------------------

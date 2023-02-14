@@ -1,8 +1,12 @@
 ﻿# ELDEN RING HKS repository
 
-As of now, this is just a place to put the latest `c0000.hks` file compatible for ELDEN RING.
+Contains various HKS files for ELDEN RING.
 
-The `c0000.hks` file is the HavokScript file serving as an interface between player inputs and the player character.
+HKS (HavokScript) serves as an interface between player/AI inputs and influences the animations and behavior of the respective chr model.
+
+* `c0000.hks`: The interface between player inputs and the player character.
+* `c8000.hks`: The HavokScript file for Torrent.
+* `c9997.hks`: A HavokScript file applying to all enemies.
 
 The HKS is decompiled using the various assorted forks of [katalash's DSLuaDecompiler](https://github.com/katalash/DSLuaDecompiler), then cleaned and manually fixed up (mostly by Vawser) due to the decompiler's outdated state and imperfect output.
 
