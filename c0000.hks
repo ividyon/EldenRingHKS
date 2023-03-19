@@ -3,7 +3,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 6 for ER version 1.08.1
+-- Version 7 for ER version 1.08.1
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -15,415 +15,7 @@
 -- 2023-01-27 - Minor oversight fixes
 -- 2023-01-27 - Put on GitHub via philiquaz' initiative
 -- 2023-02-14 - Minor comment changes
-------------------------------------------
--- Core: Includes from common_define
-------------------------------------------
-SwordArtsCategory = {
-    [0] = {0},
-    [1] = {0, 2, 3, 42},
-    [2] = {0},
-    [3] = {0, 2, 3, 24},
-    [4] = {0, 2, 3},
-    [5] = {0},
-    [6] = {0},
-    [7] = {0, 2, 3},
-    [8] = {0, 2, 3},
-    [9] = {0, 2, 3},
-    [10] = {0},
-    [11] = {0},
-    [12] = {0, 2, 3},
-    [13] = {0},
-    [14] = {0},
-    [15] = {0},
-    [16] = {0},
-    [17] = {0},
-    [18] = {0, 3},
-    [19] = {0},
-    [20] = {0},
-    [21] = {0},
-    [22] = {0, 3, 24},
-    [23] = {0, 3, 24},
-    [24] = {0, 2, 3, 24},
-    [25] = {0},
-    [50] = {0},
-    [51] = {0},
-    [52] = {0, 24},
-    [53] = {0},
-    [54] = {0, 2, 24},
-    [55] = {0},
-    [56] = {0},
-    [57] = {0, 2},
-    [58] = {0},
-    [59] = {0},
-    [61] = {0},
-    [62] = {0},
-    [63] = {0},
-    [64] = {0, 42},
-    [65] = {0, 3},
-    [66] = {0},
-    [67] = {0},
-    [68] = {0},
-    [69] = {0},
-    [70] = {0},
-    [71] = {0},
-    [72] = {0},
-    [73] = {0},
-    [74] = {0},
-    [75] = {0},
-    [76] = {0},
-    [90] = {0, 47, 48},
-    [91] = {0, 2, 3, 4, 5, 8, 9, 47, 48},
-    [92] = {0, 20, 28, 48},
-    [93] = {0, 2, 3},
-    [94] = {0},
-    [95] = {0},
-    [96] = {0},
-    [97] = {0},
-    [98] = {0, 47, 48},
-    [99] = {0},
-    [100] = {0},
-    [101] = {0},
-    [102] = {0},
-    [103] = {0},
-    [105] = {0, 45},
-    [106] = {0},
-    [108] = {0},
-    [110] = {0},
-    [107] = {0},
-    [109] = {0},
-    [111] = {0},
-    [112] = {0},
-    [113] = {0},
-    [114] = {0},
-    [115] = {0},
-    [116] = {0},
-    [117] = {0},
-    [118] = {0},
-    [130] = {0},
-    [131] = {0},
-    [132] = {0},
-    [133] = {0},
-    [134] = {0},
-    [135] = {0},
-    [136] = {0},
-    [137] = {0},
-    [140] = {0},
-    [141] = {0},
-    [142] = {0},
-    [143] = {0},
-    [144] = {0},
-    [150] = {0, 2, 42},
-    [151] = {0},
-    [152] = {0},
-    [155] = {0},
-    [156] = {0},
-    [157] = {0},
-    [160] = {0},
-    [165] = {0},
-    [166] = {0},
-    [167] = {0},
-    [168] = {0},
-    [196] = {0, 2, 3}
-}
-
---       local idle_cat = env(GetStayAnimCategory)
---        local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
---        local arts_diff_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
-
--- Art ID: swordArtsTypeNew (TAE id minus 600)
--- Idle Cat: GetStayAnimCategory
--- Weapon Cat: Weapon Category
-
--- Determines if the held weapon should be considered a different type for the sake of Sword Arts animations.
-function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
-    -- If Art ID above 770 except 796, return 0
-    if 170 <= artID and artID ~= 196 then
-        return 0
-        -- For Art ID 769, return 45 (Radahn's Rain)
-    elseif artID == 169 then
-        return 45
-    end
-    local wep_cat0 = wepCat
-    -- Secondary check. If holding a claw, also check if Fists would be viable for this sword art animation.
-    local wep_cat1 = wep_cat0
-    if wep_cat1 == WEAPON_CATEGORY_CLAW then
-        wep_cat1 = WEAPON_CATEGORY_FIST
-    end
-    local idle_cat0 = idleCat
-    if idle_cat0 >= 10 then
-        idle_cat0 = idle_cat0 - 10
-    end
-    -- WEAPON_CATEGORY_LARGE_RAPIER
-    if wepCat == 39 then
-        idle_cat0 = 0
-    end
-
-    -- Shields
-    if c_SwordArtsHand == HAND_LEFT and c_Style ~= HAND_LEFT_BOTH then
-        local shield_cat = -1
-        if idle_cat0 == 2 and wepCat == WEAPON_CATEGORY_SMALL_SHIELD then
-            shield_cat = 4
-        elseif idle_cat0 == 3 and wepCat == WEAPON_CATEGORY_SMALL_SHIELD then
-            shield_cat = 5
-        elseif idle_cat0 == 2 and wepCat == WEAPON_CATEGORY_LARGE_SHIELD then
-            shield_cat = 8
-        elseif idle_cat0 == 3 and wepCat == WEAPON_CATEGORY_LARGE_SHIELD then
-            shield_cat = 9
-        end
-        if shield_cat ~= -1 then
-            -- Only check if shields
-            for i = 1, #SwordArtsCategory[artID], 1 do
-                if SwordArtsCategory[artID][i] == shield_cat then
-                    act(9000, "GetSwordArtsDiffCategory shield_cat:" .. shield_cat)
-                    return shield_cat
-                end
-            end
-        end
-    end
-    for j = 1, #SwordArtsCategory[artID], 1 do
-        if SwordArtsCategory[artID][j] == wep_cat0 then
-            act(9000, "GetSwordArtsDiffCategory wepCat0:" .. wep_cat0)
-            return wep_cat0
-        end
-    end
-    for j = 1, #SwordArtsCategory[artID], 1 do
-        if SwordArtsCategory[artID][j] == wep_cat1 then
-            act(9000, "GetSwordArtsDiffCategory wepCat1:" .. wep_cat1)
-            return wep_cat1
-        end
-    end
-    -- Shield Arts (90 is Shield Bash, 99 is Thops Barrier)
-    if artID >= 90 and artID <= 99 and (c_SwordArtsHand ~= HAND_LEFT or c_Style == HAND_LEFT_BOTH) then
-        return 0
-    end
-    for j = 1, #SwordArtsCategory[artID], 1 do
-        if SwordArtsCategory[artID][j] == idle_cat0 then
-            act(9000, "GetSwordArtsDiffCategory idle_cat0:" .. idle_cat0)
-            return idle_cat0
-        end
-    end
-    return 0
-
-
-
-end
-
-SwordArtPutOppositeWeapon = {
-    [0] = {TRUE, FALSE, TRUE},
-    [1] = {TRUE, FALSE, TRUE},
-    [2] = {TRUE, FALSE, TRUE},
-    [3] = {TRUE, FALSE, TRUE},
-    -- 4 (Not present)
-    [5] = {TRUE, FALSE, TRUE},
-    [6] = {TRUE, FALSE, TRUE},
-    [7] = {TRUE, FALSE, TRUE},
-    [8] = {FALSE, FALSE, TRUE},
-    [9] = {FALSE, FALSE, TRUE},
-    [10] = {TRUE, FALSE, TRUE},
-    [11] = {TRUE, FALSE, TRUE},
-    [12] = {TRUE, FALSE, TRUE},
-    [13] = {TRUE, FALSE, TRUE},
-    [14] = {TRUE, FALSE, TRUE},
-    [15] = {TRUE, FALSE, TRUE},
-    [16] = {TRUE, FALSE, TRUE},
-    [17] = {FALSE, FALSE, FALSE},
-    [18] = {TRUE, FALSE, TRUE},
-    [19] = {TRUE, FALSE, TRUE},
-    [20] = {TRUE, FALSE, TRUE},
-    -- 21 (Present)
-    [22] = {TRUE, FALSE, TRUE},
-    [23] = {TRUE, FALSE, TRUE},
-    [24] = {FALSE, FALSE, TRUE},
-    [25] = {TRUE, FALSE, TRUE},
-    -- 26-49 (Not present)
-    [50] = {FALSE, FALSE, TRUE},
-    [51] = {TRUE, FALSE, TRUE},
-    [52] = {TRUE, FALSE, TRUE},
-    [53] = {FALSE, FALSE, TRUE},
-    [54] = {TRUE, FALSE, TRUE},
-    [55] = {TRUE, FALSE, FALSE},
-    [56] = {TRUE, FALSE, TRUE},
-    [57] = {TRUE, FALSE, TRUE},
-    [58] = {TRUE, FALSE, TRUE},
-    [59] = {TRUE, FALSE, TRUE},
-    [61] = {TRUE, FALSE, TRUE},
-    [62] = {TRUE, FALSE, FALSE},
-    [63] = {TRUE, FALSE, TRUE},
-    [64] = {FALSE, FALSE, TRUE},
-    [65] = {TRUE, FALSE, TRUE},
-    [66] = {TRUE, FALSE, TRUE},
-    [67] = {TRUE, FALSE, TRUE},
-    [68] = {TRUE, FALSE, TRUE},
-    [69] = {TRUE, FALSE, TRUE},
-    [70] = {TRUE, FALSE, TRUE},
-    [71] = {TRUE, FALSE, TRUE},
-    [72] = {TRUE, FALSE, TRUE},
-    [73] = {TRUE, FALSE, TRUE},
-    [74] = {FALSE, FALSE, TRUE},
-    [75] = {TRUE, FALSE, TRUE},
-    [76] = {TRUE, FALSE, TRUE},
-    -- 77-89 (Not present)
-    [90] = {TRUE, FALSE, TRUE},
-    [91] = {FALSE, FALSE, FALSE},
-    [92] = {FALSE, FALSE, TRUE},
-    [93] = {FALSE, FALSE, TRUE},
-    [94] = {FALSE, FALSE, TRUE},
-    [95] = {FALSE, FALSE, TRUE},
-    [96] = {FALSE, FALSE, TRUE},
-    [97] = {FALSE, FALSE, TRUE},
-    [98] = {TRUE, TRUE, TRUE},
-    [99] = {FALSE, FALSE, FALSE},
-    [100] = {FALSE, FALSE, FALSE},
-    [101] = {FALSE, FALSE, FALSE},
-    [102] = {FALSE, FALSE, FALSE},
-    [103] = {FALSE, FALSE, FALSE},
-    -- 104 (Not present)
-    [105] = {FALSE, FALSE, FALSE},
-    [106] = {FALSE, FALSE, FALSE},
-    -- 107 (Present)
-    [108] = {FALSE, FALSE, FALSE},
-    -- 109 (Not present)
-    [110] = {FALSE, FALSE, TRUE},
-    [111] = {FALSE, FALSE, TRUE},
-    [112] = {FALSE, FALSE, TRUE},
-    [113] = {FALSE, FALSE, TRUE},
-    [114] = {TRUE, FALSE, TRUE},
-    [115] = {FALSE, FALSE, TRUE},
-    [116] = {FALSE, FALSE, TRUE},
-    [117] = {TRUE, FALSE, TRUE},
-    [118] = {TRUE, FALSE, TRUE},
-    -- 119-129 (Not present)
-    [130] = {FALSE, FALSE, TRUE},
-    [131] = {FALSE, FALSE, TRUE},
-    [132] = {TRUE, FALSE, TRUE},
-    [133] = {FALSE, FALSE, TRUE},
-    [134] = {TRUE, FALSE, TRUE},
-    [135] = {TRUE, FALSE, TRUE},
-    [136] = {TRUE, FALSE, TRUE},
-    [137] = {FALSE, FALSE, TRUE},
-    [140] = {FALSE, FALSE, TRUE},
-    [141] = {FALSE, FALSE, TRUE},
-    [142] = {FALSE, FALSE, TRUE},
-    [143] = {FALSE, FALSE, TRUE},
-    [144] = {TRUE, FALSE, TRUE},
-    [150] = {TRUE, FALSE, TRUE},
-    [151] = {FALSE, FALSE, TRUE},
-    [152] = {TRUE, TRUE, TRUE},
-    [155] = {FALSE, FALSE, TRUE},
-    [156] = {FALSE, FALSE, TRUE},
-    [157] = {FALSE, FALSE, TRUE},
-    [160] = {FALSE, FALSE, TRUE},
-    [165] = {TRUE, FALSE, TRUE},
-    [166] = {TRUE, FALSE, TRUE},
-    [167] = {TRUE, FALSE, TRUE},
-    [168] = {TRUE, FALSE, TRUE},
-    [169] = {FALSE, FALSE, FALSE},
-    [170] = {TRUE, FALSE, TRUE},
-    [171] = {FALSE, FALSE, TRUE},
-    [172] = {TRUE, FALSE, FALSE},
-    [173] = {TRUE, FALSE, TRUE},
-    [174] = {FALSE, FALSE, TRUE},
-    [175] = {TRUE, FALSE, TRUE},
-    [176] = {TRUE, FALSE, TRUE},
-    [177] = {TRUE, FALSE, TRUE},
-    [178] = {TRUE, FALSE, TRUE},
-    [179] = {TRUE, FALSE, TRUE},
-    -- 180
-    -- 181
-    [182] = {FALSE, FALSE, TRUE},
-    [183] = {TRUE, FALSE, TRUE},
-    [184] = {TRUE, FALSE, TRUE},
-    [185] = {TRUE, FALSE, TRUE},
-    [186] = {TRUE, FALSE, TRUE},
-    [187] = {FALSE, FALSE, TRUE},
-    [188] = {TRUE, FALSE, TRUE},
-    [189] = {TRUE, FALSE, TRUE},
-    [190] = {FALSE, FALSE, FALSE},
-    [191] = {TRUE, FALSE, FALSE},
-    [192] = {TRUE, FALSE, TRUE},
-    [193] = {FALSE, FALSE, TRUE},
-    [194] = {FALSE, FALSE, TRUE},
-    [195] = {FALSE, TRUE, FALSE},
-    [196] = {FALSE, FALSE, FALSE},
-    [197] = {FALSE, FALSE, FALSE},
-    [198] = {FALSE, FALSE, TRUE},
-    [199] = {TRUE, FALSE, TRUE},
-    [200] = {TRUE, FALSE, TRUE},
-    [201] = {TRUE, TRUE, FALSE},
-    [202] = {TRUE, TRUE, FALSE},
-    [203] = {TRUE, FALSE, TRUE},
-    [204] = {TRUE, FALSE, TRUE},
-    [205] = {TRUE, FALSE, TRUE},
-    [206] = {FALSE, FALSE, TRUE},
-    [207] = {TRUE, FALSE, TRUE},
-    [208] = {TRUE, FALSE, TRUE},
-    [209] = {TRUE, FALSE, TRUE},
-    [210] = {FALSE, FALSE, TRUE},
-    [211] = {FALSE, FALSE, FALSE},
-    [212] = {FALSE, FALSE, TRUE},
-    [213] = {TRUE, FALSE, TRUE},
-    [214] = {TRUE, FALSE, TRUE},
-    [215] = {TRUE, FALSE, TRUE},
-    [216] = {FALSE, FALSE, TRUE},
-    [217] = {FALSE, FALSE, TRUE},
-    [218] = {TRUE, FALSE, TRUE},
-    [219] = {TRUE, FALSE, FALSE},
-    [220] = {FALSE, FALSE, TRUE},
-    [221] = {FALSE, FALSE, TRUE},
-    [222] = {TRUE, FALSE, TRUE},
-    [223] = {TRUE, FALSE, TRUE},
-    [224] = {TRUE, FALSE, TRUE},
-    [225] = {TRUE, FALSE, TRUE},
-    [226] = {TRUE, FALSE, TRUE},
-    [227] = {TRUE, FALSE, TRUE},
-    [228] = {TRUE, FALSE, TRUE},
-    [229] = {TRUE, FALSE, TRUE},
-    [230] = {FALSE, FALSE, TRUE},
-    [231] = {TRUE, FALSE, TRUE},
-    [232] = {TRUE, FALSE, FALSE},
-    [233] = {TRUE, FALSE, TRUE},
-    [234] = {TRUE, FALSE, TRUE},
-    [235] = {TRUE, FALSE, TRUE},
-    [236] = {TRUE, FALSE, TRUE},
-    [237] = {TRUE, FALSE, TRUE},
-    [238] = {TRUE, FALSE, TRUE},
-    [239] = {TRUE, FALSE, TRUE},
-    [240] = {TRUE, FALSE, TRUE},
-    [241] = {TRUE, FALSE, TRUE},
-    [242] = {TRUE, FALSE, TRUE},
-    [243] = {TRUE, FALSE, TRUE},
-    [244] = {TRUE, FALSE, TRUE},
-    [245] = {FALSE, FALSE, TRUE},
-    [246] = {TRUE, FALSE, TRUE},
-    [247] = {FALSE, FALSE, FALSE},
-    [248] = {TRUE, FALSE, FALSE},
-    [249] = {TRUE, FALSE, FALSE},
-    [250] = {TRUE, FALSE, TRUE},
-    [251] = {TRUE, FALSE, TRUE},
-    [252] = {TRUE, FALSE, FALSE},
-    [253] = {TRUE, FALSE, TRUE},
-    [254] = {TRUE, FALSE, TRUE}
-}
-
--- Decides (TODO: Something) in regards to transitioning after a Sword Arts animation.
--- Table key: Sword Art ID (TAE ID minus 600)
--- Value 1: Right hand, weapon art cast from right hand
--- Value 2: Right hand, weapon art cast from left hand
--- Value 3: Left hand
-function GetSwordArtsPutOppositeWeapon()
-    local f3_local0 = nil
-    if c_Style == HAND_RIGHT then
-        if HAND_RIGHT == c_SwordArtsHand then
-            f3_local0 = SwordArtPutOppositeWeapon[c_SwordArtsID][1]
-        else
-            f3_local0 = SwordArtPutOppositeWeapon[c_SwordArtsID][2]
-        end
-    else
-        f3_local0 = SwordArtPutOppositeWeapon[c_SwordArtsID][3]
-    end
-    return f3_local0
-end
-
+-- 2023-03-19 - Support for custom Ashes of War
 ------------------------------------------
 -- Core: Functions
 ------------------------------------------
@@ -2204,25 +1796,25 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         local arts_diff_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
         local arts_idx = 0
 
-        if arts_diff_cat == 2 then
+        if arts_diff_cat == SWORD_ART_DIFF_CAT_LARGE_WEAPON then
             arts_idx = 1
-        elseif arts_diff_cat == 3 then
+        elseif arts_diff_cat == SWORD_ART_DIFF_CAT_POLEARM then
             arts_idx = 2
-        elseif arts_diff_cat == 4 then
+        elseif arts_diff_cat == SWORD_ART_DIFF_CAT_LARGE_WEAPON_SMALL_SHIELD then
             arts_idx = 3
-        elseif arts_diff_cat == 5 then
+        elseif arts_diff_cat == SWORD_ART_DIFF_CAT_POLEARM_SMALL_SHIELD then
             arts_idx = 4
-        elseif arts_diff_cat == 8 then
+        elseif arts_diff_cat == SWORD_ART_DIFF_CAT_LARGE_WEAPON_LARGE_SHIELD then
             arts_idx = 5
-        elseif arts_diff_cat == 9 then
+        elseif arts_diff_cat == SWORD_ART_DIFF_CAT_LARGE_WEAPON_SMALL_SHIELD then
             arts_idx = 6
-        elseif arts_diff_cat == 20 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_SHORT_SWORD then
             arts_idx = 7
-        elseif arts_diff_cat == 28 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_CURVEDSWORD then
             arts_idx = 8
-        elseif arts_diff_cat == 47 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_LARGE_SHIELD then
             arts_idx = 9
-        elseif arts_diff_cat == 48 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_SMALL_SHIELD then
             arts_idx = 10
         end
 
@@ -2253,25 +1845,25 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
             if HAND_LEFT == c_SwordArtsHand then
                 local arts_idx = 0
 
-                if arts_diff_cat == 2 then
+                if arts_diff_cat == SWORD_ART_DIFF_CAT_LARGE_WEAPON then
                     arts_idx = 1
-                elseif arts_diff_cat == 3 then
+                elseif arts_diff_cat == SWORD_ART_DIFF_CAT_POLEARM then
                     arts_idx = 2
-                elseif arts_diff_cat == 4 then
+                elseif arts_diff_cat == SWORD_ART_DIFF_CAT_LARGE_WEAPON_SMALL_SHIELD then
                     arts_idx = 3
-                elseif arts_diff_cat == 5 then
+                elseif arts_diff_cat == SWORD_ART_DIFF_CAT_POLEARM_SMALL_SHIELD then
                     arts_idx = 4
-                elseif arts_diff_cat == 8 then
+                elseif arts_diff_cat == SWORD_ART_DIFF_CAT_LARGE_WEAPON_LARGE_SHIELD then
                     arts_idx = 5
-                elseif arts_diff_cat == 9 then
+                elseif arts_diff_cat == SWORD_ART_DIFF_CAT_LARGE_WEAPON_SMALL_SHIELD then
                     arts_idx = 6
-                elseif arts_diff_cat == 20 then
+                elseif arts_diff_cat == WEAPON_CATEGORY_SHORT_SWORD then
                     arts_idx = 7
-                elseif arts_diff_cat == 28 then
+                elseif arts_diff_cat == WEAPON_CATEGORY_CURVEDSWORD then
                     arts_idx = 8
-                elseif arts_diff_cat == 47 then
+                elseif arts_diff_cat == WEAPON_CATEGORY_LARGE_SHIELD then
                     arts_idx = 9
-                elseif arts_diff_cat == 48 then
+                elseif arts_diff_cat == WEAPON_CATEGORY_SMALL_SHIELD then
                     arts_idx = 10
                 end
 
@@ -2280,21 +1872,21 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
             else
                 local arts_idx = 0
 
-                if arts_diff_cat == 2 then
+                if arts_diff_cat == SWORD_ART_DIFF_CAT_LARGE_WEAPON then
                     arts_idx = 1
-                elseif arts_diff_cat == 3 then
+                elseif arts_diff_cat == SWORD_ART_DIFF_CAT_POLEARM then
                     arts_idx = 2
-                elseif arts_diff_cat == 20 then
+                elseif arts_diff_cat == WEAPON_CATEGORY_SHORT_SWORD then
                     arts_idx = 3
-                elseif arts_diff_cat == 24 then
+                elseif arts_diff_cat == WEAPON_CATEGORY_TWINBLADE then
                     arts_idx = 4
-                elseif arts_diff_cat == 28 then
+                elseif arts_diff_cat == WEAPON_CATEGORY_CURVEDSWORD then
                     arts_idx = 5
-                elseif arts_diff_cat == 42 then
+                elseif arts_diff_cat == WEAPON_CATEGORY_FIST then
                     arts_idx = 6
-                elseif arts_diff_cat == 47 then
+                elseif arts_diff_cat == WEAPON_CATEGORY_LARGE_SHIELD then
                     arts_idx = 7
-                elseif arts_diff_cat == 48 then
+                elseif arts_diff_cat == WEAPON_CATEGORY_SMALL_SHIELD then
                     arts_idx = 8
                 end
 
@@ -2304,13 +1896,13 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         else
             local arts_idx = 0
 
-            if arts_diff_cat == 20 then
+            if arts_diff_cat == WEAPON_CATEGORY_SHORT_SWORD then
                 arts_idx = 1
-            elseif arts_diff_cat == 28 then
+            elseif arts_diff_cat == WEAPON_CATEGORY_CURVEDSWORD then
                 arts_idx = 2
-            elseif arts_diff_cat == 47 then
+            elseif arts_diff_cat == WEAPON_CATEGORY_LARGE_SHIELD then
                 arts_idx = 3
-            elseif arts_diff_cat == 48 then
+            elseif arts_diff_cat == WEAPON_CATEGORY_SMALL_SHIELD then
                 arts_idx = 4
             end
 
@@ -2329,34 +1921,34 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         local arts_diff_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
         local arts_idx = 0
 
-        if arts_diff_cat == 2 then
+        if arts_diff_cat == SWORD_ART_DIFF_CAT_LARGE_WEAPON then
             arts_idx = 1
-        elseif arts_diff_cat == 3 then
+        elseif arts_diff_cat == SWORD_ART_DIFF_CAT_POLEARM then
             arts_idx = 2
-        elseif arts_diff_cat == 20 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_SHORT_SWORD then
             arts_idx = 3
-        elseif arts_diff_cat == 24 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_TWINBLADE then
             arts_idx = 4
-        elseif arts_diff_cat == 28 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_CURVEDSWORD then
             arts_idx = 5
-        elseif arts_diff_cat == 42 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_FIST then
             arts_idx = 6
-        elseif arts_diff_cat == 47 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_LARGE_SHIELD then
             arts_idx = 7
-        elseif arts_diff_cat == 48 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_SMALL_SHIELD then
             arts_idx = 8
         end
 
         SetVariable("SwordArtsOneShotCategory", arts_idx)
 
         local combo_idx = 0
-        if arts_diff_cat == 2 then
-            combo_idx = 1
-        elseif arts_diff_cat == 3 then
-            combo_idx = 2
-        elseif arts_diff_cat == 24 then
+        if arts_diff_cat == 2 then -- Great Weapon Idle
+            arts_idx = 1
+        elseif arts_diff_cat == 3 then -- Polearm Idle
+            arts_idx = 2
+        elseif arts_diff_cat == WEAPON_CATEGORY_TWINBLADE then
             combo_idx = 3
-        elseif arts_diff_cat == 42 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_CURVEDSWORD then
             combo_idx = 4
         end
 
@@ -10347,11 +9939,11 @@ function SwordArtsOneShot_onUpdate()
         if TRUE == env(GetSpEffectID, 100285) then
             local idle_cat = env(GetStayAnimCategory)
             local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
-            local f433_local0 = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
+            local arts_diff_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
             local arts_idx = 0
-            if f433_local0 == 47 then
+            if arts_diff_cat == WEAPON_CATEGORY_LARGE_SHIELD then
                 arts_idx = 1
-            elseif f433_local0 == 48 then
+            elseif arts_diff_cat == WEAPON_CATEGORY_SMALL_SHIELD then
                 arts_idx = 2
             end
             SetVariable("SwordArtsChargeCategory", arts_idx)
@@ -10618,11 +10210,11 @@ function SwordArtsOneShotShieldLeft_onUpdate()
     if env(ActionDuration, ACTION_ARM_L2) <= 0 then
         local idle_cat = env(GetStayAnimCategory)
         local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
-        local f439_local0 = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
+        local arts_diff_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
         local arts_idx = 0
-        if f439_local0 == 47 then
+        if arts_diff_cat == WEAPON_CATEGORY_LARGE_SHIELD then
             arts_idx = 1
-        elseif f439_local0 == 48 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_SMALL_SHIELD then
             arts_idx = 2
         end
         SetVariable("SwordArtsOneShotShieldCancelCategory", arts_idx)
@@ -10659,11 +10251,11 @@ function SwordArtsHalfOneShotShieldLeft_Upper_onUpdate()
     local blend_type, lower_state = GetHalfBlendInfo()
     local idle_cat = env(GetStayAnimCategory)
     local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
-    local f440_local0 = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
+    local arts_diff_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
     local arts_idx = 0
-    if f440_local0 == 47 then
+    if arts_diff_cat == WEAPON_CATEGORY_LARGE_SHIELD then
         arts_idx = 1
-    elseif f440_local0 == 48 then
+    elseif arts_diff_cat == WEAPON_CATEGORY_SMALL_SHIELD then
         arts_idx = 2
     end
     SetVariable("SwordArtsOneShotShieldCancelCategory", arts_idx)
@@ -10728,11 +10320,11 @@ function SwordArtsOneShotShieldBoth_onUpdate()
     if env(ActionDuration, ACTION_ARM_L2) <= 0 then
         local idle_cat = env(GetStayAnimCategory)
         local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
-        local f442_local0 = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
+        local arts_diff_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
         local arts_idx = 0
-        if f442_local0 == 47 then
+        if arts_diff_cat == WEAPON_CATEGORY_LARGE_SHIELD then
             arts_idx = 1
-        elseif f442_local0 == 48 then
+        elseif arts_diff_cat == WEAPON_CATEGORY_SMALL_SHIELD then
             arts_idx = 2
         end
         SetVariable("SwordArtsOneShotShieldCancelCategory", arts_idx)
@@ -11115,7 +10707,7 @@ function SetSwordArtsWepCategory_DrawStanceRightAttackLight()
     local idle_cat = env(GetStayAnimCategory)
     local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
     local arts_idx = 0
-    if GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat) == 45 then
+    if GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat) == WEAPON_CATEGORY_LARGE_ARROW then
         arts_idx = 1
     end
     SetVariable("DrawStanceRightAttackLightCategory", arts_idx)
@@ -20994,6 +20586,474 @@ function AddBlendSpeak_onUpdate()
         act(DebugLogOutput, "AddBlendSpeak_end")
         ExecEventAllBody("W_AddBlendSpeak")
     end
+end
+
+------------------------------------------
+-- Core: Includes from common_define
+------------------------------------------
+-- ivi: Constants for distinction of regular numbers to what exactly these mean.
+SWORD_ART_DIFF_CAT_DEFAULT = 0
+SWORD_ART_DIFF_CAT_LARGE_WEAPON = 2
+SWORD_ART_DIFF_CAT_POLEARM = 3
+SWORD_ART_DIFF_CAT_LARGE_WEAPON_SMALL_SHIELD = 4
+SWORD_ART_DIFF_CAT_POLEARM_SMALL_SHIELD = 5
+SWORD_ART_DIFF_CAT_LARGE_WEAPON_LARGE_SHIELD = 8
+SWORD_ART_DIFF_CAT_POLEARM_LARGE_SHIELD = 9
+
+-- Stores possible override animations that exist for Sword Arts.
+-- Key: Sword Art ID (TAE ID minus 600)
+-- Possible values:
+--
+-- 0: Idle (Default or Large Rapier)
+-- 2: Idle (Great Weapon)
+-- 3: Idle (Polearm)
+-- 4: Idle (Great Weapon) + Small Shield
+-- 5: Idle (Polearm) + Small Shield
+-- 8: Idle (Great Weapon) + Large Shield
+-- 9: Idle (Polearm) + Large Shield
+-- 20-59: Weapon Category
+SwordArtsCategory = {
+    [0] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [1] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, SWORD_ART_DIFF_CAT_POLEARM, WEAPON_CATEGORY_FIST},
+    [2] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [3] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, SWORD_ART_DIFF_CAT_POLEARM, WEAPON_CATEGORY_TWINBLADE},
+    [4] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, SWORD_ART_DIFF_CAT_POLEARM},
+    [5] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [6] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [7] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, SWORD_ART_DIFF_CAT_POLEARM},
+    [8] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, SWORD_ART_DIFF_CAT_POLEARM},
+    [9] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, SWORD_ART_DIFF_CAT_POLEARM},
+    [10] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [11] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [12] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, SWORD_ART_DIFF_CAT_POLEARM},
+    [13] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [14] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [15] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [16] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [17] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [18] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_POLEARM},
+    [19] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [20] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [21] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [22] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_POLEARM, WEAPON_CATEGORY_TWINBLADE},
+    [23] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_POLEARM, WEAPON_CATEGORY_TWINBLADE},
+    [24] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, SWORD_ART_DIFF_CAT_POLEARM, WEAPON_CATEGORY_TWINBLADE},
+    [25] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [50] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [51] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [52] = {SWORD_ART_DIFF_CAT_DEFAULT, WEAPON_CATEGORY_TWINBLADE},
+    [53] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [54] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, WEAPON_CATEGORY_TWINBLADE},
+    [55] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [56] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [57] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON},
+    [58] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [59] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [61] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [62] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [63] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [64] = {SWORD_ART_DIFF_CAT_DEFAULT, WEAPON_CATEGORY_FIST},
+    [65] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_POLEARM},
+    [66] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [67] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [68] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [69] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [70] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [71] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [72] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [73] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [74] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [75] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [76] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [90] = {SWORD_ART_DIFF_CAT_DEFAULT, WEAPON_CATEGORY_LARGE_SHIELD, WEAPON_CATEGORY_SMALL_SHIELD},
+    [91] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, SWORD_ART_DIFF_CAT_POLEARM, SWORD_ART_DIFF_CAT_LARGE_WEAPON_SMALL_SHIELD, SWORD_ART_DIFF_CAT_POLEARM_SMALL_SHIELD, SWORD_ART_DIFF_CAT_LARGE_WEAPON_LARGE_SHIELD, SWORD_ART_DIFF_CAT_POLEARM_LARGE_SHIELD, WEAPON_CATEGORY_LARGE_SHIELD, WEAPON_CATEGORY_SMALL_SHIELD},
+    [92] = {SWORD_ART_DIFF_CAT_DEFAULT, WEAPON_CATEGORY_SHORT_SWORD, WEAPON_CATEGORY_CURVEDSWORD, WEAPON_CATEGORY_SMALL_SHIELD},
+    [93] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, SWORD_ART_DIFF_CAT_POLEARM},
+    [94] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [95] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [96] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [97] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [98] = {SWORD_ART_DIFF_CAT_DEFAULT, WEAPON_CATEGORY_LARGE_SHIELD, WEAPON_CATEGORY_SMALL_SHIELD},
+    [99] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [100] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [101] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [102] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [103] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [105] = {SWORD_ART_DIFF_CAT_DEFAULT, WEAPON_CATEGORY_LARGE_ARROW},
+    [106] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [108] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [110] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [107] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [109] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [111] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [112] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [113] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [114] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [115] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [116] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [117] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [118] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [130] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [131] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [132] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [133] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [134] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [135] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [136] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [137] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [140] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [141] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [142] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [143] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [144] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [150] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, WEAPON_CATEGORY_FIST},
+    [151] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [152] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [155] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [156] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [157] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [160] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [165] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [166] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [167] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [168] = {SWORD_ART_DIFF_CAT_DEFAULT},
+    [196] = {SWORD_ART_DIFF_CAT_DEFAULT, SWORD_ART_DIFF_CAT_LARGE_WEAPON, SWORD_ART_DIFF_CAT_POLEARM}
+}
+
+-- Determines which override of a Sword Art animation to play, based on the size or type of the weapon.
+-- The return of this function is processed to a different ID by the cases that use it.
+--
+-- artID: Weapon Arts ID (TAE id minus 600)
+--      swordArtsTypeNew in SwordArtsParam
+-- idleCat: Stay Anim Category (Idle animation index for weapon)
+--      wepmotionOneHandId and wepmotionBothHandId in EquipParamWeapon
+-- wepCat: Weapon Animation Category (TAE ID for weapon type)
+--      wepmotionCategory in EquipParamWeapon
+--
+-- Possible returns:
+--
+-- 0: Idle (Default or Large Rapier)
+-- 2: Idle (Great Weapon)
+-- 3: Idle (Polearm)
+-- 4: Idle (Great Weapon) + Small Shield
+-- 5: Idle (Polearm) + Small Shield
+-- 8: Idle (Great Weapon) + Large Shield
+-- 9: Idle (Polearm) + Large Shield
+-- 20-59: Weapon Category
+function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
+    -- If TAE ID above 770 (except 796), no overrides, only a single default animation.
+    if artID >= 170 and artID ~= 196 then
+        return 0
+
+        -- For TAE ID 769 (Radahn's Rain), return 45 (Greatbow)
+    elseif artID == 169 then
+        return WEAPON_CATEGORY_LARGE_ARROW
+    end
+
+    -- Allows some weapon categories to query for whether the Sword Art permits a cousin category.
+    -- Only used to allow Claws to use Fist Sword Arts.
+    local wep_cat1
+    if wepCat == WEAPON_CATEGORY_CLAW then
+        wep_cat1 = WEAPON_CATEGORY_FIST
+    end
+
+    -- Idle animation TAEs. Two-hand is ignored.
+    local idle_cat0 = idleCat
+    if idle_cat0 >= 10 then
+        idle_cat0 = idle_cat0 - 10
+    end
+
+    -- Override for heavy thrusting swords (usually 3)
+    if wepCat == WEAPON_CATEGORY_LARGE_RAPIER then
+        idle_cat0 = 0
+    end
+
+    -- CASE 1: Shields
+    if c_SwordArtsHand == HAND_LEFT and c_Style ~= HAND_LEFT_BOTH then
+        local shield_cat = -1
+        if idle_cat0 == 2 and wepCat == WEAPON_CATEGORY_SMALL_SHIELD then
+            shield_cat = 4
+        elseif idle_cat0 == 3 and wepCat == WEAPON_CATEGORY_SMALL_SHIELD then
+            shield_cat = 5
+        elseif idle_cat0 == 2 and wepCat == WEAPON_CATEGORY_LARGE_SHIELD then
+            shield_cat = 8
+        elseif idle_cat0 == 3 and wepCat == WEAPON_CATEGORY_LARGE_SHIELD then
+            shield_cat = 9
+        end
+        if shield_cat ~= -1 then
+            -- Only check if shields
+            for i = 1, #SwordArtsCategory[artID], 1 do
+                if SwordArtsCategory[artID][i] == shield_cat then
+                    act(9000, "GetSwordArtsDiffCategory shield_cat:" .. shield_cat)
+                    return shield_cat
+                end
+            end
+        end
+    end
+
+    -- CASE 2: Weapon Categories
+    for j = 1, #SwordArtsCategory[artID], 1 do
+        if SwordArtsCategory[artID][j] == wepCat then
+            act(9000, "GetSwordArtsDiffCategory wepCat0:" .. wepCat)
+            return wepCat
+        end
+    end
+
+    -- ivi: Additional check to avoid unnecessary second loop
+    if wep_cat1 ~= nil then
+        -- CASE 3: Auxiliary weapon category (Some weapon categories count the same as others)
+        for j = 1, #SwordArtsCategory[artID], 1 do
+            if SwordArtsCategory[artID][j] == wep_cat1 then
+                act(9000, "GetSwordArtsDiffCategory wepCat1:" .. wep_cat1)
+                return wep_cat1
+            end
+        end
+    end
+
+    -- Shield Arts (90 is Shield Bash, 99 is Thops Barrier)
+    if artID >= 90 and artID <= 99 and (c_SwordArtsHand ~= HAND_LEFT or c_Style == HAND_LEFT_BOTH) then
+        return 0
+    end
+
+    -- CASE 4: Idle categories
+    for j = 1, #SwordArtsCategory[artID], 1 do
+        if SwordArtsCategory[artID][j] == idle_cat0 then
+            act(9000, "GetSwordArtsDiffCategory idle_cat0:" .. idle_cat0)
+            return idle_cat0
+        end
+    end
+
+    return 0
+end
+
+-- Table storing information about weapon arts.
+-- Concerns playing a "weapon retrieval" animation after
+-- the sword art was executed.
+--
+-- Table key: Sword Art ID (TAE ID minus 600)
+-- Value 1: Right hand, weapon art cast from right hand
+-- Value 2: Right hand, weapon art cast from left hand
+-- Value 3: Left hand
+--
+-- TRUE: Weapon was sheathed during animation, play retrieval animation.
+-- FALSE: Weapon was used to perform the sword art, no retrieval animation.
+SwordArtPutOppositeWeapon = {
+    [0] = {TRUE, FALSE, TRUE},
+    [1] = {TRUE, FALSE, TRUE},
+    [2] = {TRUE, FALSE, TRUE},
+    [3] = {TRUE, FALSE, TRUE},
+    -- 4 (Not present)
+    [5] = {TRUE, FALSE, TRUE},
+    [6] = {TRUE, FALSE, TRUE},
+    [7] = {TRUE, FALSE, TRUE},
+    [8] = {FALSE, FALSE, TRUE},
+    [9] = {FALSE, FALSE, TRUE},
+    [10] = {TRUE, FALSE, TRUE},
+    [11] = {TRUE, FALSE, TRUE},
+    [12] = {TRUE, FALSE, TRUE},
+    [13] = {TRUE, FALSE, TRUE},
+    [14] = {TRUE, FALSE, TRUE},
+    [15] = {TRUE, FALSE, TRUE},
+    [16] = {TRUE, FALSE, TRUE},
+    [17] = {FALSE, FALSE, FALSE},
+    [18] = {TRUE, FALSE, TRUE},
+    [19] = {TRUE, FALSE, TRUE},
+    [20] = {TRUE, FALSE, TRUE},
+    -- 21 (Present)
+    [22] = {TRUE, FALSE, TRUE},
+    [23] = {TRUE, FALSE, TRUE},
+    [24] = {FALSE, FALSE, TRUE},
+    [25] = {TRUE, FALSE, TRUE},
+    -- 26-49 (Not present)
+    [50] = {FALSE, FALSE, TRUE},
+    [51] = {TRUE, FALSE, TRUE},
+    [52] = {TRUE, FALSE, TRUE},
+    [53] = {FALSE, FALSE, TRUE},
+    [54] = {TRUE, FALSE, TRUE},
+    [55] = {TRUE, FALSE, FALSE},
+    [56] = {TRUE, FALSE, TRUE},
+    [57] = {TRUE, FALSE, TRUE},
+    [58] = {TRUE, FALSE, TRUE},
+    [59] = {TRUE, FALSE, TRUE},
+    [61] = {TRUE, FALSE, TRUE},
+    [62] = {TRUE, FALSE, FALSE},
+    [63] = {TRUE, FALSE, TRUE},
+    [64] = {FALSE, FALSE, TRUE},
+    [65] = {TRUE, FALSE, TRUE},
+    [66] = {TRUE, FALSE, TRUE},
+    [67] = {TRUE, FALSE, TRUE},
+    [68] = {TRUE, FALSE, TRUE},
+    [69] = {TRUE, FALSE, TRUE},
+    [70] = {TRUE, FALSE, TRUE},
+    [71] = {TRUE, FALSE, TRUE},
+    [72] = {TRUE, FALSE, TRUE},
+    [73] = {TRUE, FALSE, TRUE},
+    [74] = {FALSE, FALSE, TRUE},
+    [75] = {TRUE, FALSE, TRUE},
+    [76] = {TRUE, FALSE, TRUE},
+    -- 77-89 (Not present)
+    [90] = {TRUE, FALSE, TRUE},
+    [91] = {FALSE, FALSE, FALSE},
+    [92] = {FALSE, FALSE, TRUE},
+    [93] = {FALSE, FALSE, TRUE},
+    [94] = {FALSE, FALSE, TRUE},
+    [95] = {FALSE, FALSE, TRUE},
+    [96] = {FALSE, FALSE, TRUE},
+    [97] = {FALSE, FALSE, TRUE},
+    [98] = {TRUE, TRUE, TRUE},
+    [99] = {FALSE, FALSE, FALSE},
+    [100] = {FALSE, FALSE, FALSE},
+    [101] = {FALSE, FALSE, FALSE},
+    [102] = {FALSE, FALSE, FALSE},
+    [103] = {FALSE, FALSE, FALSE},
+    -- 104 (Not present)
+    [105] = {FALSE, FALSE, FALSE},
+    [106] = {FALSE, FALSE, FALSE},
+    -- 107 (Present)
+    [108] = {FALSE, FALSE, FALSE},
+    -- 109 (Not present)
+    [110] = {FALSE, FALSE, TRUE},
+    [111] = {FALSE, FALSE, TRUE},
+    [112] = {FALSE, FALSE, TRUE},
+    [113] = {FALSE, FALSE, TRUE},
+    [114] = {TRUE, FALSE, TRUE},
+    [115] = {FALSE, FALSE, TRUE},
+    [116] = {FALSE, FALSE, TRUE},
+    [117] = {TRUE, FALSE, TRUE},
+    [118] = {TRUE, FALSE, TRUE},
+    -- 119-129 (Not present)
+    [130] = {FALSE, FALSE, TRUE},
+    [131] = {FALSE, FALSE, TRUE},
+    [132] = {TRUE, FALSE, TRUE},
+    [133] = {FALSE, FALSE, TRUE},
+    [134] = {TRUE, FALSE, TRUE},
+    [135] = {TRUE, FALSE, TRUE},
+    [136] = {TRUE, FALSE, TRUE},
+    [137] = {FALSE, FALSE, TRUE},
+    [140] = {FALSE, FALSE, TRUE},
+    [141] = {FALSE, FALSE, TRUE},
+    [142] = {FALSE, FALSE, TRUE},
+    [143] = {FALSE, FALSE, TRUE},
+    [144] = {TRUE, FALSE, TRUE},
+    [150] = {TRUE, FALSE, TRUE},
+    [151] = {FALSE, FALSE, TRUE},
+    [152] = {TRUE, TRUE, TRUE},
+    [155] = {FALSE, FALSE, TRUE},
+    [156] = {FALSE, FALSE, TRUE},
+    [157] = {FALSE, FALSE, TRUE},
+    [160] = {FALSE, FALSE, TRUE},
+    [165] = {TRUE, FALSE, TRUE},
+    [166] = {TRUE, FALSE, TRUE},
+    [167] = {TRUE, FALSE, TRUE},
+    [168] = {TRUE, FALSE, TRUE},
+    [169] = {FALSE, FALSE, FALSE},
+    [170] = {TRUE, FALSE, TRUE},
+    [171] = {FALSE, FALSE, TRUE},
+    [172] = {TRUE, FALSE, FALSE},
+    [173] = {TRUE, FALSE, TRUE},
+    [174] = {FALSE, FALSE, TRUE},
+    [175] = {TRUE, FALSE, TRUE},
+    [176] = {TRUE, FALSE, TRUE},
+    [177] = {TRUE, FALSE, TRUE},
+    [178] = {TRUE, FALSE, TRUE},
+    [179] = {TRUE, FALSE, TRUE},
+    -- 180
+    -- 181
+    [182] = {FALSE, FALSE, TRUE},
+    [183] = {TRUE, FALSE, TRUE},
+    [184] = {TRUE, FALSE, TRUE},
+    [185] = {TRUE, FALSE, TRUE},
+    [186] = {TRUE, FALSE, TRUE},
+    [187] = {FALSE, FALSE, TRUE},
+    [188] = {TRUE, FALSE, TRUE},
+    [189] = {TRUE, FALSE, TRUE},
+    [190] = {FALSE, FALSE, FALSE},
+    [191] = {TRUE, FALSE, FALSE},
+    [192] = {TRUE, FALSE, TRUE},
+    [193] = {FALSE, FALSE, TRUE},
+    [194] = {FALSE, FALSE, TRUE},
+    [195] = {FALSE, TRUE, FALSE},
+    [196] = {FALSE, FALSE, FALSE},
+    [197] = {FALSE, FALSE, FALSE},
+    [198] = {FALSE, FALSE, TRUE},
+    [199] = {TRUE, FALSE, TRUE},
+    [200] = {TRUE, FALSE, TRUE},
+    [201] = {TRUE, TRUE, FALSE},
+    [202] = {TRUE, TRUE, FALSE},
+    [203] = {TRUE, FALSE, TRUE},
+    [204] = {TRUE, FALSE, TRUE},
+    [205] = {TRUE, FALSE, TRUE},
+    [206] = {FALSE, FALSE, TRUE},
+    [207] = {TRUE, FALSE, TRUE},
+    [208] = {TRUE, FALSE, TRUE},
+    [209] = {TRUE, FALSE, TRUE},
+    [210] = {FALSE, FALSE, TRUE},
+    [211] = {FALSE, FALSE, FALSE},
+    [212] = {FALSE, FALSE, TRUE},
+    [213] = {TRUE, FALSE, TRUE},
+    [214] = {TRUE, FALSE, TRUE},
+    [215] = {TRUE, FALSE, TRUE},
+    [216] = {FALSE, FALSE, TRUE},
+    [217] = {FALSE, FALSE, TRUE},
+    [218] = {TRUE, FALSE, TRUE},
+    [219] = {TRUE, FALSE, FALSE},
+    [220] = {FALSE, FALSE, TRUE},
+    [221] = {FALSE, FALSE, TRUE},
+    [222] = {TRUE, FALSE, TRUE},
+    [223] = {TRUE, FALSE, TRUE},
+    [224] = {TRUE, FALSE, TRUE},
+    [225] = {TRUE, FALSE, TRUE},
+    [226] = {TRUE, FALSE, TRUE},
+    [227] = {TRUE, FALSE, TRUE},
+    [228] = {TRUE, FALSE, TRUE},
+    [229] = {TRUE, FALSE, TRUE},
+    [230] = {FALSE, FALSE, TRUE},
+    [231] = {TRUE, FALSE, TRUE},
+    [232] = {TRUE, FALSE, FALSE},
+    [233] = {TRUE, FALSE, TRUE},
+    [234] = {TRUE, FALSE, TRUE},
+    [235] = {TRUE, FALSE, TRUE},
+    [236] = {TRUE, FALSE, TRUE},
+    [237] = {TRUE, FALSE, TRUE},
+    [238] = {TRUE, FALSE, TRUE},
+    [239] = {TRUE, FALSE, TRUE},
+    [240] = {TRUE, FALSE, TRUE},
+    [241] = {TRUE, FALSE, TRUE},
+    [242] = {TRUE, FALSE, TRUE},
+    [243] = {TRUE, FALSE, TRUE},
+    [244] = {TRUE, FALSE, TRUE},
+    [245] = {FALSE, FALSE, TRUE},
+    [246] = {TRUE, FALSE, TRUE},
+    [247] = {FALSE, FALSE, FALSE},
+    [248] = {TRUE, FALSE, FALSE},
+    [249] = {TRUE, FALSE, FALSE},
+    [250] = {TRUE, FALSE, TRUE},
+    [251] = {TRUE, FALSE, TRUE},
+    [252] = {TRUE, FALSE, FALSE},
+    [253] = {TRUE, FALSE, TRUE},
+    [254] = {TRUE, FALSE, TRUE}
+}
+
+-- Decides whether to perform a "retrieve weapon" animation after finishing a Weapon Art.
+-- See the above table for reference.
+function GetSwordArtsPutOppositeWeapon()
+    -- ivi: In Fromsoft's original code, this was nil by default. FALSE is more forgiving for custom weapon arts.
+    local result = FALSE
+
+    -- ivi: Add sanity check for absent entries (custom Sword Arts).
+    if SwordArtPutOppositeWeapon[c_SwordArtsID] ~= nil then
+        if c_Style == HAND_RIGHT then
+            if HAND_RIGHT == c_SwordArtsHand then
+                result = SwordArtPutOppositeWeapon[c_SwordArtsID][1] -- Right hand, weapon art cast from right hand
+            else
+                result = SwordArtPutOppositeWeapon[c_SwordArtsID][2] -- Right hand, weapon art cast from left hand
+            end
+        else
+            result = SwordArtPutOppositeWeapon[c_SwordArtsID][3] -- Left hand
+        end
+    end
+
+    return result
 end
 
 ------------------------------------------
