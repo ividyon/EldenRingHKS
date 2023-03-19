@@ -1942,10 +1942,10 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         SetVariable("SwordArtsOneShotCategory", arts_idx)
 
         local combo_idx = 0
-        if arts_diff_cat == 2 then -- Great Weapon Idle
-            arts_idx = 1
-        elseif arts_diff_cat == 3 then -- Polearm Idle
-            arts_idx = 2
+        if arts_diff_cat == SWORD_ART_DIFF_CAT_LARGE_WEAPON then
+            combo_idx = 1
+        elseif arts_diff_cat == SWORD_ART_DIFF_CAT_POLEARM then
+            combo_idx = 2
         elseif arts_diff_cat == WEAPON_CATEGORY_TWINBLADE then
             combo_idx = 3
         elseif arts_diff_cat == WEAPON_CATEGORY_CURVEDSWORD then
