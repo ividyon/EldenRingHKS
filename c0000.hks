@@ -17,6 +17,11 @@
 -- 2023-02-14 - Minor comment changes
 -- 2023-03-19 - Support for custom Ashes of War
 ------------------------------------------
+-- Known issues:
+-- Torrent will retain his "gallop" state even if you come to a standstill, fall, or
+-- perform any other action which would normally cancel the gallop and return to
+-- default speed. This makes him janky for precision parkour things.
+------------------------------------------
 -- Core: Functions
 ------------------------------------------
 function ExecEvent(state)
@@ -20745,7 +20750,7 @@ function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
     if artID >= 170 and artID ~= 196 then
         return SWORD_ART_DIFF_CAT_DEFAULT
 
-        -- For TAE ID 769 (Radahn's Rain), return 45 (Greatbow)
+    -- For TAE ID 769 (Radahn's Rain), return 45 (Greatbow)
     elseif artID == 169 then
         return WEAPON_CATEGORY_LARGE_ARROW
     end
