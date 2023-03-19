@@ -20743,7 +20743,7 @@ SwordArtsCategory = {
 function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
     -- If TAE ID above 770 (except 796), no overrides, only a single default animation.
     if artID >= 170 and artID ~= 196 then
-        return 0
+        return SWORD_ART_DIFF_CAT_DEFAULT
 
         -- For TAE ID 769 (Radahn's Rain), return 45 (Greatbow)
     elseif artID == 169 then
@@ -20765,20 +20765,25 @@ function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
 
     -- Override for heavy thrusting swords (usually 3)
     if wepCat == WEAPON_CATEGORY_LARGE_RAPIER then
-        idle_cat0 = 0
+        idle_cat0 = SWORD_ART_DIFF_CAT_DEFAULT
+    end
+
+    -- ivi: CASE 0: Not in table
+    if SwordArtsCategory[artID] == nil then
+        return SWORD_ART_DIFF_CAT_DEFAULT
     end
 
     -- CASE 1: Shields
     if c_SwordArtsHand == HAND_LEFT and c_Style ~= HAND_LEFT_BOTH then
         local shield_cat = -1
         if idle_cat0 == 2 and wepCat == WEAPON_CATEGORY_SMALL_SHIELD then
-            shield_cat = 4
+            shield_cat = SWORD_ART_DIFF_CAT_LARGE_WEAPON_SMALL_SHIELD
         elseif idle_cat0 == 3 and wepCat == WEAPON_CATEGORY_SMALL_SHIELD then
-            shield_cat = 5
+            shield_cat = SWORD_ART_DIFF_CAT_POLEARM_SMALL_SHIELD
         elseif idle_cat0 == 2 and wepCat == WEAPON_CATEGORY_LARGE_SHIELD then
-            shield_cat = 8
+            shield_cat = SWORD_ART_DIFF_CAT_LARGE_WEAPON_LARGE_SHIELD
         elseif idle_cat0 == 3 and wepCat == WEAPON_CATEGORY_LARGE_SHIELD then
-            shield_cat = 9
+            shield_cat = SWORD_ART_DIFF_CAT_POLEARM_LARGE_SHIELD
         end
         if shield_cat ~= -1 then
             -- Only check if shields
@@ -20812,7 +20817,7 @@ function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
 
     -- Shield Arts (90 is Shield Bash, 99 is Thops Barrier)
     if artID >= 90 and artID <= 99 and (c_SwordArtsHand ~= HAND_LEFT or c_Style == HAND_LEFT_BOTH) then
-        return 0
+        return SWORD_ART_DIFF_CAT_DEFAULT
     end
 
     -- CASE 4: Idle categories
@@ -20823,7 +20828,7 @@ function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
         end
     end
 
-    return 0
+    return SWORD_ART_DIFF_CAT_DEFAULT
 end
 
 -- Table storing information about weapon arts.
