@@ -3,7 +3,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 7 for ER version 1.08.1
+-- Version 8 for ER version 1.10
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -16,6 +16,17 @@
 -- 2023-01-27 - Put on GitHub via philiquaz' initiative
 -- 2023-02-14 - Minor comment changes
 -- 2023-03-19 - Support for custom Ashes of War
+-- 2023-09-22 - Halvard: updated for 1.10
+--               - fixed the function declaration of "ExecComboMagic", it was missing two parameters.
+--               - removed an "act(109, -1)" from the function "DamageBind_onUpdate()",
+--                 all act 109 were removed many patches ago, this one was overlooked when updating this file.
+--               - Updated the function "DrawStanceRightLoop_Upper_onUpdate()" to match changes done in 1.09
+--                 that change the follow-up attacks done after the "spinning wheel" ash of war.
+--               - Added a note in the "ExecJump()" function, as it is changed compared to the raw decompile
+--                 I'm not sure if this was intended by previous authors of this file or simply a mistake.
+--                 For now I'm only adding a note to highlight that it was changed and leaving it at that.
+--               - manually read through the entire file to make sure no other changes done by
+--                 FromSoftware in previous patch updates were still missing.
 ------------------------------------------
 -- Known issues:
 -- Torrent will retain his "gallop" state even if you come to a standstill, fall, or
@@ -2820,13 +2831,15 @@ function ExecQuickMagic(magic_hand, quick_type, blend_type)
     end
 end
 
-function ExecComboMagic(magic_hand, blend_type)
+function ExecComboMagic(magic_hand, blend_type, lastUsedMagicAnim, magicAnim)
     -- 100600 "[HKS] Right Combo Magic 1: Window"
     -- 100601 "[HKS] Right Combo Magic 2: Window"
     -- 100605 "[HKS] Left Combo Magic 1: Window"
     -- 100606 "[HKS] Left Combo Magic 2: Window"
 
-    if IsComboMagic() == FALSE then
+    if lastUsedMagicAnim ~= magicAnim then
+        return FALSE
+    elseif IsComboMagic() == FALSE then
         return FALSE
     elseif env(IsOnMount) == TRUE then
         if env(GetSpEffectID, 100600) == TRUE then
@@ -3385,6 +3398,7 @@ function GetHandChangeType(hand)
 end
 
 function ExecJump()
+    --note: Original decompile of 1.10 has ACTION_ARM_CHANGE_STYLE instead of jump
     if env(ActionRequest, ACTION_ARM_JUMP) == FALSE and env(700) == FALSE then
         return FALSE
     elseif env(GetStamina) <= 0 and env(Unknown700) == FALSE then
@@ -7370,7 +7384,6 @@ function DamageBind_onActivate()
 end
 
 function DamageBind_onUpdate()
-    act(109, -1)
     act(SetIsMagicInUse, 0)
     act(SetAllowedThrowDefenseType, 0)
     act(SetAllowedThrowAttackType, 0)
@@ -9535,6 +9548,12 @@ function DrawStanceRightStart_Upper_onUpdate()
     local r2 = "W_DrawStanceRightAttackHeavy"
     local b1 = "W_DrawStanceRightAttackLight"
     local b2 = "W_DrawStanceRightAttackHeavy"
+    if c_SwordArtsID == 239 then
+        r1 = "W_AttackRightLight2"
+        r2 = "W_AttackRightHeavy1Start"
+        b1 = "W_AttackBothLight2"
+        b2 = "W_AttackBothHeavy1Start"
+    end
     if TRUE == env(GetSpEffectID, 100530) then
         r1 = "W_SwordArtsStanceAttackLightStart"
         r2 = "W_SwordArtsStanceAttackHeavyStart"
@@ -9585,6 +9604,12 @@ function DrawStanceRightLoop_Upper_onUpdate()
     local r2 = "W_DrawStanceRightAttackHeavy"
     local b1 = "W_DrawStanceRightAttackLight"
     local b2 = "W_DrawStanceRightAttackHeavy"
+    if c_SwordArtsID == 239 then
+        r1 = "W_AttackRightLight2"
+        r2 = "W_AttackRightHeavy1Start"
+        b1 = "W_AttackBothLight2"
+        b2 = "W_AttackBothHeavy1Start"
+    end
     if TRUE == env(GetSpEffectID, 100530) then
         r1 = "W_SwordArtsStanceAttackLightStart"
         r2 = "W_SwordArtsStanceAttackHeavyStart"
@@ -20750,7 +20775,7 @@ function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
     if artID >= 170 and artID ~= 196 then
         return SWORD_ART_DIFF_CAT_DEFAULT
 
-    -- For TAE ID 769 (Radahn's Rain), return 45 (Greatbow)
+        -- For TAE ID 769 (Radahn's Rain), return 45 (Greatbow)
     elseif artID == 169 then
         return WEAPON_CATEGORY_LARGE_ARROW
     end
