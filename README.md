@@ -11,5 +11,3 @@ HKS (HavokScript) serves as an interface between player/AI inputs and influences
 The HKS is decompiled using the various assorted forks of [katalash's DSLuaDecompiler](https://github.com/katalash/DSLuaDecompiler), then cleaned and manually fixed up (mostly by Vawser) due to the decompiler's outdated state and imperfect output.
 
 With input by the community this project may grow in scope.
-
-The `main` branch holds the current fixed HKS, while the `decomp` branch holds the latest raw decompile of the HKS for comparisons.
