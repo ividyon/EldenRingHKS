@@ -126,7 +126,6 @@ end
 
 function ExecEventAllBody(event)
     SetVariable("MoveSpeedLevelReal", 0)
-
     ExecEvent(event)
 end
 
@@ -145,8 +144,6 @@ end
 function ResetEventState()
     SetVariable("MoveSpeedLevelReal", 0)
     ResetRequest()
-
-    return
 end
 
 function ResetMimicry()
@@ -197,8 +194,6 @@ function SetWeightIndex()
         SetVariable("MoveWeightIndex", MOVE_WEIGHT_HEAVY)
         SetVariable("EvasionWeightIndex", EVASION_WEIGHT_INDEX_HEAVY)
     end
-
-    return
 end
 
 function SetAIActionState()
@@ -751,10 +746,10 @@ function IsAttackSwordArts(arts_id)
         160, -- White Shadow's Lure
     }
     local oaw_whtelist = {
-        273, -- Unknown (DLC)
-        276, -- Unknown (DLC)
-        313, -- Unknown (DLC)
-        348, -- Unknown (DLC)
+        273, -- Raging Beast
+        276, -- Blind Spot
+        313, -- Dynastic Sickleplay
+        348, -- Discus Hurl
     }
 
     if IsShieldArts(arts_id) == TRUE or IsRollingArts(arts_id) == TRUE or IsEnchantArts(arts_id) == TRUE or Contains(aow_blacklist, arts_id) == TRUE then
@@ -782,10 +777,10 @@ function IsHalfBlendArts(arts_id)
         213, -- Soul Stifler
         217, -- Glintstone Dart
 
-        264, -- Unknown (DLC)
-        328, -- Unknown (DLC)
-        334, -- Unknown (DLC)
-        335, -- Unknown (DLC)
+        264, -- Wall of Sparks
+        328, -- Euporia Vortex
+        334, -- Feeble Lord's Frenzied Flame
+        335, -- Repeating Fire
     }
 
     if Contains(aow_list, arts_id) == TRUE then
@@ -826,15 +821,15 @@ function IsShieldArts(arts_id)
         207, -- Viper Bite
         211, -- Bear Witness!
 
-        322, -- Unknown (DLC)
-        324, -- Unknown (DLC)
-        348, -- Unknown (DLC)
-        352, -- Unknown (DLC)
-        354, -- Unknown (DLC)
-        355, -- Unknown (DLC)
-        359, -- Unknown (DLC)
-        399, -- Unknown (DLC)
-        334, -- Unknown (DLC)
+        322, -- Sleep Evermore
+        324, -- Moore's Charge
+        348, -- Discus Hurl
+        352, -- Revenge of the Night
+        354, -- Blindfold of Happiness
+        355, -- Blindfold of Happiness (2?)
+        359, -- Roaring Bash
+        399, -- Shield Strike
+        334, -- Feeble Lord's Frenzied Flame
     }
 
     if Contains(aow_list, arts_id) == TRUE then
@@ -866,20 +861,20 @@ function IsStanceArts(arts_id)
         219, -- Night-and-Flame Stance
         239, -- Spinning Wheel
 
-        278, -- Unknown (DLC)
-        279, -- Unknown (DLC)
-        309, -- Unknown (DLC)
-        318, -- Unknown (DLC)
-        337, -- Unknown (DLC)
-        340, -- Unknown (DLC)
-        341, -- Unknown (DLC)
-        342, -- Unknown (DLC)
-        343, -- Unknown (DLC)
-        346, -- Unknown (DLC)
-        347, -- Unknown (DLC)
-        335, -- Unknown (DLC)
-        357, -- Unknown (DLC)
-        371, -- Unknown (DLC)
+        278, -- Overhead Stance
+        279, -- Wing Stance
+        309, -- Unending Dance
+        318, -- Moon-and-Fire Stance
+        335, -- Repeating Fire
+        337, -- Fan Shot
+        340, -- UNUSED
+        341, -- UNUSED
+        342, -- UNUSED
+        343, -- UNUSED
+        346, -- UNUSED
+        347, -- UNUSED
+        357, -- Igor's Drake Hunt
+        371, -- Rancor Shot
     }
 
     if Contains(aow_list, arts_id) == TRUE then
@@ -902,9 +897,9 @@ function IsArrowStanceArts(arts_id)
         108, -- Sky Shot
         169, -- Radahn's Rain
 
-        357, -- Unknown (DLC)
-        337, -- Unknown (DLC)
-        371, -- Unknown (DLC)
+        337, -- Fan Shot
+        357, -- Igor's Drake Hunt
+        371, -- Rancor Shot
     }
 
     if Contains(aow_list, arts_id) == TRUE then
@@ -921,9 +916,9 @@ function IsAttackStanceArts(arts_id)
         25,  -- Spinning Chain
         239, -- Spinning Wheel
 
-        309, -- Unknown (DLC)
-        340, -- Unknown (DLC)
-        341, -- Unknown (DLC)
+        309, -- Unending Dance
+        340, -- UNUSED
+        341, -- UNUSED
     }
 
     if Contains(aow_list, arts_id) == TRUE then
@@ -938,9 +933,9 @@ function IsRollingArts(arts_id)
         155, -- Quickstep
         156, -- Bloodhound's Step
 
-        273, -- Unknown (DLC)
-        276, -- Unknown (DLC)
-        313, -- Unknown (DLC)
+        273, -- Raging Beast
+        276, -- Blind Spot
+        313, -- Dynastic Sickleplay
     }
 
     if Contains(aow_list, arts_id) == TRUE then
