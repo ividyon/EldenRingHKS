@@ -151,14 +151,10 @@ end
 
 function ResetMimicry()
     act(AddSpEffect, 503041)
-
-    return
 end
 
 function SetEnableMimicry()
     g_EnableMimicry = TRUE
-
-    return
 end
 
 function SetWeightIndex()
@@ -207,20 +203,14 @@ end
 
 function SetAIActionState()
     act(SetAIAttackState, env(Unknown405))
-
-    return
 end
 
 function SetAttackHand(hand)
     act(WeaponParameterReference, hand)
-
-    return
 end
 
 function SetGuardHand(hand)
     act(SetThrowPossibilityState_Attacker, hand)
-
-    return
 end
 
 function SetEnableAimMode()
@@ -246,21 +236,15 @@ function SetEnableAimMode()
     elseif style == HAND_RIGHT_BOTH and TRUE == GetEquipType(HAND_RIGHT, WEAPON_CATEGORY_SMALL_ARROW, WEAPON_CATEGORY_ARROW, WEAPON_CATEGORY_LARGE_ARROW, WEAPON_CATEGORY_CROSSBOW, WEAPON_CATEGORY_BALLISTA) then
         act(SetIsPreciseShootingPossible)
     end
-
-    return
 end
 
 function Replanning()
     act(DoAIReplanningAtCancelTiming)
-
-    return
 end
 
 function AddStamina(num)
     act(SetStaminaRecoveryDisabled)
     act(ChangeStamina, num)
-
-    return
 end
 
 function GetLocomotionState()
@@ -281,14 +265,10 @@ end
 
 function SetInterruptType(num)
     act(AINotifyAttackType, num)
-
-    return
 end
 
 function SetTurnSpeed(turn_speed)
     act(SetTurnSpeed, turn_speed)
-
-    return
 end
 
 function SetRollingTurnCondition(is_selftrans)
@@ -313,8 +293,6 @@ function SetRollingTurnCondition(is_selftrans)
     elseif GetVariable("TurnAngleReal") > 200 then
         SetTurnSpeed(0)
     end
-
-    return
 end
 
 function IsLowerQuickTurn()
@@ -385,8 +363,6 @@ end
 
 function SetVariable(name, value)
     act(SetHavokVariable, name, value)
-
-    return
 end
 
 function IsWeaponCanGuard()
@@ -411,7 +387,6 @@ function IsWeaponCanGuard()
             return canguard
         end
     end
-
 end
 
 function IsEnableGuard()
