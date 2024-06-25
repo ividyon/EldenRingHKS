@@ -17,16 +17,20 @@
 -- 2023-02-14 - Minor comment changes
 -- 2023-03-19 - Support for custom Ashes of War
 -- 2023-09-22 - Halvard: updated for 1.10
---               - fixed the function declaration of "ExecComboMagic", it was missing two parameters.
---               - removed an "act(SetAttackType, -1)" from the function "DamageBind_onUpdate()",
---                 all act 109 were removed many patches ago, this one was overlooked when updating this file.
---               - Updated the function "DrawStanceRightLoop_Upper_onUpdate()" to match changes done in 1.09
---                 that change the follow-up attacks done after the "spinning wheel" ash of war.
---               - Added a note in the "ExecJump()" function, as it is changed compared to the raw decompile
---                 I'm not sure if this was intended by previous authors of this file or simply a mistake.
---                 For now I'm only adding a note to highlight that it was changed and leaving it at that.
---               - manually read through the entire file to make sure no other changes done by
---                 FromSoftware in previous patch updates were still missing.
+--              - fixed the function declaration of "ExecComboMagic", it was missing two parameters.
+--              - removed an "act(SetAttackType, -1)" from the function "DamageBind_onUpdate()",
+--                all act 109 were removed many patches ago, this one was overlooked when updating this file.
+--              - Updated the function "DrawStanceRightLoop_Upper_onUpdate()" to match changes done in 1.09
+--                that change the follow-up attacks done after the "spinning wheel" ash of war.
+--              - Added a note in the "ExecJump()" function, as it is changed compared to the raw decompile
+--                I'm not sure if this was intended by previous authors of this file or simply a mistake.
+--                For now I'm only adding a note to highlight that it was changed and leaving it at that.
+--              - manually read through the entire file to make sure no other changes done by
+--                FromSoftware in previous patch updates were still missing.
+-- 2024-06-25 - Exelot: Updated to ER v1.12.1
+--              - Added all new functions
+--              - Merged all function changes (Compared 1.10.1 VS 1.12.1)
+--              - Overwrote ExecMagic with a raw decompiled version (added ACT and ENV names)
 ------------------------------------------
 -- Known issues:
 -- Torrent will retain his "gallop" state even if you come to a standstill, fall, or
