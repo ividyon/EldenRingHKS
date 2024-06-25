@@ -18,7 +18,7 @@
 -- 2023-03-19 - Support for custom Ashes of War
 -- 2023-09-22 - Halvard: updated for 1.10
 --               - fixed the function declaration of "ExecComboMagic", it was missing two parameters.
---               - removed an "act(109, -1)" from the function "DamageBind_onUpdate()",
+--               - removed an "act(SetAttackType, -1)" from the function "DamageBind_onUpdate()",
 --                 all act 109 were removed many patches ago, this one was overlooked when updating this file.
 --               - Updated the function "DrawStanceRightLoop_Upper_onUpdate()" to match changes done in 1.09
 --                 that change the follow-up attacks done after the "spinning wheel" ash of war.
@@ -193,7 +193,7 @@ function SetWeightIndex()
         SetVariable("EvasionWeightIndex", EVASION_WEIGHT_INDEX_HEAVY)
     elseif env(GetSpEffectID, 4100) == TRUE and weight ~= WEIGHT_OVERWEIGHT then
         SetVariable("MoveWeightIndex", MOVE_WEIGHT_HEAVY)
-    elseif env(1116, 19670) == TRUE and weight ~= WEIGHT_OVERWEIGHT then
+    elseif env(GetSpEffectID, 19670) == TRUE and weight ~= WEIGHT_OVERWEIGHT then
         SetVariable("MoveWeightIndex", MOVE_WEIGHT_HEAVY)
         SetVariable("EvasionWeightIndex", EVASION_WEIGHT_INDEX_HEAVY)
     end
@@ -475,7 +475,7 @@ function ExecGuard(event, blend_type)
             elseif sp_kind == 240 and style == HAND_RIGHT then
                 guardindex = GUARD_STYLE_TORCH
             elseif style == HAND_RIGHT_BOTH or style == HAND_LEFT_BOTH then
-                if env(358) ~= 15 and env(358) ~= 0 and env(358) ~= 2 and env(358) ~= 3 then
+                if env(GetStayAnimCategory) ~= 15 and env(GetStayAnimCategory) ~= 0 and env(GetStayAnimCategory) ~= 2 and env(GetStayAnimCategory) ~= 3 then
                     guardindex = GUARD_STYLE_DEFAULT
                 end
                 if kind == WEAPON_CATEGORY_DUELING_SHIELD then
@@ -495,16 +495,16 @@ function ExecGuard(event, blend_type)
                 blend_type = UPPER
             end
             
-            if env(1116, 102000) == TRUE and event ~= Event_GuardOn then
+            if env(GetSpEffectID, 102000) == TRUE and event ~= Event_GuardOn then
                 local is_after_additive_just_guard = FALSE
-                if env(1116, 102020) == TRUE or env(1116, 102022) == TRUE then
+                if env(GetSpEffectID, 102020) == TRUE or env(GetSpEffectID, 102022) == TRUE then
                     is_after_additive_just_guard = TRUE
                 end
-                if env(1116, 102002) == TRUE and is_after_additive_just_guard == FALSE then
+                if env(GetSpEffectID, 102002) == TRUE and is_after_additive_just_guard == FALSE then
                     event = Event_GuardStart_JustGuard2
-                elseif env(1116, 102003) == TRUE and is_after_additive_just_guard == FALSE then
+                elseif env(GetSpEffectID, 102003) == TRUE and is_after_additive_just_guard == FALSE then
                     event = Event_GuardStart_JustGuard3
-                elseif env(1116, 102004) == TRUE and is_after_additive_just_guard == FALSE then
+                elseif env(GetSpEffectID, 102004) == TRUE and is_after_additive_just_guard == FALSE then
                     if IsNodeActive("GuardStart_JustGuard4_Upper Selector") == TRUE then
                         event = Event_GuardStart_JustGuard4_SelfTrans
                     else
@@ -518,7 +518,7 @@ function ExecGuard(event, blend_type)
                 end
             end
 
-            act(2002, 102021)
+            act(AddSpEffect, 102021)
             ExecEventHalfBlend(event, blend_type)
 
             return TRUE
@@ -717,9 +717,9 @@ function GetSwordArtInfo()
         end
     end
 
-    if env(1116, 102150) == TRUE then
+    if env(GetSpEffectID, 102150) == TRUE then
         art_id = 0
-    elseif env(1116, 102151) == TRUE then
+    elseif env(GetSpEffectID, 102151) == TRUE then
         art_id = 0
     end
 
@@ -1146,7 +1146,7 @@ function SetArtsGeneratorTransitionIndex()
     else
         local idle_cat = env(GetStayAnimCategory)
 
-        if env(225, c_SwordArtsHand) == 53 or env(225, c_SwordArtsHand) == 58 then
+        if env(GetEquipWeaponCategory, c_SwordArtsHand) == 53 or env(GetEquipWeaponCategory, c_SwordArtsHand) == 58 then
             if c_SwordArtsHand == HAND_RIGHT then
                 SetVariable("ArtsTransition", 1)
             else
@@ -1369,10 +1369,10 @@ function SetMoveType()
     elseif env(GetSpEffectID, 100160) == TRUE then
         SetVariable("MoveType", ConvergeValue(1, hkbGetVariable("MoveType"), 5, 5))
         SetVariable("StanceMoveType", 3)
-    elseif env(1116, 19920) == TRUE then
+    elseif env(GetSpEffectID, 19920) == TRUE then
         SetVariable("MoveType", ConvergeValue(1, hkbGetVariable("MoveType"), 5, 5))
         SetVariable("StanceMoveType", 4)
-    elseif env(1116, 19930) == TRUE then
+    elseif env(GetSpEffectID, 19930) == TRUE then
         SetVariable("MoveType", ConvergeValue(1, hkbGetVariable("MoveType"), 5, 5))
         SetVariable("StanceMoveType", 5)
     else
@@ -1516,7 +1516,7 @@ function GetAttackRequest(is_guard)
             end
             -- 2H Heavy
         else
-            local sp_kind = env(345, hand)
+            local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, hand)
             if sp_kind == 293 then
                 return ATTACK_REQUEST_INVALID
             end
@@ -1534,7 +1534,7 @@ function GetAttackRequest(is_guard)
         else
             local is_shield_left = GetEquipType(HAND_LEFT, WEAPON_CATEGORY_SMALL_SHIELD, WEAPON_CATEGORY_MIDDLE_SHIELD, WEAPON_CATEGORY_LARGE_SHIELD, WEAPON_CATEGORY_TORCH)
             local is_shield_right = GetEquipType(HAND_RIGHT, WEAPON_CATEGORY_SMALL_SHIELD, WEAPON_CATEGORY_MIDDLE_SHIELD, WEAPON_CATEGORY_LARGE_SHIELD, WEAPON_CATEGORY_TORCH)
-            local sp_kind = env(345, hand)
+            local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, hand)
             if is_both == TRUE and sp_kind == 249 then
                 return ATTACK_REQUEST_BOTH_LEFT
             end
@@ -1590,7 +1590,7 @@ function GetAttackRequest(is_guard)
                 act(ChooseBowAndArrowSlot, 1)
                 return ATTACK_REQUEST_LEFT_CROSSBOW2
             end
-            local sp_kind = env(345, HAND_LEFT)
+            local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
             if sp_kind == 293 then
                 return ATTACK_REQUEST_INVALID
             end
@@ -1699,7 +1699,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
     end
     
     local isAfterAdditiveJustGuard = FALSE
-    if IsNodeActive("Guard_Upper LayerGenerator") == TRUE and env(1116, 102020) == TRUE then
+    if IsNodeActive("Guard_Upper LayerGenerator") == TRUE and env(GetSpEffectID, 102020) == TRUE then
         isAfterAdditiveJustGuard = TRUE
     end
     
@@ -1778,12 +1778,12 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
             r1 = "W_AttackRightLight1"
         end
 
-        if env(1116, 19903) == TRUE then
+        if env(GetSpEffectID, 19903) == TRUE then
             r1 = "W_AttackRightLight3"
-        elseif env(1116, 19904) == TRUE then
+        elseif env(GetSpEffectID, 19904) == TRUE then
             r1 = "W_AttackRightLight4"
         end
-        if env(1116, 19915) == TRUE then
+        if env(GetSpEffectID, 19915) == TRUE then
             r1 = "W_AttackRightLight2"
         end
         ExecEventAllBody(r1)
@@ -1824,7 +1824,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         end
 
         -- Unknown (DLC): Heavy Special
-        if env(1116, 102101) == TRUE then
+        if env(GetSpEffectID, 102101) == TRUE then
             IsEnableSpecialAttack = TRUE
             SetVariable("AttackRightHeavySpecialType", 0)
         end
@@ -1839,7 +1839,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
             end
         end
 
-        if env(1116, 1681) == FALSE and env(1116, 1686) == FALSE and env(1116, 1811) == FALSE and env(1116, 1816) == FALSE and env(1116, 19912) == TRUE then
+        if env(GetSpEffectID, 1681) == FALSE and env(GetSpEffectID, 1686) == FALSE and env(GetSpEffectID, 1811) == FALSE and env(GetSpEffectID, 1816) == FALSE and env(GetSpEffectID, 19912) == TRUE then
             r2 = "W_AttackRightHeavy2Start"
         end
 
@@ -1895,13 +1895,13 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
             b1 = "W_AttackBothLight1"
         end
 
-        if env(1116, 19903) == TRUE then
+        if env(GetSpEffectID, 19903) == TRUE then
             b1 = "W_AttackBothLight3"
-        elseif env(1116, 19904) == TRUE then
+        elseif env(GetSpEffectID, 19904) == TRUE then
             b1 = "W_AttackBothLight4"
         end
 
-        if env(1116, 19915) == TRUE then
+        if env(GetSpEffectID, 19915) == TRUE then
             b1 = "W_AttackBothLight2"
         end
 
@@ -1911,9 +1911,9 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
             atk_hand = HAND_LEFT
         end
 
-        if env(225, atk_hand) == WEAPON_CATEGORY_DUELING_SHIELD then
+        if env(GetEquipWeaponCategory, atk_hand) == WEAPON_CATEGORY_DUELING_SHIELD then
             guard_hand = atk_hand
-            if is_guard == TRUE and env(1108, ACTION_ARM_L1) > 0 then
+            if is_guard == TRUE and env(ActionDuration, ACTION_ARM_L1) > 0 then
                 b1 = "W_AttackBothLightGuard"
             end
         end
@@ -1985,11 +1985,11 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         end
 
         if c_Style == HAND_RIGHT_BOTH then
-            if env(1116, 102101) == TRUE then
+            if env(GetSpEffectID, 102101) == TRUE then
                 IsEnableSpecialAttack = TRUE
                 SetVariable("AttackRightHeavySpecialType", 0)
             end
-        elseif c_Style == HAND_LEFT_BOTH and env(1116, 102106) == TRUE then
+        elseif c_Style == HAND_LEFT_BOTH and env(GetSpEffectID, 102106) == TRUE then
             IsEnableSpecialAttack = TRUE
             SetVariable("AttackRightHeavySpecialType", 0)
         end
@@ -2004,7 +2004,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
             end
         end
         
-        if env(1116, 1681) == FALSE and env(1116, 1686) == FALSE and env(1116, 1811) == FALSE and env(1116, 1816) == FALSE and env(1116, 19912) == TRUE then
+        if env(GetSpEffectID, 1681) == FALSE and env(GetSpEffectID, 1686) == FALSE and env(GetSpEffectID, 1811) == FALSE and env(GetSpEffectID, 1816) == FALSE and env(GetSpEffectID, 19912) == TRUE then
             b2 = "W_AttackBothHeavy2Start"
         end
         if style == HAND_RIGHT_BOTH then
@@ -2012,7 +2012,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         elseif style == HAND_LEFT_BOTH then
             atk_hand = HAND_LEFT
         end
-        if env(225, atk_hand) == WEAPON_CATEGORY_DUELING_SHIELD then
+        if env(GetEquipWeaponCategory, atk_hand) == WEAPON_CATEGORY_DUELING_SHIELD then
             guard_hand = atk_hand
         end
 
@@ -2048,14 +2048,14 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
             l1 = "W_AttackDualLight1"
         end
 
-        if env(1116, 19903) == TRUE then
+        if env(GetSpEffectID, 19903) == TRUE then
             l1 = "W_AttackDualLight3"
-        elseif env(1116, 19904) == TRUE then
+        elseif env(GetSpEffectID, 19904) == TRUE then
             l1 = "W_AttackDualLight4"
         end
 
         if l1 == "W_AttackDualLightSubStart" then
-            if env(1116, 135) == TRUE then
+            if env(GetSpEffectID, 135) == TRUE then
                 SetVariable("AttackLightSubStartType", 0)
             else
                 l1 = "W_AttackDualLight2"
@@ -2251,9 +2251,9 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
             arts_idx = 9
         elseif arts_diff_cat == 57 then
             arts_idx = 10
-        elseif c_SwordArtsID == 328 and env(1116, 19875) == TRUE and GetVariable("IsEnoughArtPointsL2") == 0 then
+        elseif c_SwordArtsID == 328 and env(GetSpEffectID, 19875) == TRUE and GetVariable("IsEnoughArtPointsL2") == 0 then
             arts_idx = 12
-        elseif c_SwordArtsID == 328 and env(1116, 19874) == TRUE and GetVariable("IsEnoughArtPointsL2") == 0 then
+        elseif c_SwordArtsID == 328 and env(GetSpEffectID, 19874) == TRUE and GetVariable("IsEnoughArtPointsL2") == 0 then
             arts_idx = 11
         end
 
@@ -2278,10 +2278,10 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         SetVariable("SwordArtsSubCategory", 0)
 
         if c_SwordArtsID == 261 then
-            if env(1116, 102355) == TRUE then
+            if env(GetSpEffectID, 102355) == TRUE then
                 SetVariable("SwordArtsSubCategory", 0)
                 ExecEventAllBody("W_SwordArtsOneShot_Sub")
-            elseif env(1116, 102356) == TRUE then
+            elseif env(GetSpEffectID, 102356) == TRUE then
                 SetVariable("SwordArtsSubCategory", 1)
                 ExecEventAllBody("W_SwordArtsOneShot_Sub")
             else
@@ -2311,7 +2311,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         local arts_id = c_SwordArtsID
         if TRUE == IsNodeActive("SwordArtsRolling Selector MP") or TRUE == IsNodeActive("SwordArtsRolling Selector MP_SelfTrans2") then
             is_self_trans = TRUE
-        elseif (arts_id == 155 or arts_id == 156) and (IsNodeActive("SwordArtsRolling Selector MP_SelfTrans") == TRUE or env(1116, 100710) == TRUE) then
+        elseif (arts_id == 155 or arts_id == 156) and (IsNodeActive("SwordArtsRolling Selector MP_SelfTrans") == TRUE or env(GetSpEffectID, 100710) == TRUE) then
             is_self_trans_2 = TRUE
         end
 
@@ -2374,9 +2374,9 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
 
             if arts_id ~= 276 then
                 if GetVariable("IsLockon") == true then
-                    act(2019, turn_target_angle)
+                    act(TurnToLockonTargetImmediately, turn_target_angle)
                 else
-                    act(2029, turn_target_angle)
+                    act(Unknown2029, turn_target_angle)
                 end
             end
         end
@@ -2400,7 +2400,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         SetVariable("TurnAngleReal", turn_angle_real)
         SetSwordArtsPointInfo(ACTION_ARM_L2, TRUE)
 
-        if env(1116, 102360) == FALSE then
+        if env(GetSpEffectID, 102360) == FALSE then
             if GetVariable("IsEnoughArtPointsL2") == 1 then
                 AddStamina(STAMINA_REDUCE_ARTS_QUICKSTEP * STAMINA_CONSUMERATE_LOWSTATUS)
             else
@@ -2420,7 +2420,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
             ExecEventAllBody("W_SwordArtsRolling_SelfTrans")
         elseif is_self_trans_2 == TRUE then
             ExecEventAllBody("W_SwordArtsRolling_SelfTrans2")
-        elseif (arts_id == 276 or arts_id == 313) and GetVariable("IsLockon") == true and env(1116, 100002) == TRUE then
+        elseif (arts_id == 276 or arts_id == 313) and GetVariable("IsLockon") == true and env(GetSpEffectID, 100002) == TRUE then
             ExecEventAllBody("W_SwordArtsRolling_Sub")
         else
             ExecEventAllBody("W_SwordArtsRolling")
@@ -2632,7 +2632,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         guard_hand = HAND_LEFT
         local index = env(GetGuardMotionCategory, HAND_LEFT)
 
-        if env(225, HAND_LEFT) == WEAPON_CATEGORY_DUELING_SHIELD then
+        if env(GetEquipWeaponCategory, HAND_LEFT) == WEAPON_CATEGORY_DUELING_SHIELD then
             index = 3
         end
 
@@ -2696,7 +2696,7 @@ end
 -- Get the maximum supported combo length for each type
 function GetAttackMaxNumber(hand)
     local kind = env(GetEquipWeaponCategory, hand)
-    local sp_kind = env(345, hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, hand)
     local max_num = 1
 
     if sp_kind == 249 then
@@ -2783,7 +2783,7 @@ function IsEnableSpecialAttack(hand)
 
     env(GetEquipWeaponCategory, hand)
 
-    local sp_kind = env(345, HAND_RIGHT)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT)
     if sp_kind == 254 or sp_kind == 251 then
         return TRUE
     end
@@ -3025,7 +3025,7 @@ function ExecArtsStance(blend_type)
         SetSwordArtsPointInfo(ACTION_ARM_L2, TRUE)
     end
 
-    if env(1116, 19921) == TRUE then
+    if env(GetSpEffectID, 19921) == TRUE then
         ExecEventHalfBlendNoReset(Event_DrawStanceRightLoop, blend_type)
     else
         ExecEventHalfBlend(Event_DrawStanceRightStart, blend_type)
@@ -3066,8 +3066,8 @@ function ExecMagic(quick_type, blend_type, is_ride)
     local wep_hand = HAND_RIGHT
     local delayActRequestNo = -1
     local is_samagic = FALSE
-    local sp_kind_R = env(345, HAND_RIGHT)
-    local sp_kind_L = env(345, HAND_LEFT)
+    local sp_kind_R = env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT)
+    local sp_kind_L = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
     local buttonR = ACTION_ARM_MAGIC_R
     local buttonL = ACTION_ARM_MAGIC_L
 
@@ -3102,13 +3102,13 @@ function ExecMagic(quick_type, blend_type, is_ride)
     elseif env(ActionRequest, ACTION_ARM_MAGIC_R2) == TRUE then
         delayActRequestNo = ACTION_ARM_MAGIC_R2
         if style == HAND_LEFT_BOTH then
-            local sp_kind = env(345, HAND_LEFT)
+            local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
             if sp_kind ~= 293 then
                 return FALSE
             end
             wep_hand = HAND_LEFT
         else
-            local sp_kind = env(345, HAND_RIGHT)
+            local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT)
             if sp_kind ~= 293 then
                 return FALSE
             end
@@ -3130,7 +3130,7 @@ function ExecMagic(quick_type, blend_type, is_ride)
     elseif env(ActionRequest, ACTION_ARM_MAGIC_L2) == TRUE and is_ride == FALSE then
         delayActRequestNo = ACTION_ARM_MAGIC_L2
         if style == HAND_RIGHT then
-            local sp_kind = env(345, HAND_LEFT)
+            local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
             if sp_kind ~= 293 then
                 return FALSE
             end
@@ -3142,9 +3142,9 @@ function ExecMagic(quick_type, blend_type, is_ride)
     else
         return FALSE
     end
-    if env(114, wep_hand) == TRUE then
+    if env(IsMagicUseMenuOpening, wep_hand) == TRUE then
         ResetRequest()
-        act(124, delayActRequestNo)
+        act(OpenMenuWhenUsingMagic, delayActRequestNo)
         return TRUE
     end
     act(Unknown2026)
@@ -3163,7 +3163,7 @@ function ExecMagic(quick_type, blend_type, is_ride)
             blend_type = UPPER
         end
     end
-    if env(232, wep_hand, 0) == FALSE then
+    if env(IsMagicUseable, wep_hand, 0) == FALSE then
         act(DebugLogOutput, "Event_MagicInvalid_Cannot_Use_Magic")
         SetVariable("IndexMagicHand", magic_hand)
         if is_ride == TRUE then
@@ -3213,13 +3213,13 @@ function ExecMagic(quick_type, blend_type, is_ride)
     end
 
     if magic_index == MAGIC_REQUEST_GRAVITY or magic_index == MAGIC_REQUEST_METEOR or magic_index == MAGIC_REQUEST_BLASTING or magic_index == MAGIC_REQUEST_DRILL or magic_index == MAGIC_REQUEST_MAGIC_SPARK or magic_index == 115 or magic_index == 120 or magic_index == 121 or magic_index == 157 or magic_index == 82 or magic_index == 150 or magic_index == 156 or magic_index == 161 then
-        if env(345, wep_hand) == 293 then
+        if env(GetEquipWeaponSpecialCategoryNumber, wep_hand) == 293 then
             SetVariable("Magic_SpecialStaffCategory", 2)
         else
             SetVariable("Magic_SpecialStaffCategory", 0)
         end
     elseif magic_index == 141 or magic_index == 128 or magic_index == 146 then
-        if env(345, wep_hand) == 290 then
+        if env(GetEquipWeaponSpecialCategoryNumber, wep_hand) == 290 then
             SetVariable("Magic_SpecialStaffCategory", 1)
         else
             SetVariable("Magic_SpecialStaffCategory", 0)
@@ -3243,7 +3243,7 @@ function ExecMagic(quick_type, blend_type, is_ride)
         is_atk_auto_aim = TRUE
     end
 
-    if magic_index == 127 and env(1116, 19975) == TRUE then
+    if magic_index == 127 and env(GetSpEffectID, 19975) == TRUE then
         return TRUE
     end
 
@@ -3380,7 +3380,7 @@ function ExecRollingMagic(magic_hand, magic_type, blend_type)
     local rollingDirection = 0
     local turn_angle_real = 200
 
-    if GetVariable("IsLockon") == false and env(234) == FALSE and env(1007) == FALSE or env(1116, 100002) == TRUE then
+    if GetVariable("IsLockon") == false and env(IsPrecisionShoot) == FALSE and env(IsCOMPlayer) == FALSE or env(GetSpEffectID, 100002) == TRUE then
         rollingDirection = 0
     else
         if rollingAngle <= GetVariable("RollingAngleThresholdRightFrontTest") and rollingAngle >= GetVariable("RollingAngleThresholdLeftFrontTest") then
@@ -3533,7 +3533,7 @@ function ExecItem(quick_type, blend_type)
 
     local item_type = env(GetItemAnimType)
     local hand = HAND_RIGHT
-    local kind = env(225, hand)
+    local kind = env(GetEquipWeaponCategory, hand)
 
     if IsUseStaminaItem(item_type) == TRUE and env(GetStamina) <= 0 then
         return FALSE
@@ -3596,7 +3596,7 @@ function ExecItem(quick_type, blend_type)
             ExecEventHalfBlend(Event_ItemDrinkStart, blend_type)
         end
     elseif item_type == ITEM_TRANSFORM_DRAGONPRIEST then
-        if env(1116, 19980) == TRUE or env(1116, 19981) == TRUE then
+        if env(GetSpEffectID, 19980) == TRUE or env(GetSpEffectID, 19981) == TRUE then
             SetVariable("ItemTransformType", 1)
         else
             SetVariable("ItemTransformType", 0)
@@ -3672,7 +3672,7 @@ function ExecItem(quick_type, blend_type)
     elseif item_type == ITEM_CRY_SICKNESS_PHANTOM then
         ExecEventHalfBlend(Event_ItemCrySicknessPhantom, blend_type)
     elseif item_type == ITEM_TRANSFORM_GODMAN then
-        if env(1116, 19982) == TRUE or env(1116, 19983) == TRUE then
+        if env(GetSpEffectID, 19982) == TRUE or env(GetSpEffectID, 19983) == TRUE then
             SetVariable("ItemTransformType", 1)
         else
             SetVariable("ItemTransformType", 0)
@@ -3991,14 +3991,14 @@ end
 
 function ExecJump()
     --note: Original decompile of 1.10 has ACTION_ARM_CHANGE_STYLE instead of jump
-    if env(ActionRequest, ACTION_ARM_JUMP) == FALSE and env(700) == FALSE then
+    if env(ActionRequest, ACTION_ARM_JUMP) == FALSE and env(Unknown700) == FALSE then
         return FALSE
     elseif env(GetStamina) <= 0 and env(Unknown700) == FALSE then
         ResetRequest()
         return FALSE
     end
 
-    if env(1116, 102360) == FALSE then
+    if env(GetSpEffectID, 102360) == FALSE then
         AddStamina(STAMINA_REDUCE_JUMP)
     end
     SetWeightIndex()
@@ -4072,7 +4072,7 @@ function ExecJump()
     elseif env(GetSpEffectID, 4100) == TRUE then
         JumpMoveLevel = 0
         -- Unknown (DLC)
-    elseif env(1116, 19670) == TRUE then
+    elseif env(GetSpEffectID, 19670) == TRUE then
         JumpMoveLevel = 0
     end
 
@@ -4414,7 +4414,7 @@ function ExecEvasion(backstep_limit, estep, is_usechainrecover)
             rollingEvent = rollingEvent .. "_Selftrans"
         end
 
-        if env(1116, 102360) == FALSE then
+        if env(GetSpEffectID, 102360) == FALSE then
             AddStamina(STAMINA_REDUCE_ROLLING)
         end
 
@@ -4511,7 +4511,7 @@ function ExecEvasion(backstep_limit, estep, is_usechainrecover)
             return FALSE
         end
 
-        if env(1116, 102360) == FALSE then
+        if env(GetSpEffectID, 102360) == FALSE then
             AddStamina(STAMINA_REDUCE_BACKSTEP)
         end
 
@@ -4554,7 +4554,7 @@ function ExecQuickTurn(blend_type, turn_type)
         return FALSE
     end
 
-    if env(1116, 19946) == TRUE then
+    if env(GetSpEffectID, 19946) == TRUE then
         return FALSE
     end
 
@@ -4649,7 +4649,7 @@ function ExecAddDamage(damage_dir, attack_dir, damage_level, is_guard, is_damage
     if env(GetBehaviorID, 2) == TRUE then
         return
     end
-    if is_guard == TRUE and is_justGuard == TRUE and env(1116, 102022) == TRUE then
+    if is_guard == TRUE and is_justGuard == TRUE and env(GetSpEffectID, 102022) == TRUE then
         return
     end
 
@@ -4663,8 +4663,8 @@ function ExecAddDamage(damage_dir, attack_dir, damage_level, is_guard, is_damage
     end
 
     if is_guard == TRUE and is_justGuard == TRUE then
-        act(2002, 102020)
-        act(2002, 102022)
+        act(AddSpEffect, 102020)
+        act(AddSpEffect, 102022)
         ExecEventNoReset("W_AddDamageJustGuardStartFront")
         return
     end
@@ -4906,11 +4906,11 @@ function ExecDeath()
 
         if env(GetDamageSpecialAttribute, 3) == TRUE then
             SetVariable("IndexDeath", DEATH_TYPE_STONE)
-        elseif env(1116, 19700) == TRUE then
+        elseif env(GetSpEffectID, 19700) == TRUE then
             SetVariable("IndexDeath", DEATH_TYPE_CRY)
-        elseif env(1116, 102351) == TRUE then
+        elseif env(GetSpEffectID, 102351) == TRUE then
             SetVariable("IndexDeath", DEATH_TYPE_SLEEP)
-        elseif env(1116, 9913) == TRUE then
+        elseif env(GetSpEffectID, 9913) == TRUE then
             SetVariable("IndexDeath", DEATH_TYPE_TRINA_EVENT)
         elseif env(GetSpecialAttribute) == 25 then
             act(DebugLogOutput, "DEATY_TYPE_MAD")
@@ -4960,16 +4960,16 @@ function ExecDeath()
 
         ExecEventAllBody("W_DeathStart")
         return TRUE
-    elseif env(1101) == FALSE then
-        if env(305, CONDITION_TYPE_STONE) == TRUE or env(305, CONDITION_TYPE_CRYSTAL) == TRUE or env(409, 3) == TRUE then
+    elseif env(IsInvincibleDebugMode) == FALSE then
+        if env(GetStateChangeType, CONDITION_TYPE_STONE) == TRUE or env(GetStateChangeType, CONDITION_TYPE_CRYSTAL) == TRUE or env(GetDamageSpecialAttribute, 3) == TRUE then
             SetVariable("IndexDeath", DEATH_TYPE_STONE)
             ExecEventAllBody("W_DeathStart")
             return TRUE
-        elseif env(1116, 19700) == TRUE then
+        elseif env(GetSpEffectID, 19700) == TRUE then
             SetVariable("IndexDeath", DEATH_TYPE_CRY)
             ExecEventAllBody("W_DeathStart")
             return TRUE
-        elseif env(1116, 102351) == TRUE then
+        elseif env(GetSpEffectID, 102351) == TRUE then
             SetVariable("IndexDeath", DEATH_TYPE_SLEEP)
             ExecEventAllBody("W_DeathStart")
             return TRUE
@@ -5000,7 +5000,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
     local damage_level = env(GetDamageLevel)
     local damage_type = env(GetReceivedDamageType)
     local is_damaged = env(HasReceivedAnyDamage)
-    if env(Unknown362, 32) == TRUE and env(1116, 19925) == FALSE then
+    if env(Unknown362, 32) == TRUE and env(GetSpEffectID, 19925) == FALSE then
         act(SetDamageAnimType, DAMAGE_FLAG_SMALL)
         ResetRequest()
         ExecEventAllBody("W_DamageBind")
@@ -5100,13 +5100,13 @@ function ExecDamage(is_parry, is_attackwhileguard)
                     SetVariable("IsTorchGuard", FALSE)
                 end
 
-                if env(225, HAND_LEFT) == WEAPON_CATEGORY_DUELING_SHIELD then
+                if env(GetEquipWeaponCategory, HAND_LEFT) == WEAPON_CATEGORY_DUELING_SHIELD then
                     guardindex = 3
                 end
 
-                if env(225, HAND_RIGHT) == WEAPON_CATEGORY_DUELING_SHIELD then
+                if env(GetEquipWeaponCategory, HAND_RIGHT) == WEAPON_CATEGORY_DUELING_SHIELD then
                     guardindex = 3
-                    if env(1116, 176) == TRUE then
+                    if env(GetSpEffectID, 176) == TRUE then
                         SetVariable("GuardBreakDuelingShieldState", 1)
                     end
                 end
@@ -5117,7 +5117,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
                     guardindex = env(GetGuardMotionCategory, HAND_LEFT)
                 end
 
-                if env(225, HAND_LEFT) == WEAPON_CATEGORY_DUELING_SHIELD then
+                if env(GetEquipWeaponCategory, HAND_LEFT) == WEAPON_CATEGORY_DUELING_SHIELD then
                     guardindex = 3
                 end
             elseif style == HAND_RIGHT_BOTH then
@@ -5127,7 +5127,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
                     guardindex = env(GetGuardMotionCategory, HAND_RIGHT)
                 end
 
-                if env(225, HAND_RIGHT) == WEAPON_CATEGORY_DUELING_SHIELD then
+                if env(GetEquipWeaponCategory, HAND_RIGHT) == WEAPON_CATEGORY_DUELING_SHIELD then
                     guardindex = 3
                 end
             end
@@ -5195,7 +5195,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
                 SetVariable("IsTorchGuard", FALSE)
             end
 
-            if env(225, HAND_LEFT) == WEAPON_CATEGORY_DUELING_SHIELD then
+            if env(GetEquipWeaponCategory, HAND_LEFT) == WEAPON_CATEGORY_DUELING_SHIELD then
                 guardindex = 3
             end
         elseif style == HAND_LEFT_BOTH then
@@ -5205,7 +5205,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
                 guardindex = env(GetGuardMotionCategory, HAND_LEFT)
             end
 
-            if env(225, HAND_LEFT) == WEAPON_CATEGORY_DUELING_SHIELD then
+            if env(GetEquipWeaponCategory, HAND_LEFT) == WEAPON_CATEGORY_DUELING_SHIELD then
                 guardindex = 3
             end
         elseif style == HAND_RIGHT_BOTH then
@@ -5215,7 +5215,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
                 guardindex = env(GetGuardMotionCategory, HAND_RIGHT)
             end
 
-            if env(225, HAND_RIGHT) == WEAPON_CATEGORY_DUELING_SHIELD then
+            if env(GetEquipWeaponCategory, HAND_RIGHT) == WEAPON_CATEGORY_DUELING_SHIELD then
                 guardindex = 3
             end
         end
@@ -5231,7 +5231,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
         if guard_damage_level > 0 then
             if guard_damage_level == 1 then
                 act(SetDamageAnimType, DAMAGE_FLAG_GUARD_SMALL)
-                if env(1116, 102001) == TRUE or env(1116, 102011) == TRUE or env(1116, 102013) == TRUE or env(1116, 102015) == TRUE then
+                if env(GetSpEffectID, 102001) == TRUE or env(GetSpEffectID, 102011) == TRUE or env(GetSpEffectID, 102013) == TRUE or env(GetSpEffectID, 102015) == TRUE then
                     SetJustGuardSucceedEffect(1)
                     ExecEventAllBody("W_GuardDamageSmall_JustGuard")
                 else
@@ -5239,7 +5239,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
                 end
             elseif guard_damage_level == 3 then
                 act(SetDamageAnimType, DAMAGE_FLAG_GUARD_LARGE)
-                if env(1116, 102001) == TRUE or env(1116, 102011) == TRUE or env(1116, 102013) == TRUE or env(1116, 102015) == TRUE then
+                if env(GetSpEffectID, 102001) == TRUE or env(GetSpEffectID, 102011) == TRUE or env(GetSpEffectID, 102013) == TRUE or env(GetSpEffectID, 102015) == TRUE then
                     SetJustGuardSucceedEffect(2)
                     ExecEventAllBody("W_GuardDamageMiddle_JustGuard")
                 else
@@ -5247,7 +5247,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
                 end
             elseif guard_damage_level == 4 then
                 act(SetDamageAnimType, DAMAGE_FLAG_GUARD_EXLARGE)
-                if env(1116, 102001) == TRUE or env(1116, 102011) == TRUE or env(1116, 102013) == TRUE or env(1116, 102015) == TRUE then
+                if env(GetSpEffectID, 102001) == TRUE or env(GetSpEffectID, 102011) == TRUE or env(GetSpEffectID, 102013) == TRUE or env(GetSpEffectID, 102015) == TRUE then
                     SetJustGuardSucceedEffect(2)
                     ExecEventAllBody("W_GuardDamageLarge_JustGuard")
                 else
@@ -5255,7 +5255,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
                 end
             else
                 act(SetDamageAnimType, DAMAGE_FLAG_GUARD_LARGE)
-                if env(1116, 102001) == TRUE or env(1116, 102011) == TRUE or env(1116, 102013) == TRUE or env(1116, 102015) == TRUE then
+                if env(GetSpEffectID, 102001) == TRUE or env(GetSpEffectID, 102011) == TRUE or env(GetSpEffectID, 102013) == TRUE or env(GetSpEffectID, 102015) == TRUE then
                     SetJustGuardSucceedEffect(2)
                     ExecEventAllBody("W_GuardDamageMiddle_JustGuard")
                 else
@@ -5265,7 +5265,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
 
             return TRUE
         else
-            if env(1116, 102001) == TRUE or env(1116, 102011) == TRUE or env(1116, 102013) == TRUE or env(1116, 102015) == TRUE then
+            if env(GetSpEffectID, 102001) == TRUE or env(GetSpEffectID, 102011) == TRUE or env(GetSpEffectID, 102013) == TRUE or env(GetSpEffectID, 102015) == TRUE then
                 SetJustGuardSucceedEffect(1)
                 ExecAddDamage(damage_angle, attack_dir, damage_level, TRUE, is_damaged, TRUE)
             else
@@ -5372,8 +5372,8 @@ function ExecDamage(is_parry, is_attackwhileguard)
 
         return TRUE
     elseif damage_level == DAMAGE_LEVEL_PUSH then
-        if env(334, 14) == TRUE then
-            act(2002, 19865)
+        if env(GetBehaviorID, 14) == TRUE then
+            act(AddSpEffect, 19865)
         end
         CalcDamageCount()
         SetVariable("DamageDirection", damage_angle)
@@ -5394,9 +5394,9 @@ function ExecDamage(is_parry, is_attackwhileguard)
         ResetDamageCount()
         SetVariable("DamageDirection", damage_angle)
         act(SetDamageAnimType, DAMAGE_FLAG_LARGE_BLOW)
-        if env(334, 10) == TRUE then
+        if env(GetBehaviorID, 10) == TRUE then
             SetVariable("DamageLv9_Behavior", 1)
-        elseif env(334, 13) == TRUE then
+        elseif env(GetBehaviorID, 13) == TRUE then
             SetVariable("DamageLv9_Behavior", 2)
         else
             SetVariable("DamageLv9_Behavior", 0)
@@ -5524,7 +5524,7 @@ function FallCommonFunction(is_enable_falling_death, is_jump, fall_style)
                     JumpMoveLevel = 0
                 elseif env(GetSpEffectID, 4100) == TRUE then
                     JumpMoveLevel = 0
-                elseif env(1116, 19670) == TRUE then
+                elseif env(GetSpEffectID, 19670) == TRUE then
                     JumpMoveLevel = 0
                 end
 
@@ -5673,7 +5673,7 @@ function ExecGuardOnCancelTiming(guardcondition, blend_type)
 
     act(DebugLogOutput, "ExecGuardOnCancelTiming " .. guardcondition)
 
-    if guardcondition == TO_GUARDON and env(1116, 102000) == TRUE and env(1106, ACTION_ARM_L1) == TRUE then
+    if guardcondition == TO_GUARDON and env(GetSpEffectID, 102000) == TRUE and env(ActionRequest, ACTION_ARM_L1) == TRUE then
         guardcondition = FALSE
     end
 
@@ -6262,8 +6262,8 @@ function AttackCommonFunction(r1, r2, l1, l2, b1, b2, guardcondition, use_atk_qu
     SetThrowAtkInvalid()
     SetAIActionState()
     
-    if env(1116, 102050) == TRUE then
-        act(2018)
+    if env(GetSpEffectID, 102050) == TRUE then
+        act(LockonFixedAngleCancel)
     end
 
     local bool = FALSE
@@ -6312,7 +6312,7 @@ function AttackCommonFunction(r1, r2, l1, l2, b1, b2, guardcondition, use_atk_qu
         return TRUE
     end
     local move_event = Event_Move
-    if env(1116, 102051) == TRUE then
+    if env(GetSpEffectID, 102051) == TRUE then
         move_event = Event_MoveLong
     end
     if MoveStartonCancelTiming(move_event, gen_hand) == TRUE then
@@ -6440,8 +6440,8 @@ function GestureLoopCommonFunction(blend_type, lower_state, is_start)
 
     local canmove = FALSE
 
-    if env(301, 0) == TRUE then
-        if env(1109) == TRUE then
+    if env(GetEventEzStateFlag, 0) == TRUE then
+        if env(HasActionRequest) == TRUE then
             ExecEventHalfBlend(Event_GestureEnd, lower_state)
             return TRUE
         end
@@ -6622,7 +6622,7 @@ function DamageCommonFunction(guardcondition, estep, fall_type)
     SetVariable("ToggleDash", 0)
     SetEnableAimMode()
     
-    if c_SwordArtsID == 352 and (c_SwordArtsHand == HAND_LEFT or c_Style == HAND_RIGHT_BOTH) and env(1116, 102340) == TRUE and 0 < env(1108, ACTION_ARM_L2) then
+    if c_SwordArtsID == 352 and (c_SwordArtsHand == HAND_LEFT or c_Style == HAND_RIGHT_BOTH) and env(GetSpEffectID, 102340) == TRUE and 0 < env(ActionDuration, ACTION_ARM_L2) then
         if c_Style == HAND_RIGHT_BOTH or c_Style == HAND_LEFT_BOTH then
             SetSwordArtsPointInfo(ACTION_ARM_L2, TRUE)
             ExecEventAllBody("W_SwordArtsBothGuardCounter")
@@ -7097,12 +7097,12 @@ function GuardCommonFunction(is_guard_end, blend_type, is_just_guard)
     end
 
     if is_just_guard == TRUE then
-        if env(1116, 20100006) == TRUE and JUSTGUARD_IS_FIRSTFRAME == FALSE and (env(1107, ACTION_ARM_L1) == TRUE or env(1108, ACTION_ARM_L1) <= 0) then
+        if env(GetSpEffectID, 20100006) == TRUE and JUSTGUARD_IS_FIRSTFRAME == FALSE and (env(ActionCancelRequest, ACTION_ARM_L1) == TRUE or env(ActionDuration, ACTION_ARM_L1) <= 0) then
             ExecEventHalfBlendNoReset(Event_GuardEnd, blend_type)
             return TRUE
         end
         JUSTGUARD_IS_FIRSTFRAME = FALSE
-        if env(1106, ACTION_ARM_L1) == TRUE and ExecGuard(Event_GuardStart, blend_type) == TRUE then
+        if env(ActionRequest, ACTION_ARM_L1) == TRUE and ExecGuard(Event_GuardStart, blend_type) == TRUE then
             return TRUE
         end
     elseif is_guard_end == FALSE then
@@ -7236,7 +7236,7 @@ function ArtsStanceCommonFunction(r1, r2, l1, l2, b1, b2, blend_type, turn_type,
         return TRUE
     elseif ExecHandChange(HAND_RIGHT, FALSE, blend_type) == TRUE then
         return TRUE
-    elseif c_SwordArtsID ~= 335 and env(1108, ACTION_ARM_L1) < 440 and ExecGuardOnCancelTiming(FALSE, blend_type) == TRUE then
+    elseif c_SwordArtsID ~= 335 and env(ActionDuration, ACTION_ARM_L1) < 440 and ExecGuardOnCancelTiming(FALSE, blend_type) == TRUE then
         return TRUE
     elseif ExecWeaponChange(blend_type) == TRUE then
         return TRUE
@@ -7435,7 +7435,7 @@ function EventCommonFunction()
         return TRUE
     elseif TRUE == ExecTalkDamage() then
         return TRUE
-    elseif env(1116, 9913) == FALSE and ExecDamage(FALSE) == TRUE then
+    elseif env(GetSpEffectID, 9913) == FALSE and ExecDamage(FALSE) == TRUE then
         return TRUE
     elseif TRUE == ExecFallStart(FALL_TYPE_DEFAULT) then
         return TRUE
@@ -7949,8 +7949,8 @@ function Guard_Update()
     if c_Style == HAND_RIGHT_BOTH then
         hand = HAND_RIGHT
     end
-    if env(345, hand) == 289 then
-        act(2002, 19860)
+    if env(GetEquipWeaponSpecialCategoryNumber, hand) == 289 then
+        act(AddSpEffect, 19860)
     end
 end
 
@@ -8061,15 +8061,15 @@ end
 function JustGuardStartCommonFunction(event)
     local blend_type, lower_state = GetHalfBlendInfo()
     if lower_state == LOWER_IDLE then
-        act(2015, 45, 45)
-        act(129, TRUE)
+        act(LockonSystemUnableToTurnAngle, 45, 45)
+        act(DisallowAdditiveTurning, TRUE)
     else
-        act(129, FALSE)
+        act(DisallowAdditiveTurning, FALSE)
     end
     if GuardCommonFunction(FALSE, blend_type, TRUE) == TRUE then
         return
     end
-    if env(339, 1) == TRUE or env(301, 0) == TRUE then
+    if env(IsAnimEnd, 1) == TRUE or env(GetEventEzStateFlag, 0) == TRUE then
         ExecEventHalfBlend(Event_GuardOn, blend_type)
         return
     end
@@ -8080,7 +8080,7 @@ end
 
 JUSTGUARD_IS_FIRSTFRAME = TRUE
 function GuardStart_JustGuard_Upper_onActivate()
-    act(9100)
+    act(Wait)
     JUSTGUARD_IS_FIRSTFRAME = TRUE
 end
 
@@ -8089,11 +8089,11 @@ function GuardStart_JustGuard_Upper_onUpdate()
 end
 
 function GuardStart_JustGuard_Upper_onDeactivate()
-    act(129, FALSE)
+    act(DisallowAdditiveTurning, FALSE)
 end
 
 function GuardStart_JustGuard_SelfTrans_Upper_onActivate()
-    act(9100)
+    act(Wait)
     JUSTGUARD_IS_FIRSTFRAME = TRUE
 end
 
@@ -8102,11 +8102,11 @@ function GuardStart_JustGuard_SelfTrans_Upper_onUpdate()
 end
 
 function GuardStart_JustGuard_SelfTrans_Upper_onDeactivate()
-    act(129, FALSE) 
+    act(DisallowAdditiveTurning, FALSE) 
 end
 
 function GuardStart_JustGuard2_Upper_onActivate()
-    act(9100)
+    act(Wait)
     JUSTGUARD_IS_FIRSTFRAME = TRUE
 end
 
@@ -8115,11 +8115,11 @@ function GuardStart_JustGuard2_Upper_onUpdate()
 end
 
 function GuardStart_JustGuard2_Upper_onDeactivate()
-    act(129, FALSE)
+    act(DisallowAdditiveTurning, FALSE)
 end
 
 function GuardStart_JustGuard3_Upper_onActivate()
-    act(9100)
+    act(Wait)
     JUSTGUARD_IS_FIRSTFRAME = TRUE
 end
 
@@ -8128,11 +8128,11 @@ function GuardStart_JustGuard3_Upper_onUpdate()
 end
 
 function GuardStart_JustGuard3_Upper_onDeactivate()
-    act(129, FALSE)
+    act(DisallowAdditiveTurning, FALSE)
 end
 
 function GuardStart_JustGuard4_Upper_onActivate()
-    act(9100)
+    act(Wait)
     JUSTGUARD_IS_FIRSTFRAME = TRUE
 end
 
@@ -8141,11 +8141,11 @@ function GuardStart_JustGuard4_Upper_onUpdate()
 end
 
 function GuardStart_JustGuard4_Upper_onDeactivate()
-    act(129, FALSE)
+    act(DisallowAdditiveTurning, FALSE)
 end
 
 function GuardStart_JustGuard4_SelfTrans_Upper_onActivate()
-    act(9100)
+    act(Wait)
     JUSTGUARD_IS_FIRSTFRAME = TRUE  
 end
 
@@ -8154,7 +8154,7 @@ function GuardStart_JustGuard4_SelfTrans_Upper_onUpdate()
 end
 
 function GuardStart_JustGuard4_SelfTrans_Upper_onDeactivate()
-    act(129, FALSE)
+    act(DisallowAdditiveTurning, FALSE)
 end
 
 
@@ -8171,12 +8171,12 @@ function FallJumpStart_onUpdate()
 end
 
 function FallLoop_onUpdate()
-    if env(1116, 19935) == TRUE then
-        if env(315, 20) == TRUE then
+    if env(GetSpEffectID, 19935) == TRUE then
+        if env(IsHamariFallDeath, 20) == TRUE then
             ExecEvent("W_FallDeath")
             return
         end
-    elseif env(315, 12) == TRUE then
+    elseif env(IsHamariFallDeath, 12) == TRUE then
         ExecEvent("W_FallDeath")
         return
     elseif FallCommonFunction(TRUE, FALSE, FALL_DEFAULT) == TRUE then
@@ -8215,12 +8215,12 @@ function FallStartFaceDown_onUpdate()
 end
 
 function FallLoopFaceUp_onUpdate()
-    if env(1116, 19935) == TRUE then
-        if env(315, 20) == TRUE then
+    if env(GetSpEffectID, 19935) == TRUE then
+        if env(IsHamariFallDeath, 20) == TRUE then
             ExecEvent("W_FallDeathFaceUp")
             return
         end
-    elseif env(315, 12) == TRUE then
+    elseif env(IsHamariFallDeath, 12) == TRUE then
         ExecEvent("W_FallDeathFaceUp")
         return
     elseif FallCommonFunction(TRUE, FALSE, FALL_FACEUP) == TRUE then
@@ -8229,12 +8229,12 @@ function FallLoopFaceUp_onUpdate()
 end
 
 function FallLoopFaceDown_onUpdate()
-    if env(1116, 19935) == TRUE then
-        if env(315, 20) == TRUE then
+    if env(GetSpEffectID, 19935) == TRUE then
+        if env(IsHamariFallDeath, 20) == TRUE then
             ExecEvent("W_FallDeathFaceDown")
             return
         end
-    elseif env(315, 12) == TRUE then
+    elseif env(IsHamariFallDeath, 12) == TRUE then
         ExecEvent("W_FallDeathFaceDown")
         return
     elseif FallCommonFunction(TRUE, FALSE, FALL_FACEDOWN) == TRUE then
@@ -8263,7 +8263,7 @@ function Damage_Update()
 end
 
 function Damage_NoThrowDef_Update()
-    if env(1116, 30) == FALSE and env(1116, 19970) == FALSE and env(1116, 19865) == FALSE then
+    if env(GetSpEffectID, 30) == FALSE and env(GetSpEffectID, 19970) == FALSE and env(GetSpEffectID, 19865) == FALSE then
         SetThrowDefInvalid()
     end
 end
@@ -8406,7 +8406,7 @@ function GuardDamageSmall_onUpdate()
         return
     end
 
-    if env(1116, 102000) == TRUE then
+    if env(GetSpEffectID, 102000) == TRUE then
         SetJustGuardReinputState()
     end 
 end
@@ -8422,7 +8422,7 @@ function GuardDamageMiddle_onUpdate()
         return
     end
 
-    if env(1116, 102000) == TRUE then
+    if env(GetSpEffectID, 102000) == TRUE then
         SetJustGuardReinputState()
     end
 end
@@ -8437,52 +8437,52 @@ function GuardDamageLarge_onUpdate()
     if DamageCommonFunction(TO_GUARDON, ESTEP_NONE, FALL_TYPE_DEFAULT) == TRUE then
         return
     end
-    if env(1116, 102000) == TRUE then
+    if env(GetSpEffectID, 102000) == TRUE then
         SetJustGuardReinputState()
     end
 end
 
 function SetJustGuardSucceedEffect(level)
-    if env(1116, 102010) == TRUE or env(1116, 102009) == TRUE then
-        act(2002, 102010)
-    elseif env(1116, 102008) == TRUE then
+    if env(GetSpEffectID, 102010) == TRUE or env(GetSpEffectID, 102009) == TRUE then
+        act(AddSpEffect, 102010)
+    elseif env(GetSpEffectID, 102008) == TRUE then
         if level > 1 then
-            act(2002, 102010)
+            act(AddSpEffect, 102010)
         else
-            act(2002, 102009)
+            act(AddSpEffect, 102009)
         end
-    elseif env(1116, 102007) == TRUE then
+    elseif env(GetSpEffectID, 102007) == TRUE then
         if level > 2 then
-            act(2002, 102010)
+            act(AddSpEffect, 102010)
         elseif level == 2 then
-            act(2002, 102009)
+            act(AddSpEffect, 102009)
         else
-            act(2002, 102008)
+            act(AddSpEffect, 102008)
         end
     elseif level > 3 then
-        act(2002, 102010)
+        act(AddSpEffect, 102010)
     elseif level == 3 then
-        act(2002, 102009)
+        act(AddSpEffect, 102009)
     elseif level == 2 then
-        act(2002, 102008)
+        act(AddSpEffect, 102008)
     else
-        act(2002, 102007)
+        act(AddSpEffect, 102007)
     end
-    act(2002, 102019)
+    act(AddSpEffect, 102019)
 end
 
 JUSTGUARD_RELEASE_GUARD_BUTTON = FALSE
 function SetJustGuardReinputState()
-    if env(1108, ACTION_ARM_L1) > 0 then
+    if env(ActionDuration, ACTION_ARM_L1) > 0 then
         if JUSTGUARD_RELEASE_GUARD_BUTTON == TRUE then
-            if env(1116, 102018) == TRUE or env(1116, 102017) == TRUE or env(1116, 102016) == TRUE or env(1116, 102015) == TRUE then
-                act(2002, 102017)
-            elseif env(1116, 102014) == TRUE or env(1116, 102013) == TRUE then
-                act(2002, 102015)
-            elseif env(1116, 102012) == TRUE or env(1116, 102011) == TRUE then
-                act(2002, 102013)
+            if env(GetSpEffectID, 102018) == TRUE or env(GetSpEffectID, 102017) == TRUE or env(GetSpEffectID, 102016) == TRUE or env(GetSpEffectID, 102015) == TRUE then
+                act(AddSpEffect, 102017)
+            elseif env(GetSpEffectID, 102014) == TRUE or env(GetSpEffectID, 102013) == TRUE then
+                act(AddSpEffect, 102015)
+            elseif env(GetSpEffectID, 102012) == TRUE or env(GetSpEffectID, 102011) == TRUE then
+                act(AddSpEffect, 102013)
             else
-                act(2002, 102011)
+                act(AddSpEffect, 102011)
             end
         end
         JUSTGUARD_RELEASE_GUARD_BUTTON = FALSE
@@ -8496,7 +8496,7 @@ function GuardDamageSmall_JustGuard_onActivate()
 end
 
 function GuardDamageSmall_JustGuard_onUpdate()
-    act(110)
+    act(SetStaminaRecoveryDisabled)
     if DamageCommonFunction(TO_GUARDON, ESTEP_NONE, FALL_TYPE_DEFAULT) == TRUE then
         return
     end
@@ -8509,7 +8509,7 @@ function GuardDamageMiddle_JustGuard_onActivate()
 end
 
 function GuardDamageMiddle_JustGuard_onUpdate()
-    act(110)
+    act(SetStaminaRecoveryDisabled)
     if DamageCommonFunction(TO_GUARDON, ESTEP_NONE, FALL_TYPE_DEFAULT) == TRUE then
         return
     end
@@ -8521,7 +8521,7 @@ function GuardDamageLarge_JustGuard_onActivate()
 end
 
 function GuardDamageLarge_JustGuard_onUpdate()
-    act(110)
+    act(SetStaminaRecoveryDisabled)
     if DamageCommonFunction(TO_GUARDON, ESTEP_NONE, FALL_TYPE_DEFAULT) == TRUE then
         return
     end
@@ -8784,7 +8784,7 @@ end
 
 function AttackRightHeavy2Start_onUpdate()
     if IsEnableSpecialAttack(HAND_RIGHT) == TRUE and env(ActionDuration, ACTION_ARM_R2) > 0 and env(ActionDuration, ACTION_ARM_SP_MOVE) > 0 and TRUE == env(GetSpEffectID, 100290) then
-        if env(345, HAND_RIGHT) == 953 then
+        if env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT) == 953 then
             ExecEventAllBody("W_AttackRightSpecial1")
         else
             ExecEventAllBody("W_AttackRightSpecial2")
@@ -9062,8 +9062,8 @@ function AttackDualLightSubStart_onUpdate()
         return
     end
 
-    if env(301, 0) == TRUE or env(339, 1) == TRUE then
-        act(2020, 0, TRUE)
+    if env(GetEventEzStateFlag, 0) == TRUE or env(IsAnimEnd, 1) == TRUE then
+        act(SetSpecialInterpolation, 0, TRUE)
         ExecEventAllBody("W_AttackDualLight2")
         return
     end 
@@ -9266,7 +9266,7 @@ function AttackBothHeavy2Start_onUpdate()
         if c_Style == HAND_LEFT_BOTH then
             hand = HAND_LEFT
         end
-        if env(345, hand) == 953 then
+        if env(GetEquipWeaponSpecialCategoryNumber, hand) == 953 then
             ExecEventAllBody("W_AttackBothSpecial1")
         else
             ExecEventAllBody("W_AttackBothSpecial2")
@@ -10737,7 +10737,7 @@ function DrawStanceRightStart_Upper_onUpdate()
         end
     end
     if GetEquipType(c_SwordArtsHand, WEAPON_CATEGORY_CROSSBOW) == TRUE then
-        act(2012)
+        act(SetIsPreciseShootingPossible)
         if CrossbowStanceCommonFunction(blend_type, FALSE) == TRUE then
             return
         end
@@ -10767,7 +10767,7 @@ function DrawStanceRightStart_Upper_onUpdate()
         return
     end
     
-    if env(1116, 19945) == TRUE then
+    if env(GetSpEffectID, 19945) == TRUE then
         SetVariable("DrawStanceRightEndType", 1)
     else
         SetVariable("DrawStanceRightEndType", 0)
@@ -10812,7 +10812,7 @@ function DrawStanceRightLoop_Upper_onUpdate()
         end
     end
     if GetEquipType(c_SwordArtsHand, WEAPON_CATEGORY_CROSSBOW) == TRUE then
-        act(2012)
+        act(SetIsPreciseShootingPossible)
         if CrossbowStanceCommonFunction(blend_type, FALSE) == TRUE then
             return
         end
@@ -10842,7 +10842,7 @@ function DrawStanceRightLoop_Upper_onUpdate()
         return
     end
     
-    if env(1116, 19945) == TRUE then
+    if env(GetSpEffectID, 19945) == TRUE then
         SetVariable("DrawStanceRightEndType", 1)
     else
         SetVariable("DrawStanceRightEndType", 0)
@@ -10897,7 +10897,7 @@ function DrawStanceNoSyncLoop_Upper_onUpdate()
         return
     end
     
-    if env(1116, 19945) == TRUE then
+    if env(GetSpEffectID, 19945) == TRUE then
         SetVariable("DrawStanceRightEndType", 1)
     else
         SetVariable("DrawStanceRightEndType", 0)
@@ -10940,7 +10940,7 @@ function DrawStanceNoSyncLoopMax_Upper_onUpdate()
         return
     end
     
-    if env(1116, 19945) == TRUE then
+    if env(GetSpEffectID, 19945) == TRUE then
         SetVariable("DrawStanceRightEndType", 1)
     else
         SetVariable("DrawStanceRightEndType", 0)
@@ -11008,7 +11008,7 @@ function DrawStanceRightAttackLight_onUpdate()
 
     local artsr1 = FALSE
     local artsr2 = FALSE
-    if env(1116, 19921) == TRUE and env(1108, ACTION_ARM_L2) > 0 then
+    if env(GetSpEffectID, 19921) == TRUE and env(ActionDuration, ACTION_ARM_L2) > 0 then
         r1 = "W_DrawStanceRightAttackLight"
         r2 = "W_DrawStanceRightAttackHeavy"
         b1 = "W_DrawStanceRightAttackLight"
@@ -11018,10 +11018,10 @@ function DrawStanceRightAttackLight_onUpdate()
     end
 
     if c_SwordArtsID == 318 then
-        if env(1116, 100054) == TRUE then
+        if env(GetSpEffectID, 100054) == TRUE then
             r1 = "W_SwordArtsOneShotComboEnd_MesmerSowrdArts"
             b1 = "W_SwordArtsOneShotComboEnd_MesmerSowrdArts"
-        elseif env(1116, 100055) == TRUE then
+        elseif env(GetSpEffectID, 100055) == TRUE then
             r1 = "W_SwordArtsOneShotComboEnd_2"
             b1 = "W_SwordArtsOneShotComboEnd_2"
         end
@@ -11080,8 +11080,8 @@ end
 
 function DrawStanceHalfRightAttackLight_Upper_onUpdate()
     local blend_type, lower_state = GetHalfBlendInfo()
-    if GetEquipType(c_SwordArtsHand, WEAPON_CATEGORY_CROSSBOW) == TRUE and env(1108, ACTION_ARM_L2) > 0 then
-        act(2012)
+    if GetEquipType(c_SwordArtsHand, WEAPON_CATEGORY_CROSSBOW) == TRUE and env(ActionDuration, ACTION_ARM_L2) > 0 then
+        act(SetIsPreciseShootingPossible)
         if CrossbowStanceCommonFunction(blend_type, TRUE) == TRUE then
             return
         end
@@ -11093,17 +11093,17 @@ function DrawStanceHalfRightAttackLight_Upper_onUpdate()
     if ArtsCommonFunction(r1, r2, "W_AttackLeftLight1", "W_AttackLeftHeavy1", b1, b2, FALSE, FALSE, FALSE, TRUE, FALSE, ALLBODY) == TRUE then
         return
     end
-    if env(339, 1) == TRUE then
+    if env(IsAnimEnd, 1) == TRUE then
         SetArtsGeneratorTransitionIndex()
         ExecEventAllBody("W_Idle")
         return
     end
     if lower_state == LOWER_IDLE then
-        act(2015, 45, 45)
+        act(LockonSystemUnableToTurnAngle, 45, 45)
     elseif lower_state == LOWER_TURN then
         SetVariable("TurnType", TURN_TYPE_DEFAULT)
     end
-    if lower_state == LOWER_MOVE and env(2000) == TRUE then
+    if lower_state == LOWER_MOVE and env(IsMoveCancelPossible) == TRUE then
         ExecEventHalfBlendNoReset(Event_Move, UPPER)
         return
     end
@@ -11228,8 +11228,8 @@ function SwordArtsOneShot_onUpdate()
     if c_SwordArtsID == 130 or c_SwordArtsID == 55 or c_SwordArtsID == 323 then
         canThrow = TRUE
     end
-    if env(1116, 102050) == TRUE then
-        act(2018)
+    if env(GetSpEffectID, 102050) == TRUE then
+        act(LockonFixedAngleCancel)
     end
     local r1 = "W_AttackRightLight1"
     local b1 = "W_AttackBothLight1"
@@ -11301,8 +11301,8 @@ function SwordArtsOneShot_onUpdate()
         end
     end
     if c_SwordArtsID == 356 then
-        act(2016, ACTION_ARM_L2, c_SwordArtsHand)
-        if env(344, ACTION_ARM_L2, c_SwordArtsHand) == FALSE and env(1116, 100285) == TRUE then
+        act(ReserveArtsPointsUse, ACTION_ARM_L2, c_SwordArtsHand)
+        if env(HasEnoughArtsPoints, ACTION_ARM_L2, c_SwordArtsHand) == FALSE and env(GetSpEffectID, 100285) == TRUE then
             ExecEventAllBody("W_SwordArtsChargeCancelEarly")
         end
     end
@@ -11331,7 +11331,7 @@ function SwordArtsOneShot_Sub_onUpdate()
     if ArtsCommonFunction(r1, r2, "W_AttackLeftLight1", "W_AttackLeftHeavy1", b1, b2, FALSE, TRUE, TRUE, TRUE, canThrow, ALLBODY) == TRUE then
         return
     end
-    if env(1108, ACTION_ARM_L2) <= 0 and env(1116, 100285) == TRUE then
+    if env(ActionDuration, ACTION_ARM_L2) <= 0 and env(GetSpEffectID, 100285) == TRUE then
         if GetVariable("SwordArtsSubCategory") == 0 then
             SetVariable("SwordArtsSubCategory2", 0)
         elseif GetVariable("SwordArtsSubCategory") == 1 then
@@ -11340,7 +11340,7 @@ function SwordArtsOneShot_Sub_onUpdate()
         ExecEventAllBody("W_SwordArtsChargeCancelEarly_Sub")
         return
     end
-    if env(339, 0) == TRUE then
+    if env(IsAnimEnd, 0) == TRUE then
         SetArtsGeneratorTransitionIndex()
         ExecEventAllBody("W_Idle")
         return
@@ -11400,7 +11400,7 @@ function SwordArtsHalfOneShot_Upper_onUpdate()
                 SetVariable("IsMadTorch", 0)
             end
 
-            if env(1108, ACTION_ARM_L2) > 0 then
+            if env(ActionDuration, ACTION_ARM_L2) > 0 then
                 if c_SwordArtsID == 334 and GetVariable("IsEnoughArtPointsL2_MadTorchEnd") == TRUE then
                     ExecEventHalfBlend(Event_SwordArtsHalfLoopEnd, blend_type)
                 else
@@ -11474,17 +11474,17 @@ function SwordArtsOneShotComboEnd_MesmerSowrdArts_onUpdate()
     local b1 = "W_AttackBothLight1"
     local r2 = "W_AttackRightHeavy1Start"
     local b2 = "W_AttackBothHeavy1Start"
-    if env(1116, 100054) == TRUE then
+    if env(GetSpEffectID, 100054) == TRUE then
         r1 = "W_SwordArtsOneShotComboEnd"
         b1 = "W_SwordArtsOneShotComboEnd"
-    elseif env(1116, 100055) == TRUE then
+    elseif env(GetSpEffectID, 100055) == TRUE then
         r1 = "W_SwordArtsOneShotComboEnd_2"
         b1 = "W_SwordArtsOneShotComboEnd_2"
     end
-    if env(1116, 100050) == TRUE then
+    if env(GetSpEffectID, 100050) == TRUE then
         r2 = "W_SwordArtsOneShotComboEnd"
         b2 = "W_SwordArtsOneShotComboEnd"
-    elseif env(1116, 100051) == TRUE then
+    elseif env(GetSpEffectID, 100051) == TRUE then
         r2 = "W_SwordArtsOneShotComboEnd_2"
         b2 = "W_SwordArtsOneShotComboEnd_2"
     end
@@ -11492,11 +11492,11 @@ function SwordArtsOneShotComboEnd_MesmerSowrdArts_onUpdate()
         r1 = "W_AttackRightLightStep"
         b1 = "W_AttackBothLightStep"
     end
-    if env(1108, ACTION_ARM_L2) <= 0 then
-        if env(1116, 100285) == TRUE then
+    if env(ActionDuration, ACTION_ARM_L2) <= 0 then
+        if env(GetSpEffectID, 100285) == TRUE then
             ExecEventAllBody("W_SwordArtsChargeCancelEarly2")
             return
-        elseif env(1116, 100286) == TRUE then
+        elseif env(GetSpEffectID, 100286) == TRUE then
             ExecEventAllBody("W_SwordArtsChargeCancelEarly2")
             return
         end
@@ -11504,7 +11504,7 @@ function SwordArtsOneShotComboEnd_MesmerSowrdArts_onUpdate()
     if ArtsCommonFunction(r1, r2, "W_AttackLeftLight1", "W_AttackLeftHeavy1", b1, b2, FALSE, TRUE, TRUE, TRUE, FALSE, ALLBODY) == TRUE then
         return
     end
-    if env(339, 0) == TRUE then
+    if env(IsAnimEnd, 0) == TRUE then
         SetArtsGeneratorTransitionIndex()
         ExecEventAllBody("W_Idle")
         return
@@ -11684,7 +11684,7 @@ function SwordArtsLeftGuardCounter_onUpdate()
         return
     end
 
-    if env(339, 0) == TRUE then
+    if env(IsAnimEnd, 0) == TRUE then
         SetArtsGeneratorTransitionIndex()
         ExecEventAllBody("W_Idle")
         return
@@ -11697,7 +11697,7 @@ function SwordArtsBothGuardCounter_onUpdate()
         return
     end
 
-    if env(339, 0) == TRUE then
+    if env(IsAnimEnd, 0) == TRUE then
         SetArtsGeneratorTransitionIndex()
         ExecEventAllBody("W_Idle")
         return
@@ -11848,8 +11848,8 @@ function SwordArtsHalfOneShotShieldBoth_Upper_onUpdate()
     end
     local blend_type, lower_state = GetHalfBlendInfo()
     local arts_cat = 0
-    local idle_cat = env(358)
-    local wep_cat = env(225, c_SwordArtsHand)
+    local idle_cat = env(GetStayAnimCategory)
+    local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
     arts_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
     local arts_idx = 0
     if arts_cat == 47 then
@@ -11858,21 +11858,21 @@ function SwordArtsHalfOneShotShieldBoth_Upper_onUpdate()
         arts_idx = 2
     end
     SetVariable("SwordArtsOneShotShieldCancelCategory", arts_idx)
-    if 0 >= env(1108, ACTION_ARM_L2) then
-        if env(1116, 100285) == TRUE then
+    if 0 >= env(ActionDuration, ACTION_ARM_L2) then
+        if env(GetSpEffectID, 100285) == TRUE then
             ExecEventAllBody("W_SwordArtsOneShotShieldBoth_Cancel")
-        elseif env(1116, 100286) == TRUE then
+        elseif env(GetSpEffectID, 100286) == TRUE then
             ExecEventAllBody("W_SwordArtsOneShotShieldBoth_Cancel")
         end
     end
     if ArtsCommonFunction("W_AttackRightLight1", "W_AttackRightHeavy1Start", "W_AttackLeftLight1", "W_AttackLeftHeavy1", "W_AttackBothLight1", "W_AttackBothHeavy1Start", FALSE, TRUE, TRUE, FALSE, canThrow, ALLBODY) == TRUE then
         return
     end
-    if env(339, 1) == TRUE then
+    if env(IsAnimEnd, 1) == TRUE then
         local arts_category = c_SwordArtsID + 600
         local loop_animID = SWORDARTS_ANIM_ID_RIGHT_LOOP
-        if env(1114, arts_category, loop_animID) == TRUE and (c_SwordArtsID ~= 201 and c_SwordArtsID ~= 202 or GetVariable("IsEnoughArtPointsL2") == FALSE) then
-            if 0 < env(1108, ACTION_ARM_L2) then
+        if env(DoesAnimExist, arts_category, loop_animID) == TRUE and (c_SwordArtsID ~= 201 and c_SwordArtsID ~= 202 or GetVariable("IsEnoughArtPointsL2") == FALSE) then
+            if 0 < env(ActionDuration, ACTION_ARM_L2) then
                 if c_SwordArtsID == 334 then
                     SetVariable("IsMadTorch", 1)
                 else
@@ -11893,11 +11893,11 @@ function SwordArtsHalfOneShotShieldBoth_Upper_onUpdate()
         return
     end
     if lower_state == LOWER_IDLE then
-        act(2015, 45, 45)
+        act(LockonSystemUnableToTurnAngle, 45, 45)
     elseif lower_state == LOWER_TURN then
         SetVariable("TurnType", TURN_TYPE_DEFAULT)
     end
-    if lower_state == LOWER_MOVE and env(2000) == TRUE then
+    if lower_state == LOWER_MOVE and env(IsMoveCancelPossible) == TRUE then
         ExecEventHalfBlendNoReset(Event_Move, UPPER)
         return
     end
@@ -11920,18 +11920,18 @@ function SwordArtsRolling_onUpdate()
         b1 = "W_AttackBothBackstep"
     end
 
-    if env(1116, 100054) == TRUE then
+    if env(GetSpEffectID, 100054) == TRUE then
         r1 = "W_SwordArtsOneShotComboEnd"
         b1 = "W_SwordArtsOneShotComboEnd"
-    elseif env(1116, 100055) == TRUE then
+    elseif env(GetSpEffectID, 100055) == TRUE then
         r1 = "W_SwordArtsOneShotComboEnd_2"
         b1 = "W_SwordArtsOneShotComboEnd_2"
     end
 
-    if env(1116, 100050) == TRUE then
+    if env(GetSpEffectID, 100050) == TRUE then
         r2 = "W_SwordArtsOneShotComboEnd"
         b2 = "W_SwordArtsOneShotComboEnd"
-    elseif env(1116, 100051) == TRUE then
+    elseif env(GetSpEffectID, 100051) == TRUE then
         r2 = "W_SwordArtsOneShotComboEnd_2"
         b2 = "W_SwordArtsOneShotComboEnd_2"
     end
@@ -11956,18 +11956,18 @@ function SwordArtsRolling_SelfTrans_onUpdate()
         b1 = "W_AttackBothBackstep"
     end
 
-    if env(1116, 100054) == TRUE then
+    if env(GetSpEffectID, 100054) == TRUE then
         r1 = "W_SwordArtsOneShotComboEnd"
         b1 = "W_SwordArtsOneShotComboEnd"
-    elseif env(1116, 100055) == TRUE then
+    elseif env(GetSpEffectID, 100055) == TRUE then
         r1 = "W_SwordArtsOneShotComboEnd_2"
         b1 = "W_SwordArtsOneShotComboEnd_2"
     end
 
-    if env(1116, 100050) == TRUE then
+    if env(GetSpEffectID, 100050) == TRUE then
         r2 = "W_SwordArtsOneShotComboEnd"
         b2 = "W_SwordArtsOneShotComboEnd"
-    elseif env(1116, 100051) == TRUE then
+    elseif env(GetSpEffectID, 100051) == TRUE then
         r2 = "W_SwordArtsOneShotComboEnd_2"
         b2 = "W_SwordArtsOneShotComboEnd_2"
     end
@@ -11992,18 +11992,18 @@ function SwordArtsRolling_SelfTrans2_onUpdate()
         b1 = "W_AttackBothBackstep"
     end
 
-    if env(1116, 100054) == TRUE then
+    if env(GetSpEffectID, 100054) == TRUE then
         r1 = "W_SwordArtsOneShotComboEnd"
         b1 = "W_SwordArtsOneShotComboEnd"
-    elseif env(1116, 100055) == TRUE then
+    elseif env(GetSpEffectID, 100055) == TRUE then
         r1 = "W_SwordArtsOneShotComboEnd_2"
         b1 = "W_SwordArtsOneShotComboEnd_2"
     end
 
-    if env(1116, 100050) == TRUE then
+    if env(GetSpEffectID, 100050) == TRUE then
         r2 = "W_SwordArtsOneShotComboEnd"
         b2 = "W_SwordArtsOneShotComboEnd"
-    elseif env(1116, 100051) == TRUE then
+    elseif env(GetSpEffectID, 100051) == TRUE then
         r2 = "W_SwordArtsOneShotComboEnd_2"
         b2 = "W_SwordArtsOneShotComboEnd_2"
     end
@@ -12054,8 +12054,8 @@ function SwordArtsRolling_Sub_onUpdate()
         return
     end
 
-    if env(301, 0) == TRUE or env(339, 1) == TRUE then
-        act(2020, 0, TRUE)
+    if env(GetEventEzStateFlag, 0) == TRUE or env(IsAnimEnd, 1) == TRUE then
+        act(SetSpecialInterpolation, 0, TRUE)
         ExecEventAllBody("W_SwordArtsRolling")
         return
     end
@@ -12103,13 +12103,13 @@ function SwordArtsHalfLoopLoop_Upper_onUpdate()
 
     if c_SwordArtsID == 334 then
         SetVariable("IsMadTorch", 1)
-        if env(1116, 100700) == FALSE and (env(1108, ACTION_ARM_L2) <= 0 or env(1001) <= 0 or GetVariable("IsEnoughArtPointsL2") == 1 and env(344, ACTION_ARM_L2, c_SwordArtsHand) == FALSE) then
+        if env(GetSpEffectID, 100700) == FALSE and (env(ActionDuration, ACTION_ARM_L2) <= 0 or env(GetStamina) <= 0 or GetVariable("IsEnoughArtPointsL2") == 1 and env(HasEnoughArtsPoints, ACTION_ARM_L2, c_SwordArtsHand) == FALSE) then
             ExecEventHalfBlend(Event_SwordArtsHalfLoopEnd, blend_type)
             return
         end
     else
         SetVariable("IsMadTorch", 0)
-        if env(1116, 100700) == FALSE and (env(1108, ACTION_ARM_L2) <= 0 or env(1001) <= 0 or GetVariable("IsEnoughArtPointsL2") == 0 and env(344, ACTION_ARM_L2, c_SwordArtsHand) == FALSE) then
+        if env(GetSpEffectID, 100700) == FALSE and (env(ActionDuration, ACTION_ARM_L2) <= 0 or env(GetStamina) <= 0 or GetVariable("IsEnoughArtPointsL2") == 0 and env(HasEnoughArtsPoints, ACTION_ARM_L2, c_SwordArtsHand) == FALSE) then
             ExecEventHalfBlend(Event_SwordArtsHalfLoopEnd, blend_type)
             return
         end
@@ -12184,7 +12184,7 @@ function SwordArtsHalfBothLoopLoop_Upper_onUpdate()
     if ArtsCommonFunction("W_AttackRightLight1", "W_AttackRightHeavy1Start", "W_AttackLeftLight1", "W_AttackLeftHeavy1", "W_AttackBothLight1", "W_AttackBothHeavy1Start", FALSE, TRUE, TRUE, FALSE, canThrow, ALLBODY) == TRUE then
         return
     end
-    if env(1108, ACTION_ARM_L2) <= 0 or env(1107, ACTION_ARM_L2) == TRUE or env(1001) <= 0 or GetVariable("IsEnoughArtPointsL2") == 1 then
+    if env(ActionDuration, ACTION_ARM_L2) <= 0 or env(ActionCancelRequest, ACTION_ARM_L2) == TRUE or env(GetStamina) <= 0 or GetVariable("IsEnoughArtPointsL2") == 1 then
         if c_SwordArtsID == 334 then
             SetVariable("IsMadTorch", 1)
         else
@@ -12194,11 +12194,11 @@ function SwordArtsHalfBothLoopLoop_Upper_onUpdate()
         return
     end
     if lower_state == LOWER_IDLE then
-        act(2015, 45, 45)
+        act(LockonSystemUnableToTurnAngle, 45, 45)
     elseif lower_state == LOWER_TURN then
         SetVariable("TurnType", TURN_TYPE_DEFAULT)
     end
-    if lower_state == LOWER_MOVE and env(2000) == TRUE then
+    if lower_state == LOWER_MOVE and env(IsMoveCancelPossible) == TRUE then
         ExecEventHalfBlendNoReset(Event_Move, UPPER)
         return
     end
@@ -12215,17 +12215,17 @@ function SwordArtsHalfBothLoopEnd_Upper_onUpdate()
     if ArtsCommonFunction("W_AttackRightLight1", "W_AttackRightHeavy1Start", "W_AttackLeftLight1", "W_AttackLeftHeavy1", "W_AttackBothLight1", "W_AttackBothHeavy1Start", FALSE, TRUE, TRUE, TRUE, canThrow, blend_type) == TRUE then
         return
     end
-    if env(339, 1) == TRUE then
+    if env(IsAnimEnd, 1) == TRUE then
         SetArtsGeneratorTransitionIndex()
         ExecEventAllBody("W_Idle")
         return
     end
     if lower_state == LOWER_IDLE then
-        act(2015, 45, 45)
+        act(LockonSystemUnableToTurnAngle, 45, 45)
     elseif lower_state == LOWER_TURN then
         SetVariable("TurnType", TURN_TYPE_DEFAULT)
     end
-    if lower_state == LOWER_MOVE and env(2000) == TRUE then
+    if lower_state == LOWER_MOVE and env(IsMoveCancelPossible) == TRUE then
         ExecEventHalfBlendNoReset(Event_Move, UPPER)
         return
     end
@@ -12243,7 +12243,7 @@ function SwordArtsHalfLeftLoopLoop_Upper_onUpdate()
     if ArtsCommonFunction("W_AttackRightLight1", "W_AttackRightHeavy1Start", "W_AttackLeftLight1", "W_AttackLeftHeavy1", "W_AttackBothLight1", "W_AttackBothHeavy1Start", FALSE, TRUE, TRUE, FALSE, canThrow, ALLBODY) == TRUE then
         return
     end
-    if env(1108, ACTION_ARM_L2) <= 0 or env(1107, ACTION_ARM_L2) == TRUE or env(1001) <= 0 or GetVariable("IsEnoughArtPointsL2") == 1 then
+    if env(ActionDuration, ACTION_ARM_L2) <= 0 or env(ActionCancelRequest, ACTION_ARM_L2) == TRUE or env(GetStamina) <= 0 or GetVariable("IsEnoughArtPointsL2") == 1 then
         if c_SwordArtsID == 334 then
             SetVariable("IsMadTorch", 1)
         else
@@ -12253,11 +12253,11 @@ function SwordArtsHalfLeftLoopLoop_Upper_onUpdate()
         return
     end
     if lower_state == LOWER_IDLE then
-        act(2015, 45, 45)
+        act(LockonSystemUnableToTurnAngle, 45, 45)
     elseif lower_state == LOWER_TURN then
         SetVariable("TurnType", TURN_TYPE_DEFAULT)
     end
-    if lower_state == LOWER_MOVE and env(2000) == TRUE then
+    if lower_state == LOWER_MOVE and env(IsMoveCancelPossible) == TRUE then
         ExecEventHalfBlendNoReset(Event_Move, UPPER)
         return
     end
@@ -12274,17 +12274,17 @@ function SwordArtsHalfLeftLoopEnd_Upper_onUpdate()
     if ArtsCommonFunction("W_AttackRightLight1", "W_AttackRightHeavy1Start", "W_AttackLeftLight1", "W_AttackLeftHeavy1", "W_AttackBothLight1", "W_AttackBothHeavy1Start", FALSE, TRUE, TRUE, TRUE, canThrow, blend_type) == TRUE then
         return
     end
-    if env(339, 1) == TRUE then
+    if env(IsAnimEnd, 1) == TRUE then
         SetArtsGeneratorTransitionIndex()
         ExecEventAllBody("W_Idle")
         return
     end
     if lower_state == LOWER_IDLE then
-        act(2015, 45, 45)
+        act(LockonSystemUnableToTurnAngle, 45, 45)
     elseif lower_state == LOWER_TURN then
         SetVariable("TurnType", TURN_TYPE_DEFAULT)
     end
-    if lower_state == LOWER_MOVE and env(2000) == TRUE then
+    if lower_state == LOWER_MOVE and env(IsMoveCancelPossible) == TRUE then
         ExecEventHalfBlendNoReset(Event_Move, UPPER)
         return
     end
@@ -12367,8 +12367,8 @@ function SwordArtsChargeCancelEarly_onUpdate()
         return
     end
 
-    if env(1116, 102050) == TRUE then
-        act(2018)
+    if env(GetSpEffectID, 102050) == TRUE then
+        act(LockonFixedAngleCancel)
     end
 
     local r1 = "W_AttackRightLight1"
@@ -12400,7 +12400,7 @@ function SwordArtsChargeCancelEarly_onUpdate()
         return
     end
 
-    if env(339, 0) == TRUE then
+    if env(IsAnimEnd, 0) == TRUE then
         SetArtsGeneratorTransitionIndex()
         ExecEventAllBody("W_Idle")
         return
@@ -12473,7 +12473,7 @@ function SwordArtsChargeCancelEarly_Sub_onUpdate()
     if ArtsCommonFunction(r1, r2, "W_AttackLeftLight1", "W_AttackLeftHeavy1", b1, b2, FALSE, TRUE, TRUE, TRUE, FALSE, ALLBODY) == TRUE then
         return
     end
-    if env(339, 0) == TRUE then
+    if env(IsAnimEnd, 0) == TRUE then
         SetArtsGeneratorTransitionIndex()
         ExecEventAllBody("W_Idle")
         return
@@ -12486,34 +12486,34 @@ function SwordArtsHalfChargeCancelEarly_Upper_onUpdate()
     local r2 = "W_AttackRightHeavy1Start"
     local b2 = "W_AttackBothHeavy1Start"
     local blend_type, lower_state = GetHalfBlendInfo()
-    if env(1116, 100054) == TRUE then
+    if env(GetSpEffectID, 100054) == TRUE then
         r1 = "W_SwordArtsOneShotComboEnd"
         b1 = "W_SwordArtsOneShotComboEnd"
-    elseif env(1116, 100055) == TRUE then
+    elseif env(GetSpEffectID, 100055) == TRUE then
         r1 = "W_SwordArtsOneShotComboEnd_2"
         b1 = "W_SwordArtsOneShotComboEnd_2"
     end
-    if env(1116, 100050) == TRUE then
+    if env(GetSpEffectID, 100050) == TRUE then
         r2 = "W_SwordArtsOneShotComboEnd"
         b2 = "W_SwordArtsOneShotComboEnd"
-    elseif env(1116, 100051) == TRUE then
+    elseif env(GetSpEffectID, 100051) == TRUE then
         r2 = "W_SwordArtsOneShotComboEnd_2"
         b2 = "W_SwordArtsOneShotComboEnd_2"
     end
     if ArtsCommonFunction(r1, r2, "W_AttackLeftLight1", "W_AttackLeftHeavy1", b1, b2, FALSE, TRUE, TRUE, TRUE, FALSE, ALLBODY) == TRUE then
         return
     end
-    if env(339, 1) == TRUE then
+    if env(IsAnimEnd, 1) == TRUE then
         SetArtsGeneratorTransitionIndex()
         ExecEventAllBody("W_Idle")
         return
     end
     if lower_state == LOWER_IDLE then
-        act(2015, 45, 45)
+        act(LockonSystemUnableToTurnAngle, 45, 45)
     elseif lower_state == LOWER_TURN then
         SetVariable("TurnType", TURN_TYPE_DEFAULT)
     end
-    if lower_state == LOWER_MOVE and env(2000) == TRUE then
+    if lower_state == LOWER_MOVE and env(IsMoveCancelPossible) == TRUE then
         ExecEventHalfBlendNoReset(Event_Move, UPPER)
         return
     end
@@ -12618,18 +12618,18 @@ function CrossbowStanceCommonFunction(blend_type, IsShooting)
         arrowHand = HAND_LEFT
     end
     if IsShooting == TRUE then
-        if env(1108, ACTION_ARM_L2) > 0 and (request == ATTACK_REQUEST_RIGHT_CROSSBOW or request == ATTACK_REQUEST_LEFT_CROSSBOW or request == ATTACK_REQUEST_BOTHRIGHT_CROSSBOW or request == ATTACK_REQUEST_BOTHLEFT_CROSSBOW or request == ATTACK_REQUEST_RIGHT_CROSSBOW2 or request == ATTACK_REQUEST_LEFT_CROSSBOW2 or request == ATTACK_REQUEST_BOTHRIGHT_CROSSBOW2 or request == ATTACK_REQUEST_BOTHLEFT_CROSSBOW2) then
+        if env(ActionDuration, ACTION_ARM_L2) > 0 and (request == ATTACK_REQUEST_RIGHT_CROSSBOW or request == ATTACK_REQUEST_LEFT_CROSSBOW or request == ATTACK_REQUEST_BOTHRIGHT_CROSSBOW or request == ATTACK_REQUEST_BOTHLEFT_CROSSBOW or request == ATTACK_REQUEST_RIGHT_CROSSBOW2 or request == ATTACK_REQUEST_LEFT_CROSSBOW2 or request == ATTACK_REQUEST_BOTHRIGHT_CROSSBOW2 or request == ATTACK_REQUEST_BOTHLEFT_CROSSBOW2) then
             ExecEventHalfBlend(Event_DrawStanceRightStart, blend_type)
             return TRUE
         end
-    elseif (request == ATTACK_REQUEST_RIGHT_CROSSBOW or request == ATTACK_REQUEST_LEFT_CROSSBOW or request == ATTACK_REQUEST_BOTHRIGHT_CROSSBOW or request == ATTACK_REQUEST_BOTHLEFT_CROSSBOW) and env(1108, ACTION_ARM_L2) > 0 then
+    elseif (request == ATTACK_REQUEST_RIGHT_CROSSBOW or request == ATTACK_REQUEST_LEFT_CROSSBOW or request == ATTACK_REQUEST_BOTHRIGHT_CROSSBOW or request == ATTACK_REQUEST_BOTHLEFT_CROSSBOW) and env(ActionDuration, ACTION_ARM_L2) > 0 then
         g_ArrowSlot = 0
-        act(2013, 0)
-        if env(245, arrowHand) == TRUE then
+        act(ChooseBowAndArrowSlot, 0)
+        if env(IsOutOfAmmo, arrowHand) == TRUE then
             ExecEventHalfBlend(Event_AttackCrossbowRightEmpty, blend_type)
             return TRUE
         end
-        if env(1001) > 0 then
+        if env(GetStamina) > 0 then
             SetSwordArtsPointInfo(ACTION_ARM_R1, TRUE)
             SetSwordArtsWepCategory_DrawStanceRightAttackLight()
             if IsHalfBlendArts(c_SwordArtsID) == TRUE then
@@ -12640,15 +12640,15 @@ function CrossbowStanceCommonFunction(blend_type, IsShooting)
             end
             return TRUE
         end
-    elseif (request == ATTACK_REQUEST_RIGHT_CROSSBOW2 or request == ATTACK_REQUEST_LEFT_CROSSBOW2 or request == ATTACK_REQUEST_BOTHRIGHT_CROSSBOW2 or request == ATTACK_REQUEST_BOTHLEFT_CROSSBOW2) and env(1108, ACTION_ARM_L2) > 0 then
-        act(9101)
+    elseif (request == ATTACK_REQUEST_RIGHT_CROSSBOW2 or request == ATTACK_REQUEST_LEFT_CROSSBOW2 or request == ATTACK_REQUEST_BOTHRIGHT_CROSSBOW2 or request == ATTACK_REQUEST_BOTHLEFT_CROSSBOW2) and env(ActionDuration, ACTION_ARM_L2) > 0 then
+        act(ResetInputQueue)
         g_ArrowSlot = 1
-        act(2013, 1)
-        if env(245, arrowHand) == TRUE then
+        act(ChooseBowAndArrowSlot, 1)
+        if env(IsOutOfAmmo, arrowHand) == TRUE then
             ExecEventHalfBlend(Event_AttackCrossbowRightEmpty, blend_type)
             return TRUE
         end
-        if env(1001) > 0 then
+        if env(GetStamina) > 0 then
             SetSwordArtsPointInfo(ACTION_ARM_R2, TRUE)
             SetSwordArtsWepCategory_DrawStanceRightAttackLight()
             if IsHalfBlendArts(c_SwordArtsID) == TRUE then
@@ -13527,7 +13527,7 @@ function ItemDragonThrowSpearMax_Upper_onUpdate()
     if HalfBlendLowerCommonFunction(Event_ItemDragonThrowSpearMax, lower_state, FALSE, TRUE) == TRUE then
         return
     end
-    if env(1108, ACTION_ARM_USE_ITEM) <= 0 and (env(2003, TAE_FLAG_CHARGING) == 1 or env(1116, 100280) == TRUE) then
+    if env(ActionDuration, ACTION_ARM_USE_ITEM) <= 0 and (env(GetGeneralTAEFlag, TAE_FLAG_CHARGING) == 1 or env(GetSpEffectID, 100280) == TRUE) then
         ExecEventHalfBlend(Event_ItemDragonThrowSpearCancel, blend_type)
         return
     end
@@ -14100,7 +14100,7 @@ end
 
 function MagicLaunchRight_Upper_onUpdate()
     local blend_type, lower_state = GetHalfBlendInfo()
-    local magic_index = env(227)
+    local magic_index = env(GetMagicAnimType)
     if MagicCommonFunction(blend_type, QUICKTYPE_NORMAL, FALSE) == TRUE then
         return
     elseif env(GetMagicAnimType) ~= MAGIC_REQUEST_CRYSTAL_MOON and blend_type ~= UPPER and TRUE == ExecQuickTurn(LOWER, TURN_TYPE_DEFAULT) then
@@ -14130,12 +14130,12 @@ function MagicLoopRight_Upper_onUpdate()
     end
 
     local button = ACTION_ARM_R1
-    local sp_kind = env(345, wep_hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
     if sp_kind == 293 then
         button = ACTION_ARM_R2
     end
 
-    if env(1108, button) <= 0 or env(232, wep_hand, 1) == FALSE or env(1001) <= 0 then
+    if env(ActionDuration, button) <= 0 or env(IsMagicUseable, wep_hand, 1) == FALSE or env(GetStamina) <= 0 then
         local magic_index = env(GetMagicAnimType)
         if magic_index == MAGIC_REQUEST_EX_LARGE_ARROW then
             ExecEventHalfBlend(Event_MagicFireRightCancel2, blend_type)
@@ -14164,18 +14164,18 @@ function MagicFireRight_Upper_onUpdate()
     end
     
     local button = ACTION_ARM_R1
-    local sp_kind = env(345, wep_hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
     if sp_kind == 293 then
         button = ACTION_ARM_R2
     end
 
-    if env(1116, 100610) == TRUE and (env(1108, button) <= 0 or env(232, wep_hand, 1) == FALSE) then
+    if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, button) <= 0 or env(IsMagicUseable, wep_hand, 1) == FALSE) then
         ExecEventHalfBlend(Event_MagicFireRightCancel, blend_type)
         return
     end
 
-    if CheckIfHoldMagic() == TRUE and (env(313) == TRUE or env(339, 1) == TRUE) then
-        if env(1108, button) > 0 then
+    if CheckIfHoldMagic() == TRUE and (env(IsAnimEndBySkillCancel) == TRUE or env(IsAnimEnd, 1) == TRUE) then
+        if env(ActionDuration, button) > 0 then
             ExecEventHalfBlend(Event_MagicLoopRight, blend_type)
             return
         else
@@ -14212,7 +14212,7 @@ end
 
 function MagicLaunchLeft_Upper_onUpdate()
     local blend_type, lower_state = GetHalfBlendInfo()
-    local magic_index = env(227)
+    local magic_index = env(GetMagicAnimType)
     if MagicCommonFunction(blend_type, QUICKTYPE_NORMAL, FALSE) == TRUE then
         return
     elseif env(GetMagicAnimType) ~= MAGIC_REQUEST_CRYSTAL_MOON and blend_type ~= UPPER and TRUE == ExecQuickTurn(LOWER, TURN_TYPE_DEFAULT) then
@@ -14236,11 +14236,11 @@ function MagicLoopLeft_Upper_onUpdate()
         return
     end
     local button = ACTION_ARM_L1
-    local sp_kind = env(345, HAND_LEFT)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
     if sp_kind == 293 then
         button = ACTION_ARM_L2
     end
-    if env(1108, button) <= 0 or env(232, HAND_LEFT, 1) == FALSE or env(1001) <= 0 then
+    if env(ActionDuration, button) <= 0 or env(IsMagicUseable, HAND_LEFT, 1) == FALSE or env(GetStamina) <= 0 then
         local magic_index = env(GetMagicAnimType)
         if magic_index == MAGIC_REQUEST_EX_LARGE_ARROW then
             ExecEventHalfBlend(Event_MagicFireLeftCancel2, blend_type)
@@ -14283,11 +14283,11 @@ function MagicFireRight2_Upper_onUpdate()
         wep_hand = HAND_LEFT
     end
     local button = ACTION_ARM_R1
-    local sp_kind = env(345, wep_hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
     if sp_kind == 293 then
         button = ACTION_ARM_R2
     end
-    if env(1116, 100610) == TRUE and (env(1108, button) <= 0 or mp_condition >= env(2016)) then
+    if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, button) <= 0 or mp_condition >= env(GetFP)) then
         ExecEventHalfBlend(Event_MagicFireRightCancel2, blend_type)
         return
     elseif lower_state == LOWER_MOVE and TRUE == env(IsMoveCancelPossible) then
@@ -14314,11 +14314,11 @@ function MagicFireRight3_Upper_onUpdate()
         wep_hand = HAND_LEFT
     end
     local button = ACTION_ARM_R1
-    local sp_kind = env(345, wep_hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
     if sp_kind == 293 then
         button = ACTION_ARM_R2
     end
-    if env(1116, 100610) == TRUE and (env(1108, button) <= 0 or mp_condition >= env(2016)) then
+    if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, button) <= 0 or mp_condition >= env(GetFP)) then
         ExecEventHalfBlend(Event_MagicFireRightCancel3, blend_type)
         return
     elseif lower_state == LOWER_MOVE and TRUE == env(IsMoveCancelPossible) then
@@ -14343,17 +14343,17 @@ function MagicFireLeft_Upper_onUpdate()
     end
 
     local button = ACTION_ARM_L1
-    local sp_kind = env(345, HAND_LEFT)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
     if sp_kind == 293 then
         button = ACTION_ARM_L2
     end
 
-    if env(1116, 100610) == TRUE and (env(1108, button) <= 0 or env(232, HAND_LEFT, 1) == FALSE) then
+    if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, button) <= 0 or env(IsMagicUseable, HAND_LEFT, 1) == FALSE) then
         ExecEventHalfBlend(Event_MagicFireLeftCancel, blend_type)
         return
     end
-    if CheckIfHoldMagic() == TRUE and (env(313) == TRUE or env(339, 1) == TRUE) then
-        if env(1108, button) > 0 then            ExecEventHalfBlend(Event_MagicLoopLeft, blend_type)
+    if CheckIfHoldMagic() == TRUE and (env(IsAnimEndBySkillCancel) == TRUE or env(IsAnimEnd, 1) == TRUE) then
+        if env(ActionDuration, button) > 0 then            ExecEventHalfBlend(Event_MagicLoopLeft, blend_type)
             return
         else
             ExecEventHalfBlend(Event_MagicFireLeftCancel, blend_type)
@@ -14424,12 +14424,12 @@ function MagicFireLeft2_Upper_onUpdate()
     end
 
     local button = ACTION_ARM_L1
-    local sp_kind = env(345, HAND_LEFT)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
     if sp_kind == 293 then
         button = ACTION_ARM_L2
     end
 
-    if env(1116, 100610) == TRUE and (env(1108, button) <= 0 or env(232, HAND_LEFT, 1) == FALSE) then
+    if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, button) <= 0 or env(IsMagicUseable, HAND_LEFT, 1) == FALSE) then
         ExecEventHalfBlend(Event_MagicFireLeftCancel2, blend_type)
         return
     elseif lower_state == LOWER_MOVE and TRUE == env(IsMoveCancelPossible) then
@@ -14462,12 +14462,12 @@ function MagicFireLeft3_Upper_onUpdate()
         return
 
     local button = ACTION_ARM_L1
-    local sp_kind = env(345, HAND_LEFT)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
     if sp_kind == 293 then
         button = ACTION_ARM_L2
     end
 
-    if env(1116, 100610) == TRUE and (env(1108, button) <= 0 or env(232, HAND_LEFT, 1) == FALSE) then
+    if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, button) <= 0 or env(IsMagicUseable, HAND_LEFT, 1) == FALSE) then
         ExecEventHalfBlend(Event_MagicFireLeftCancel3, blend_type)
         return
     elseif lower_state == LOWER_MOVE and TRUE == env(IsMoveCancelPossible) then
@@ -14663,11 +14663,11 @@ function MagicFireLeftJump_Upper_onUpdate()
     end
     local wep_hand = HAND_LEFT
     local button = ACTION_ARM_L1
-    local sp_kind = env(345, wep_hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
     if sp_kind == 293 then
         button = ACTION_ARM_L2
     end
-    if env(1116, 100610) == TRUE and (env(1108, button) <= 0 or env(232, wep_hand, 1) == FALSE) then
+    if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, button) <= 0 or env(IsMagicUseable, wep_hand, 1) == FALSE) then
         ExecEventHalfBlend(Event_MagicFireRightJumpCancel, blend_type)
         return
     elseif lower_state == LOWER_MOVE and TRUE == env(IsMoveCancelPossible) then
@@ -14751,7 +14751,7 @@ function RollingMagicRight_Upper_onUpdate()
     if MagicCommonFunction(blend_type, QUICKTYPE_NORMAL, FALSE) == TRUE then
         return
     end
-    if lower_state == LOWER_MOVE and env(2000) == TRUE then
+    if lower_state == LOWER_MOVE and env(IsMoveCancelPossible) == TRUE then
         ExecEventHalfBlendNoReset(Event_Move, UPPER)
         return
     end
@@ -14768,7 +14768,7 @@ function RollingMagicLeft_Upper_onUpdate()
     if MagicCommonFunction(blend_type, QUICKTYPE_NORMAL, FALSE) == TRUE then
         return
     end
-    if lower_state == LOWER_MOVE and env(2000) == TRUE then
+    if lower_state == LOWER_MOVE and env(IsMoveCancelPossible) == TRUE then
         ExecEventHalfBlendNoReset(Event_Move, UPPER)
         return
     end
@@ -14859,10 +14859,10 @@ function ThrowDef_onActivate()
 end
 
 function ThrowDef_onUpdate()
-    if env(1116, 19682) == TRUE and env(1116, 19681) == TRUE then
-        act(2002, 19680)
+    if env(GetSpEffectID, 19682) == TRUE and env(GetSpEffectID, 19681) == TRUE then
+        act(AddSpEffect, 19680)
     end
-    if env(301, 0) == TRUE and env(1116, 19680) == TRUE then
+    if env(GetEventEzStateFlag, 0) == TRUE and env(GetSpEffectID, 19680) == TRUE then
         SetVariable("IndexDeath", DEATH_TYPE_CHARM)
         ExecEvent("W_DeathStart")
         return
@@ -16782,7 +16782,7 @@ function SpeedUpdate()
         if stick_level > 1.100000023841858 then
             ChangeMoveSpeedIndex(1)
         end
-    elseif env(1116, 425) == TRUE or env(1116, 19670) == TRUE then
+    elseif env(GetSpEffectID, 425) == TRUE or env(GetSpEffectID, 19670) == TRUE then
         if stick_level > 1.100000023841858 then
             ChangeMoveSpeedIndex(1)
         end
@@ -16997,36 +16997,36 @@ function Update()
     end
 
     end
-    if env(234) == TRUE and env(1116, 19990) == TRUE and env(1116, 3240) == FALSE then
-        act(2002, 19991)
+    if env(IsPrecisionShoot) == TRUE and env(GetSpEffectID, 19990) == TRUE and env(GetSpEffectID, 3240) == FALSE then
+        act(AddSpEffect, 19991)
     end
-    if env(1116, 19985) == TRUE then
+    if env(GetSpEffectID, 19985) == TRUE then
         SetWeightIndex()
         if GetVariable("EvasionWeightIndex") == EVASION_WEIGHT_INDEX_HEAVY then
-            act(2002, 19986)
+            act(AddSpEffect, 19986)
         elseif GetVariable("EvasionWeightIndex") == EVASION_WEIGHT_INDEX_OVERWEIGHT then
-            act(2002, 19987)
+            act(AddSpEffect, 19987)
         end
     end
 
-    if env(1116, 19875) == TRUE then
-        if env(326, HAND_LEFT) == 328 then
-            act(2002, 19887)
+    if env(GetSpEffectID, 19875) == TRUE then
+        if env(GetWeaponID, HAND_LEFT) == 328 then
+            act(AddSpEffect, 19887)
         end
-        if env(326, HAND_RIGHT) == 328 then
-            act(2002, 19883)
+        if env(GetWeaponID, HAND_RIGHT) == 328 then
+            act(AddSpEffect, 19883)
         end
-    elseif env(1116, 19874) == TRUE then
-        if env(326, HAND_LEFT) == 328 then
-            act(2002, 19885)
+    elseif env(GetSpEffectID, 19874) == TRUE then
+        if env(GetWeaponID, HAND_LEFT) == 328 then
+            act(AddSpEffect, 19885)
         end
-        if env(326, HAND_RIGHT) == 328 then
-            act(2002, 19881)
+        if env(GetWeaponID, HAND_RIGHT) == 328 then
+            act(AddSpEffect, 19881)
         end
     end
 
-    if env(1116, 102380) == TRUE then
-        act(2002, 102381)
+    if env(GetSpEffectID, 102380) == TRUE then
+        act(AddSpEffect, 102381)
     end
 
     g_FrameCount = g_FrameCount + 1
@@ -17175,7 +17175,7 @@ function ExecRideOff(is_force, rideOffAnyway)
     local event = "W_RideOff"
     local event_under = "W_RideOff"
 
-    if env(1116, 19995) == TRUE then
+    if env(GetSpEffectID, 19995) == TRUE then
         event = "W_RideDamage_Fall_AbyssalForest"
         event_under = "W_RideDamage_Fall_AbyssalForest"
     elseif GetVariable("MoveSpeedLevel") >= 0.8999999761581421 and rideOffAnyway ~= TRUE then
@@ -17239,8 +17239,8 @@ function RideReActionFunction()
 
     if isEnableForceRideOff == TRUE then
         ExecRideOff(TRUE, TRUE)
-        if env(1116, 19995) == FALSE then
-            act(2002, 181)
+        if env(GetSpEffectID, 19995) == FALSE then
+            act(AddSpEffect, 181)
         end
         return TRUE
     elseif TRUE == ExecRideDeath() then
@@ -17358,7 +17358,7 @@ function ExecRideDamage()
         Replanning()
 
         return TRUE
-    if env(362, 32) == TRUE then
+    if env(Unknown362, 32) == TRUE then
         FireRideEvent("W_RideDamageBind_Start", "W_RideDeath", FALSE)
         Replanning()
 
@@ -17512,8 +17512,8 @@ function RideFallCommonFunction()
         if env(GetStamina) <= 0 or height > DISABLEJUMP_FALLDIST then
             ResetRequest()
         else
-            if env(1116, 102360) == FALSE then
-                act(1001, STAMINA_REDUCE_RIDE_JUMP)
+            if env(GetSpEffectID, 102360) == FALSE then
+                act(ChangeStamina, STAMINA_REDUCE_RIDE_JUMP)
             end
 
             if GetVariable("MoveSpeedLevel") >= 1.5 then
@@ -17672,7 +17672,7 @@ function ExecRideAttack(r1, r2, l1, l2)
 
     local is_arrow = GetEquipType(attackHand, WEAPON_CATEGORY_SMALL_ARROW, WEAPON_CATEGORY_ARROW, WEAPON_CATEGORY_CROSSBOW)
     local is_staff = GetEquipType(attackHand, WEAPON_CATEGORY_STAFF)
-    local sp_kind = env(345, attackHand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, attackHand)
     local is_weaponStaff = FALSE
     if sp_kind == 293 then
         is_weaponStaff = TRUE
@@ -17774,7 +17774,7 @@ function ExecRideItem()
     end 
 
     local hand = HAND_RIGHT
-    local kind = env(225, hand)
+    local kind = env(GetEquipWeaponCategory, hand)
     if kind == WEAPON_CATEGORY_BACKHAND_SWORD then
         SetVariable("ItemWeaponType", 1)
     elseif kind == WEAPON_CATEGORY_DUELING_SHIELD then
@@ -18268,13 +18268,13 @@ function RideMagicFire_onUpdate()
 
     local buttonR = ACTION_ARM_R1
     local buttonL = ACTION_ARM_L1
-    local sp_kind = env(345, wep_hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
     if sp_kind == 293 then
         buttonR = ACTION_ARM_R2
         buttonL = ACTION_ARM_L2
     end
 
-    if env(1116, 100610) == TRUE and (env(1108, buttonR) <= 0 and env(1108, buttonL) <= 0 or env(232, wep_hand, 1) == FALSE) then
+    if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, buttonR) <= 0 and env(ActionDuration, buttonL) <= 0 or env(IsMagicUseable, wep_hand, 1) == FALSE) then
         ExecEventAllBody("W_RideMagicFireCancel")
         return
     elseif TRUE == CheckIfHoldMagic() and (TRUE == env(IsAnimEndBySkillCancel) or TRUE == env(IsAnimEnd, 0)) then
@@ -18313,13 +18313,13 @@ function RideMagicLoop_onUpdate()
 
     local buttonR = ACTION_ARM_R1
     local buttonL = ACTION_ARM_L1
-    local sp_kind = env(345, wep_hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
     if sp_kind == 293 then
         buttonR = ACTION_ARM_R2
         buttonL = ACTION_ARM_L2
     end
 
-    if env(1108, buttonR) <= 0 and env(1108, buttonL) <= 0 and env(1108, buttonL) <= 0 or env(232, wep_hand, 1) == FALSE or env(1001) <= 0 then
+    if env(ActionDuration, buttonR) <= 0 and env(ActionDuration, buttonL) <= 0 and env(ActionDuration, buttonL) <= 0 or env(IsMagicUseable, wep_hand, 1) == FALSE or env(GetStamina) <= 0 then
         local magic_index = env(GetMagicAnimType)
 
         if magic_index == MAGIC_REQUEST_EX_LARGE_ARROW then
@@ -18369,13 +18369,13 @@ function RideMagicFireCombo1_onUpdate()
 
     local buttonR = ACTION_ARM_R1
     local buttonL = ACTION_ARM_L1
-    local sp_kind = env(345, wep_hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
     if sp_kind == 293 then
         buttonR = ACTION_ARM_R2
         buttonL = ACTION_ARM_L2
     end
 
-    if env(1116, 100610) == TRUE and (env(1108, buttonR) <= 0 and env(1108, buttonL) <= 0 or env(232, wep_hand, 1) == FALSE) then
+    if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, buttonR) <= 0 and env(ActionDuration, buttonL) <= 0 or env(IsMagicUseable, wep_hand, 1) == FALSE) then
         ExecEventAllBody("W_RideMagicFireCombo1Cancel")
         return
     end
@@ -18424,13 +18424,13 @@ function RideMagicFireCombo2_onUpdate()
 
     local buttonR = ACTION_ARM_R1
     local buttonL = ACTION_ARM_L1
-    local sp_kind = env(345, wep_hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
     if sp_kind == 293 then
         buttonR = ACTION_ARM_R2
         buttonL = ACTION_ARM_L2
     end
 
-    if env(1116, 100610) == TRUE and (env(1108, buttonR) <= 0 and env(1108, buttonL) <= 0 or env(232, wep_hand, 1) == FALSE) then
+    if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, buttonR) <= 0 and env(ActionDuration, buttonL) <= 0 or env(IsMagicUseable, wep_hand, 1) == FALSE) then
         ExecEventAllBody("W_RideMagicFireCombo2Cancel")
         return
     end
@@ -18901,12 +18901,12 @@ end
 
 function RideItemDragonThrowSpearCancel_onActivate()
     SetAIActionState()
-    act(2025, env(404))
-    act(9101)
+    act(Unknown2025, env(Unknown404))
+    act(ResetInputQueue)
 end
 
 function RideItemDragonThrowSpearCancel_onUpdate()
-    act(150)
+    act(SetIsItemAnimationPlaying)
     SetAIActionState()
     if RideReActionFunction() == TRUE then
         return
@@ -18919,14 +18919,14 @@ function RideItemDragonThrowSpearCancel_onUpdate()
     end
     local lower_only = TRUE
     local enable_turn = FALSE
-    if env(1110) == TRUE or env(339, 0) == TRUE then
+    if env(MovementRequest) == TRUE or env(IsAnimEnd, 0) == TRUE then
         lower_only = FALSE
         enable_turn = TRUE
     end
     if RideRequestFunction(RIDE_MOVE_TYPE_OTHER, enable_turn, lower_only) == TRUE then
         return
     end
-    if env(339, 1) == TRUE then
+    if env(IsAnimEnd, 1) == TRUE then
         ExecEventNoReset("W_RideIdle")
     end
 end
@@ -18958,8 +18958,8 @@ function RideItemOneShot_onUpdate()
     if RideRequestFunction(RIDE_MOVE_TYPE_OTHER, enable_turn, lower_only) == TRUE then
         return
     end
-    local item_type = env(231)
-    if item_type == ITEM_DRAGONTHROWSPEAR and env(1108, ACTION_ARM_USE_ITEM) <= 0 and (env(2003, TAE_FLAG_CHARGING) == 1 or env(1116, 100280) == TRUE) then
+    local item_type = env(GetItemAnimType)
+    if item_type == ITEM_DRAGONTHROWSPEAR and env(ActionDuration, ACTION_ARM_USE_ITEM) <= 0 and (env(GetGeneralTAEFlag, TAE_FLAG_CHARGING) == 1 or env(GetSpEffectID, 100280) == TRUE) then
         ExecEvent("W_RideItemDragonThrowSpearCancel")
         return
     end
@@ -19363,8 +19363,8 @@ function RideMoveStaminaConsume()
         dash_dt_sum = dash_dt_sum + dT
         if dash_dt_sum > 0.06499999761581421 then
             dash_dt_sum = 0
-            if env(1116, 102360) == FALSE then
-                act(1001, -1)
+            if env(GetSpEffectID, 102360) == FALSE then
+                act(ChangeStamina, -1)
             end
         end
     end
@@ -19567,8 +19567,8 @@ function RideDamage_Fall_onUpdate()
 end
 
 function RideDamage_Fall_AbyssalForest_onUpdate()
-    act(103, 0)
-    act(102, 1)
+    act(SetAllowedThrowDefenseType, 0)
+    act(SetAllowedThrowAttackType, 1)
     SetAIActionState()
     SetVariable("Int16Variable01", 0)
 
@@ -19576,14 +19576,14 @@ function RideDamage_Fall_AbyssalForest_onUpdate()
         return TRUE
     end
 
-    if env(1110) == TRUE or env(339, 0) == TRUE then
+    if env(MovementRequest) == TRUE or env(IsAnimEnd, 0) == TRUE then
         ExecEventAllBody("W_Idle")
         return
     end
 end
 
 function RideDamage_Fall_AbyssalForest_onDeactivate()
-    act(3005)
+    act(Unknown3005)
 end
 
 function RideDamageMad_onUpdate()
@@ -19608,48 +19608,48 @@ function RideDamageMad_onUpdate()
 end
 
 function RideDamageBind_Start_onUpdate()
-    act(118, 0)
-    act(103, 0)
-    act(102, 1)
+    act(SetIsMagicInUse, 0)
+    act(SetAllowedThrowDefenseType, 0)
+    act(SetAllowedThrowAttackType, 1)
     SetAIActionState()
     SetVariable("Int16Variable01", 0)
-    act(3005)
+    act(Unknown3005)
     if DamageCommonFunction(FALSE, ESTEP_NONE, FALL_TYPE_FORCE) == TRUE then
         return TRUE
     end
-    if env(339, 0) == TRUE then
+    if env(IsAnimEnd, 0) == TRUE then
         ExecEventAllBody("W_RideDamageBind_Loop")
         return
     end
 end
 
 function RideDamageBind_Loop_onUpdate()
-    act(118, 0)
-    act(103, 0)
-    act(102, 1)
+    act(SetIsMagicInUse, 0)
+    act(SetAllowedThrowDefenseType, 0)
+    act(SetAllowedThrowAttackType, 1)
     SetAIActionState()
     SetVariable("Int16Variable01", 0)
-    act(3005)
+    act(Unknown3005)
     if DamageCommonFunction(FALSE, ESTEP_NONE, FALL_TYPE_FORCE) == TRUE then
         return TRUE
     end
-    if env(362, 32) == FALSE then
+    if env(Unknown362, 32) == FALSE then
         ExecEventAllBody("W_RideDamageBind_End")
     end
 end
 
 function RideDamageBind_End_onUpdate()
-    act(118, 0)
-    act(103, 0)
-    act(102, 1)
+    act(SetIsMagicInUse, 0)
+    act(SetAllowedThrowDefenseType, 0)
+    act(SetAllowedThrowAttackType, 1)
     SetAIActionState()
     SetVariable("Int16Variable01", 0)
-    act(3005)
+    act(Unknown3005)
     if DamageCommonFunction(FALSE, ESTEP_NONE, FALL_TYPE_FORCE) == TRUE then
         return TRUE
     end
-    if env(1110) == TRUE or env(339, 0) == TRUE then
-        act(141, DAMAGE_FLAG_SMALL)
+    if env(MovementRequest) == TRUE or env(IsAnimEnd, 0) == TRUE then
+        act(SetDamageAnimType, DAMAGE_FLAG_SMALL)
         ExecEventAllBody("W_Idle")
         return
     end
@@ -19720,8 +19720,8 @@ function RideCommonFunction(r1, r2, l1, l2)
             end
 
             -- Normal Jump
-            if env(1116, 102360) == FALSE then
-                act(1001, STAMINA_REDUCE_RIDE_JUMP)
+            if env(GetSpEffectID, 102360) == FALSE then
+                act(ChangeStamina, STAMINA_REDUCE_RIDE_JUMP)
             end
 
             if 1.5 <= GetVariable("MoveSpeedLevel") then
@@ -19772,8 +19772,8 @@ function ExecRideDashAccelerate()
         return FALSE
         -- "O" Pressed
     elseif evasionRequest == TRUE then
-        if env(1116, 102360) == FALSE then
-            act(1001, STAMINA_REDUCE_RIDE_DASH)
+        if env(GetSpEffectID, 102360) == FALSE then
+            act(ChangeStamina, STAMINA_REDUCE_RIDE_DASH)
         end
 
         SetVariable("ToggleDash", 1)
@@ -19800,8 +19800,8 @@ function ExecRideDashAccelerate()
     -- local evasionRequest = GetEvasionRequest()
 
     -- if evasionRequest == ATTACK_REQUEST_ROLLING then
-    -- if env(1116, 102360) == FALSE then
-    --     act(1001, STAMINA_REDUCE_RIDE_DASH)
+    -- if env(GetSpEffectID, 102360) == FALSE then
+    --     act(ChangeStamina, STAMINA_REDUCE_RIDE_DASH)
     -- end
 
     -- if TRUE == IsNodeActive("RideDashAccelerate CMSG") or TRUE == IsNodeActive("RideDashAccelerateContinue CMSG") then
@@ -20004,7 +20004,7 @@ function RideAttack_R_Hard1_Start_onUpdate()
 
     local r2 = "W_RideAttack_R_Hard1_Start"
 
-    if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(345, HAND_RIGHT) ~= 241 then
+    if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT) ~= 241 then
         r2 = "W_RideAttack_R_Hard2_Start"
     end
 
@@ -20039,8 +20039,8 @@ function RideAttack_R_Hard1_Start_onUpdate()
         elseif GetVariable("MoveSpeedLevel") >= 0.6000000238418579 then
             jumpEvent = "W_RideJump_F"
         end
-        if env(1116, 102360) == FALSE then
-            act(1001, STAMINA_REDUCE_RIDE_JUMP)
+        if env(GetSpEffectID, 102360) == FALSE then
+            act(ChangeStamina, STAMINA_REDUCE_RIDE_JUMP)
         end
         SetVariable("RideJumpAttack_Land", 0)
         FireRideEvent("W_RideAttack_Jump_R_Hard1", jumpEvent, FALSE)
@@ -20063,7 +20063,7 @@ function RideAttack_R_Hard1_End_onUpdate()
 
     local r2 = "W_RideAttack_R_Hard1_Start"
 
-    if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(345, HAND_RIGHT) ~= 241 then
+    if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT) ~= 241 then
         r2 = "W_RideAttack_R_Hard2_Start"
     end
 
@@ -20130,8 +20130,8 @@ function RideAttack_R_Hard2_Start_onUpdate()
         elseif GetVariable("MoveSpeedLevel") >= 0.6000000238418579 then
             jumpEvent = "W_RideJump_F"
         end
-        if env(1116, 102360) == FALSE then
-            act(1001, STAMINA_REDUCE_RIDE_JUMP)
+        if env(GetSpEffectID, 102360) == FALSE then
+            act(ChangeStamina, STAMINA_REDUCE_RIDE_JUMP)
         end
         SetVariable("RideJumpAttack_Land", 0)
         FireRideEvent("W_RideAttack_Jump_R_Hard2", jumpEvent, FALSE)
@@ -20186,7 +20186,7 @@ function RideAttack_L_Hard1_Start_onUpdate()
 
     local l2 = "W_RideAttack_L_Hard1_Start"
 
-    if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(345, HAND_RIGHT) ~= 241 then
+    if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT) ~= 241 then
         l2 = "W_RideAttack_L_Hard2_Start"
     end
 
@@ -20221,8 +20221,8 @@ function RideAttack_L_Hard1_Start_onUpdate()
         elseif GetVariable("MoveSpeedLevel") >= 0.6000000238418579 then
             jumpEvent = "W_RideJump_F"
         end
-        if env(1116, 102360) == FALSE then
-            act(1001, STAMINA_REDUCE_RIDE_JUMP)
+        if env(GetSpEffectID, 102360) == FALSE then
+            act(ChangeStamina, STAMINA_REDUCE_RIDE_JUMP)
         end
         SetVariable("RideJumpAttack_Land", 0)
         FireRideEvent("W_RideAttack_Jump_L_Hard1", jumpEvent, FALSE)
@@ -20245,7 +20245,7 @@ function RideAttack_L_Hard1_End_onUpdate()
 
     local l2 = "W_RideAttack_L_Hard1_Start"
 
-    if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(345, HAND_RIGHT) ~= 241 then
+    if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT) ~= 241 then
         l2 = "W_RideAttack_L_Hard2_Start"
     end
 
@@ -20314,8 +20314,8 @@ function RideAttack_L_Hard2_Start_onUpdate()
             jumpEvent = "W_RideJump_F"
         end
 
-        if env(1116, 102360) == FALSE then
-            act(1001, STAMINA_REDUCE_RIDE_JUMP)
+        if env(GetSpEffectID, 102360) == FALSE then
+            act(ChangeStamina, STAMINA_REDUCE_RIDE_JUMP)
         end
         SetVariable("RideJumpAttack_Land", 0)
         FireRideEvent("W_RideAttack_Jump_L_Hard2", jumpEvent, FALSE)
@@ -20813,8 +20813,8 @@ function RideJumpCommonFunction(jump_type, lower_only, isSecond, isHighJump)
         if env(GetStamina) <= 0 or height > DISABLEJUMP_FALLDIST then
             ResetRequest()
         else
-            if env(1116, 102360) == FALSE then
-                act(1001, STAMINA_REDUCE_RIDE_JUMP)
+            if env(GetSpEffectID, 102360) == FALSE then
+                act(ChangeStamina, STAMINA_REDUCE_RIDE_JUMP)
             end
 
             if GetVariable("MoveSpeedLevel") >= 1.5 then
@@ -20939,12 +20939,12 @@ function RideJump_Loop_onActivate()
 end
 
 function RideJump_Loop_onUpdate()
-    if env(1116, 19935) == TRUE then
-        if env(315, 20) == TRUE and env(1116, 185) == FALSE then
+    if env(GetSpEffectID, 19935) == TRUE then
+        if env(IsHamariFallDeath, 20) == TRUE and env(GetSpEffectID, 185) == FALSE then
             FireRideEvent("W_RideDeath", "W_RideDeath", FALSE)
             return
         end
-    elseif env(315, 12) == TRUE and env(1116, 185) == FALSE then
+    elseif env(IsHamariFallDeath, 12) == TRUE and env(GetSpEffectID, 185) == FALSE then
         FireRideEvent("W_RideDeath", "W_RideDeath", FALSE)
         return
     elseif env(GetSpiritspringJumpHeight) > 0 or env(GetSpEffectID, 183) == TRUE then
@@ -20994,12 +20994,12 @@ function RideJump2_Loop_onActivate()
 end
 
 function RideJump2_Loop_onUpdate()
-    if env(1116, 19935) == TRUE then
-        if env(315, 20) == TRUE then
+    if env(GetSpEffectID, 19935) == TRUE then
+        if env(IsHamariFallDeath, 20) == TRUE then
             FireRideEvent("W_RideDeath", "W_RideDeath", FALSE)
             return
         end
-    elseif env(315, 12) == TRUE then
+    elseif env(IsHamariFallDeath, 12) == TRUE then
         FireRideEvent("W_RideDeath", "W_RideDeath", FALSE)
         return
     elseif env(GetSpiritspringJumpHeight) > 0 or env(GetSpEffectID, 183) == TRUE then
@@ -21248,12 +21248,12 @@ function RideJump_onUpdate()
 end
 
 function RideJumpAttackCommonFunction()
-    if env(1116, 19935) == TRUE then
-        if env(315, 20) == TRUE and env(1116, 185) == FALSE then
+    if env(GetSpEffectID, 19935) == TRUE then
+        if env(IsHamariFallDeath, 20) == TRUE and env(GetSpEffectID, 185) == FALSE then
             FireRideEvent("W_RideDeath", "W_RideDeath", FALSE)
             return
         end
-    elseif env(315, 12) == TRUE and env(1116, 185) == FALSE then
+    elseif env(IsHamariFallDeath, 12) == TRUE and env(GetSpEffectID, 185) == FALSE then
         FireRideEvent("W_RideDeath", "W_RideDeath", FALSE)
         return
     end
@@ -21305,7 +21305,7 @@ function RideAttack_Jump_R_Hard1_onUpdate()
     SetVariable("Int16Variable01", 1)
     if 1 == GetVariable("RideJumpAttack_Land") then
         local r2 = "W_RideAttack_R_Hard1_Start"
-        if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(345, HAND_RIGHT) ~= 241 then
+        if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT) ~= 241 then
             r2 = "W_RideAttack_R_Hard2_Start"
         end
         if RideCommonFunction("W_RideAttack_R_Top", r2, "W_RideAttack_L_Top", "W_RideAttack_L_Hard1_Start") == TRUE then
@@ -21398,7 +21398,7 @@ function RideAttack_Jump_L_Hard1_onUpdate()
     SetVariable("Int16Variable01", 1)
     if 1 == GetVariable("RideJumpAttack_Land") then
         local l2 = "W_RideAttack_L_Hard1_Start"
-        if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(345, HAND_RIGHT) ~= 241 then
+        if IsEnableRideAttackHard2(HAND_RIGHT) == TRUE and env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT) ~= 241 then
             l2 = "W_RideAttack_L_Hard2_Start"
         end
         if RideCommonFunction("W_RideAttack_R_Top", "W_RideAttack_R_Hard1_Start", "W_RideAttack_L_Top", l2) == TRUE then
@@ -21556,12 +21556,12 @@ function RideFall_Loop_onUpdate()
         act(AddSpEffect, 186)
     end
 
-    if env(1116, 19935) == TRUE then
-        if env(315, 20) == TRUE and env(1116, 185) == FALSE then
+    if env(GetSpEffectID, 19935) == TRUE then
+        if env(IsHamariFallDeath, 20) == TRUE and env(GetSpEffectID, 185) == FALSE then
             FireRideEvent("W_RideDeath", "W_RideDeath", FALSE)
             return
         end
-    elseif env(315, 12) == TRUE and env(1116, 185) == FALSE then
+    elseif env(IsHamariFallDeath, 12) == TRUE and env(GetSpEffectID, 185) == FALSE then
         FireRideEvent("W_RideDeath", "W_RideDeath", FALSE)
         return
     elseif TRUE == env(IsMountInFallLoop) then
@@ -21899,8 +21899,8 @@ function JumpCommonFunction(jump_type)
 
     if GetVariable("JumpAttackForm") == 0 then
         act(Unknown2050, IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE_JUMP_NONATTACK)
-    elseif env(1116, 102050) == TRUE then
-        act(2018)
+    elseif env(GetSpEffectID, 102050) == TRUE then
+        act(LockonFixedAngleCancel)
     end
 
     act(DisallowAdditiveTurning, TRUE)
@@ -21945,7 +21945,7 @@ function JumpCommonFunction(jump_type)
         wep_hand = HAND_LEFT
     end
     local isWeaponStaff = FALSE
-    local sp_kind = env(345, wep_hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
     if sp_kind == 293 then
         isWeaponStaff = TRUE
     end
@@ -21955,7 +21955,7 @@ function JumpCommonFunction(jump_type)
         -- Catalyst: R1
     elseif is_staff == TRUE and env(ActionRequest, ACTION_ARM_R1) == TRUE then
         -- Weapon Catalyst: R2
-    elseif isWeaponStaff == TRUE and env(1106, ACTION_ARM_R2) == TRUE then
+    elseif isWeaponStaff == TRUE and env(ActionRequest, ACTION_ARM_R2) == TRUE then
         -- Bow
     elseif is_arrow == TRUE and (c_Style == HAND_RIGHT_BOTH or c_Style == HAND_LEFT_BOTH) and env(IsOutOfAmmo, arrowHand) == TRUE then
         -- Other
@@ -22288,17 +22288,17 @@ function ExecJumpMagic(jump_type)
 
     local buttonR = ACTION_ARM_MAGIC_R
     local buttonL = ACTION_ARM_MAGIC_L
-    local sp_kind = env(345, wep_hand)
+    local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
     if sp_kind == 293 then
         buttonR = ACTION_ARM_MAGIC_R2
     end
 
-    local sp_kind_L = env(345, HAND_LEFT)
+    local sp_kind_L = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
     if c_Style == HAND_RIGHT and sp_kind_L == 293 then
         buttonL = ACTION_ARM_MAGIC_L2
     end
 
-    if env(1106, buttonR) == FALSE and env(1106, buttonL) == FALSE then
+    if env(ActionRequest, buttonR) == FALSE and env(ActionRequest, buttonL) == FALSE then
         return FALSE
     elseif env(GetStamina) <= 0 then
         ResetRequest()
@@ -22426,7 +22426,7 @@ end
 function ExecFallMagic()
     if c_HasActionRequest == FALSE then
         return FALSE
-    elseif env(1106, ACTION_ARM_MAGIC_R) == FALSE and env(1106, ACTION_ARM_MAGIC_L) == FALSE and env(1106, ACTION_ARM_MAGIC_R2) == FALSE and env(1106, ACTION_ARM_MAGIC_L2) == FALSE then
+    elseif env(ActionRequest, ACTION_ARM_MAGIC_R) == FALSE and env(ActionRequest, ACTION_ARM_MAGIC_L) == FALSE and env(ActionRequest, ACTION_ARM_MAGIC_R2) == FALSE and env(ActionRequest, ACTION_ARM_MAGIC_L2) == FALSE then
         return FALSE
     elseif env(GetStamina) <= 0 then
         ResetRequest()
@@ -22467,33 +22467,33 @@ function ExecFallMagic()
         magic_hand = HAND_LEFT
 
         act(DebugLogOutput, "MagicLeft")
-    elseif env(1106, ACTION_ARM_MAGIC_R2) == TRUE then
+    elseif env(ActionRequest, ACTION_ARM_MAGIC_R2) == TRUE then
         delayActRequestNo = ACTION_ARM_MAGIC_R2
         if style == HAND_LEFT_BOTH then
-            local sp_kind = env(345, HAND_LEFT)
+            local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
             if sp_kind ~= 293 then
                 return FALSE
             end
             wep_hand = HAND_LEFT
         else
-            local sp_kind = env(345, HAND_RIGHT)
+            local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT)
             if sp_kind ~= 293 then
                 return FALSE
             end
             wep_hand = HAND_RIGHT
         end
-    elseif env(1106, ACTION_ARM_MAGIC_L2) == TRUE then
+    elseif env(ActionRequest, ACTION_ARM_MAGIC_L2) == TRUE then
         delayActRequestNo = ACTION_ARM_MAGIC_L2
         if style == HAND_RIGHT_BOTH or style == HAND_LEFT_BOTH then
             return FALSE
         end
-        local sp_kind = env(345, HAND_LEFT)
+        local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
         if sp_kind ~= 293 then
             return FALSE
         end
         wep_hand = HAND_LEFT
         magic_hand = HAND_LEFT
-        act(9000, "MagicLeft")
+        env(DebugLogOutput, "MagicLeft")
     else
         return FALSE
     end
@@ -22693,12 +22693,12 @@ function Jump_Loop_onUpdate()
     SetAIActionState()
     act(DisallowAdditiveTurning, TRUE)
 
-    if env(1116, 19935) == TRUE then
-        if env(315, 20) == TRUE then
+    if env(GetSpEffectID, 19935) == TRUE then
+        if env(IsHamariFallDeath, 20) == TRUE then
             ExecEvent("W_FallDeath")
             return
         end
-    elseif env(315, 12) == TRUE then
+    elseif env(IsHamariFallDeath, 12) == TRUE then
         ExecEvent("W_FallDeath")
         return
     end
@@ -22813,7 +22813,7 @@ function Jump_Loop_onUpdate()
             JumpMoveLevel = 0
         elseif TRUE == env(GetSpEffectID, 4100) then
             JumpMoveLevel = 0
-        elseif env(1116, 19670) == TRUE then
+        elseif env(GetSpEffectID, 19670) == TRUE then
             JumpMoveLevel = 0
         end
         if JumpMoveLevel == 2 then
@@ -22982,12 +22982,12 @@ function JumpDamage_Start_onUpdate()
     local height = env(GetFallHeight) / 100
     local damage_type = env(GetReceivedDamageType)
 
-    if env(1116, 19935) == TRUE then
-        if env(315, 20) == TRUE then
+    if env(GetSpEffectID, 19935) == TRUE then
+        if env(IsHamariFallDeath, 20) == TRUE then
             ExecEventAllBody("W_FallDeath")
             return
         end
-    elseif env(315, 12) == TRUE then
+    elseif env(IsHamariFallDeath, 12) == TRUE then
         ExecEventAllBody("W_FallDeath")
         return
     end
@@ -23707,7 +23707,7 @@ function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
             -- Only check if shields
             for i = 1, #SwordArtsCategory[artID], 1 do
                 if SwordArtsCategory[artID][i] == shield_cat then
-                    act(9000, "GetSwordArtsDiffCategory shield_cat:" .. shield_cat)
+                    env(DebugLogOutput, "GetSwordArtsDiffCategory shield_cat:" .. shield_cat)
                     return shield_cat
                 end
             end
@@ -23717,7 +23717,7 @@ function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
     -- CASE 2: Weapon Categories
     for j = 1, #SwordArtsCategory[artID], 1 do
         if SwordArtsCategory[artID][j] == wepCat then
-            act(9000, "GetSwordArtsDiffCategory wepCat0:" .. wepCat)
+            env(DebugLogOutput, "GetSwordArtsDiffCategory wepCat0:" .. wepCat)
             return wepCat
         end
     end
@@ -23727,7 +23727,7 @@ function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
         -- CASE 3: Auxiliary weapon category (Some weapon categories count the same as others)
         for j = 1, #SwordArtsCategory[artID], 1 do
             if SwordArtsCategory[artID][j] == wep_cat1 then
-                act(9000, "GetSwordArtsDiffCategory wepCat1:" .. wep_cat1)
+                env(DebugLogOutput, "GetSwordArtsDiffCategory wepCat1:" .. wep_cat1)
                 return wep_cat1
             end
         end
@@ -23741,7 +23741,7 @@ function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
     -- CASE 4: Idle categories
     for j = 1, #SwordArtsCategory[artID], 1 do
         if SwordArtsCategory[artID][j] == idle_cat0 then
-            act(9000, "GetSwordArtsDiffCategory idle_cat0:" .. idle_cat0)
+            env(DebugLogOutput, "GetSwordArtsDiffCategory idle_cat0:" .. idle_cat0)
             return idle_cat0
         end
     end
