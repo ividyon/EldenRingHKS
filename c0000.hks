@@ -27,7 +27,7 @@
 --                For now I'm only adding a note to highlight that it was changed and leaving it at that.
 --              - manually read through the entire file to make sure no other changes done by
 --                FromSoftware in previous patch updates were still missing.
--- 2024-06-25 - Exelot: Updated to ER v1.12.1
+-- 2024-06-25 - Exelot: Updated to ER v1.12.1 [DLC Initial Release]
 --              - Added all new functions
 --              - Merged all function changes (Compared 1.10.1 VS 1.12.1)
 --              - Overwrote ExecMagic with a raw decompiled version (added ACT and ENV names)

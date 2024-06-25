@@ -8,7 +8,8 @@
 ------------------------------------------
 -- Changelog:
 -- 2023-02-14 - Vawser: Cleaned up and added.
--- 2024-06-25 - Exelot: Added new DLC functions and merged function changes (compared 1.07.1 vs 1.12.1)
+-- 2024-06-25 - Exelot: Updated to ER v1.12.1 [DLC Initial Release]
+--              - Added new DLC functions and merged function changes (compared 1.07.1 vs 1.12.1)
 ------------------------------------------
 -- Core: Functions
 ------------------------------------------
