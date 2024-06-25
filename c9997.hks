@@ -4,7 +4,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 1 for ER version 1.08.1
+-- Version 2 for ER version 1.12.1
 ------------------------------------------
 -- Changelog:
 -- 2023-02-14 - Vawser: Cleaned up and added.
@@ -113,7 +113,15 @@ function SoulDropUp()
         feverchance = 5
     end
     if feverchance > 0 and feversoul <= feverchance then
-        act(AddSpEffect, 5250)
+        if env(GetSpEffectID,5271) == TRUE then
+            env(AddSpEffect, 5251)
+        elseif env(GetSpEffectID,5272) == TRUE then
+            env(AddSpEffect, 5252)
+        elseif env(GetSpEffectID,5273) == TRUE then
+            env(AddSpEffect, 5253)
+        else
+            env(AddSpEffect, 5250)
+        end
     else
         act(AddSpEffect, 5255)
     end
@@ -890,16 +898,26 @@ function ExecDeath()
         event = "W_DeathStartDefault"
         death_type = DEATH_TYPE_DEFAULT
     end
-    if death_type == DEATH_TYPE_DEFAULT then
-        local num = GetExistAnimeNum(ANIME_ID_DEATH_VARIATION, 2, 10) + 1
-        local index = math.random(0, num - 1)
-        SetVariable("IndexDeathVariation", index)
-    elseif death_type == DEATH_TYPE_FIRE then
-        local index = GetRandomIndex(ANIME_ID_DEATH_FIRE, 2, 10)
-        SetVariable("IndexDeathVariation", index)
+    if env(GetSpEffectID, 19710) == FALSE then
+        if death_type == DEATH_TYPE_DEFAULT then
+            local num = GetExistAnimeNum(ANIME_ID_DEATH_VARIATION, 2, 10) + 1
+            local index = math.random(0, num - 1)
+            SetVariable("IndexDeathVariation", index)
+        elseif death_type == DEATH_TYPE_FIRE then
+            local index = GetRandomIndex(ANIME_ID_DEATH_FIRE, 2, 10)
+            SetVariable("IndexDeathVariation", index)
+        end
     end
     if env(GetSpEffectID, 14397) == TRUE then
         event = "W_Event20000"
+    elseif env(GetSpEffectID, 9795) == TRUE and env(GetSpEffectID, 18680) == TRUE then
+        event = "W_Event20009"
+    elseif env(GetSpEffectID, 9795) == TRUE and env(GetSpEffectID, 18681) == TRUE then
+        event = "W_Event20011"
+    elseif env(GetSpEffectID, 9795) == TRUE and env(GetSpEffectID, 18682) == TRUE then
+        event = "W_Event20012"
+    elseif env(GetSpEffectID, 9795) == TRUE and env(GetSpEffectID, 9796) == TRUE then
+        event = "W_Event20018"
     elseif env(GetSpEffectID, 18681) == TRUE or env(GetSpEffectID, 18682) == TRUE then
         event = "W_Event20050"
     elseif env(GetSpEffectID, 6071) == TRUE then
@@ -956,6 +974,24 @@ function ExecDeath()
         event = "W_Event20017"
     elseif env(GetSpEffectID, 15368) == TRUE then
         event = "W_Event20019"
+    elseif env(GetSpEffectID,19611) == TRUE then
+        event = "W_Event20000"
+    elseif env(GetSpEffectID,19612) == TRUE then
+        event = "W_Event20002"
+    elseif env(GetSpEffectID,19600) == TRUE then
+        event = "W_Event20012"
+    elseif env(GetSpEffectID,19650) == TRUE then
+        event = "W_Event20000"
+    elseif env(GetSpEffectID,19660) == TRUE then
+        event = "W_Event20002"
+    elseif env(GetSpEffectID,9779) == TRUE and env(GetSpEffectID,9775) == TRUE then
+        event = "W_Event20004"
+    elseif env(GetSpEffectID,9779) == TRUE and env(GetSpEffectID,9776) == TRUE then
+        event = "W_Event20012"
+    elseif env(GetSpEffectID,19618) == TRUE then
+        event = "W_Event20012"
+    elseif env(GetSpEffectID,19619) == TRUE then
+        event = "W_Event20013"
     elseif env(GetSpEffectID, 15360) == TRUE then
         event = "W_Event20003"
     elseif env(GetSpEffectID, 10105) == TRUE then
@@ -1435,9 +1471,37 @@ function ExecSpDamage()
         act(SetDamageAnimType, DAMAGE_FLAG_LARGE)
         Fire("W_DamageSpecial")
         return TRUE
-    else
-        return FALSE
     end
+    if env(GetSpEffectID,19600) == TRUE and IsSpDamageAllowed() == TRUE then
+        Replanning()
+        env(SetDamageAnimType, DAMAGE_FLAG_LARGE)
+        env(TurnTowardAttacker, 0)
+        Fire("W_Event20010")
+        return TRUE
+    end
+    if env(GetSpEffectID,19620) == TRUE and env(GetSpEffectID,19623) == TRUE and env(GetSpEffectID,19628) == TRUE then
+        if GetHpRatio() <= 0.8500000238418579 and env(GetSpEffectID,19624) == FALSE then
+            if IsSpDamageAllowed() == TRUE then
+                Replanning()
+                env(SetDamageAnimType, DAMAGE_FLAG_LARGE)
+                Fire("W_Event20006")
+                return TRUE
+            end
+        elseif GetHpRatio() <= 0.550000011920929 and env(GetSpEffectID,19625) == FALSE then
+            if IsSpDamageAllowed() == TRUE then
+                Replanning()
+                env(SetDamageAnimType, DAMAGE_FLAG_LARGE)
+                Fire("W_Event20006")
+                return TRUE
+            end
+        elseif GetHpRatio() <= 0.30000001192092896 and env(GetSpEffectID,19626) == FALSE and IsSpDamageAllowed() == TRUE then
+            Replanning()
+            env(SetDamageAnimType, DAMAGE_FLAG_LARGE)
+            Fire("W_Event20009")
+            return TRUE
+        end
+    end
+    return FALSE
 end
 
 function ExecNoSyncAddDamage(damage_level, is_damaged)
@@ -1470,6 +1534,9 @@ function ExecNoSyncAddDamage(damage_level, is_damaged)
             end
         end
         if TRUE == IsExistAnime(ANIME_ID_ADD_BLEND_FRONT) then
+            if env(GetSpEffectID,19690) == TRUE then
+                return TRUE
+            end
             local damage_direction = env(GetReceivedDamageDirection)
             local offsetanim = GetDamageDirectionOffset(damage_direction)
             local str = "W_SABlend_Add_Front"
@@ -1784,6 +1851,32 @@ function ExecSaBreakDamage(damage_level, is_damaged)
             Fire("W_Event20006")
             return TRUE
         end
+    elseif env(HasBrokenSA) == TRUE and env(GetSpEffectID,19610) == TRUE and env(GetSpEffectID,19611) == TRUE then
+        SetVariable("IndexDamageDirection", 2)
+        env(SetDamageAnimType, DAMAGE_FLAG_MIDDLE)
+        Replanning()
+        Fire("W_Event20001")
+        return TRUE
+    elseif env(HasBrokenSA) == TRUE and env(GetSpEffectID,19610) == TRUE and env(GetSpEffectID,19612) == TRUE then
+        SetVariable("IndexDamageDirection", 2)
+        env(SetDamageAnimType, DAMAGE_FLAG_MIDDLE)
+        Replanning()
+        Fire("W_Event20003")
+        return TRUE
+    elseif env(HasBrokenSA) == TRUE and env(GetSpEffectID,19620) == TRUE then
+        local damage_direction = env(GetReceivedDamageDirection)
+        local damage_part = env(GetPartGroup)
+        if damage_part == 3 then
+            env(SetDamageAnimType, DAMAGE_FLAG_MIDDLE)
+            Replanning()
+            Fire("W_Event20000")
+            return TRUE
+        elseif damage_part == 4 then
+            env(SetDamageAnimType, DAMAGE_FLAG_MIDDLE)
+            Replanning()
+            Fire("W_Event20001")
+            return TRUE
+        end
     elseif env(GetSpEffectType, 398) == TRUE and env(GetSpEffectType, 399) == TRUE and (env(GetSpEffectID, 11456) == TRUE or env(GetSpEffectID, 11457) == TRUE or env(GetSpEffectID, 11458) == TRUE) then
         SetVariable("IndexDamageDirection", 2)
         act(SetDamageAnimType, DAMAGE_FLAG_MIDDLE)
@@ -1863,6 +1956,22 @@ function ExecTypeDamage(damage_type)
                 Fire("W_Event20001")
             elseif TRUE == env(GetSpEffectID, 15460) then
                 Fire("W_Event20000")
+            elseif env(GetSpEffectID,19630) == TRUE then
+                Fire("W_Event20001")
+            elseif env(GetSpEffectID,19631) == TRUE then
+                if damage_type == DAMAGE_TYPE_PARRY_ENEMY1 then
+                    Fire("W_Event20000")
+                elseif damage_type == DAMAGE_TYPE_PARRY_ENEMY2 then
+                    Fire("W_Event20001")
+                end
+            elseif env(GetSpEffectID,19632) == TRUE then
+                if damage_type == DAMAGE_TYPE_PARRY_ENEMY1 then
+                    Fire("W_Event20010")
+                elseif damage_type == DAMAGE_TYPE_PARRY_ENEMY2 then
+                    Fire("W_Event20011")
+                end
+            elseif env(GetSpEffectID,19633) == TRUE then
+                Fire("W_Event20035")
             end
         elseif damage_type == DAMAGE_TYPE_PARRY_ENEMY1 and TRUE == env(GetSpEffectID, 16247) and env(GetSpEffectID, 16249) == FALSE and env(GetSpEffectID, 16200) == FALSE then
             Fire("W_Event3024")
@@ -2054,7 +2163,32 @@ function ExecNpcDamage(damage_level, damage_type, is_damaged)
             Replanning()
             Fire("W_Event20053")
             return TRUE
-        elseif env(GetSpEffectID, 18680) == TRUE then
+        end
+        if env(GetSpEffectID,9795) == TRUE and env(GetSpEffectID,18680) == TRUE then
+            env(SetDamageAnimType, DAMAGE_FLAG_LARGE)
+            Replanning()
+            Fire("W_Event20007")
+            return TRUE
+        end
+        if env(GetSpEffectID,9795) == TRUE and env(GetSpEffectID,18681) == TRUE then
+            env(SetDamageAnimType, DAMAGE_FLAG_LARGE)
+            Replanning()
+            Fire("W_Event20013")
+            return TRUE
+        end
+        if env(GetSpEffectID,9795) == TRUE and env(GetSpEffectID,18682) == TRUE then
+            env(SetDamageAnimType, DAMAGE_FLAG_LARGE)
+            Replanning()
+            Fire("W_Event20014")
+            return TRUE
+        end
+        if env(GetSpEffectID,9795) == TRUE and env(GetSpEffectID,9796) == TRUE then
+            env(SetDamageAnimType, DAMAGE_FLAG_LARGE)
+            Replanning()
+            Fire("W_Event20017")
+            return TRUE
+        end
+        if env(GetSpEffectID, 18680) == TRUE then
             act(SetDamageAnimType, DAMAGE_FLAG_LARGE)
             Replanning()
             Fire("W_Event20044")
@@ -2077,6 +2211,23 @@ function ExecNpcDamage(damage_level, damage_type, is_damaged)
                 return TRUE
             else
                 Fire("W_Event20011")
+                return TRUE
+            end
+        end
+        if env(GetSpEffectID,9779) == TRUE then
+            env(SetDamageAnimType, DAMAGE_FLAG_LARGE)
+            Replanning()
+            if env(GetSpEffectID,9775) == TRUE then
+                Fire("W_Event20005")
+                return TRUE
+            elseif env(GetSpEffectID,9776) == TRUE then
+                Fire("W_Event20013")
+                return TRUE
+            elseif env(GetSpEffectID,9777) == TRUE then
+                Fire("W_Event20016")
+                return TRUE
+            elseif env(GetSpEffectID,9778) == TRUE then
+                Fire("W_Event20025")
                 return TRUE
             end
         end
@@ -4173,7 +4324,13 @@ function ExecPassiveTransition(judge_fall_type, is_weak, ignore_guard_block, ena
     elseif env(GetSpEffectID, 11432) == TRUE then
         Fire("W_Event30007")
         return TRUE
-    elseif ExecDamage(is_weak, ignore_guard_block) == TRUE then
+    end
+    if env(GetSpEffectID,19629) == TRUE and env(IsLanding) == TRUE then
+        Replanning()
+        Fire("W_Event20011")
+        return TRUE
+    end
+    if ExecDamage(is_weak, ignore_guard_block) == TRUE then
         return TRUE
     elseif ExecFallStart(judge_fall_type) == TRUE then
         return TRUE
@@ -4249,7 +4406,7 @@ function MoveCommonFunction(style, move_type)
     elseif fly_route_state == AI_FLY_ROUTE_STATE_DESCENR then
         Fire("W_Event30001")
         return TRUE
-    elseif fly_route_state == AI_FLY_ROUTE_STATE_NOMAL_CRUISE_TO_DESCENT and env(9999) < 40 then
+    elseif fly_route_state == AI_FLY_ROUTE_STATE_NOMAL_CRUISE_TO_DESCENT and env(Unknown9999) < 40 then
         Fire("W_Event20002")
         return TRUE
     elseif (env(GetSpEffectID, 6004) == TRUE or fly_route_state ~= AI_FLY_ROUTE_STATE_NOT_USE_FLY_ROUTE and fly_route_state ~= AI_FLY_ROUTE_STATE_ON_GROUND and fly_route_state ~= AI_FLY_ROUTE_STATE_ON_GROUND_TAKEOFF_REQUESTED) and ExecActiveTransition(FALSE, style, move_type, TRUE) == TRUE then
@@ -4750,156 +4907,187 @@ end
 
 function IdleUnique700_onUpdate()
     if IdleUniqueCommonFunction(700) == TRUE then
+        return
     end
 end
 
 function IdleUnique701_onUpdate()
     if IdleUniqueCommonFunction(701) == TRUE then
+        return
     end
 end
 
 function IdleUnique702_onUpdate()
     if IdleUniqueCommonFunction(702) == TRUE then
+        return
     end
 end
 
 function IdleUnique703_onUpdate()
     if IdleUniqueCommonFunction(703) == TRUE then
+        return
     end
 end
 
 function IdleUnique704_onUpdate()
     if IdleUniqueCommonFunction(704) == TRUE then
+        return
     end
 end
 
 function IdleUnique705_onUpdate()
     if IdleUniqueCommonFunction(705) == TRUE then
+        return
     end
 end
 
 function IdleUnique706_onUpdate()
     if IdleUniqueCommonFunction(706) == TRUE then
+        return
     end
 end
 
 function IdleUnique707_onUpdate()
     if IdleUniqueCommonFunction(707) == TRUE then
+        return
     end
 end
 
 function IdleUnique708_onUpdate()
     if IdleUniqueCommonFunction(708) == TRUE then
+        return
     end
 end
 
 function IdleUnique709_onUpdate()
     if IdleUniqueCommonFunction(709) == TRUE then
+        return
     end
 end
 
 function IdleUnique710_onUpdate()
     if IdleUniqueCommonFunction(710) == TRUE then
+        return
     end
 end
 
 function IdleUnique711_onUpdate()
     if IdleUniqueCommonFunction(711) == TRUE then
+        return
     end
 end
 
 function IdleUnique712_onUpdate()
     if IdleUniqueCommonFunction(712) == TRUE then
+        return
     end
 end
 
 function IdleUnique713_onUpdate()
     if IdleUniqueCommonFunction(713) == TRUE then
+        return
     end
 end
 
 function IdleUnique714_onUpdate()
     if IdleUniqueCommonFunction(714) == TRUE then
+        return
     end
 end
 
 function IdleUnique715_onUpdate()
     if IdleUniqueCommonFunction(715) == TRUE then
+        return
     end
 end
 
 function IdleUnique716_onUpdate()
     if IdleUniqueCommonFunction(716) == TRUE then
+        return
     end
 end
 
 function IdleUnique717_onUpdate()
     if IdleUniqueCommonFunction(717) == TRUE then
+        return
     end
 end
 
 function IdleUnique718_onUpdate()
     if IdleUniqueCommonFunction(718) == TRUE then
+        return
     end
 end
 
 function IdleUnique719_onUpdate()
     if IdleUniqueCommonFunction(719) == TRUE then
+        return
     end
 end
 
 function IdleUnique720_onUpdate()
     if IdleUniqueCommonFunction(720) == TRUE then
+        return
     end
 end
 
 function IdleUnique721_onUpdate()
     if IdleUniqueCommonFunction(721) == TRUE then
+        return
     end
 end
 
 function IdleUnique722_onUpdate()
     if IdleUniqueCommonFunction(722) == TRUE then
+        return
     end
 end
 
 function IdleUnique723_onUpdate()
     if IdleUniqueCommonFunction(723) == TRUE then
+        return
     end
 end
 
 function IdleUnique724_onUpdate()
     if IdleUniqueCommonFunction(724) == TRUE then
+        return
     end
 end
 
 function IdleUnique725_onUpdate()
     if IdleUniqueCommonFunction(725) == TRUE then
+        return
     end
 end
 
 function IdleUnique726_onUpdate()
     if IdleUniqueCommonFunction(726) == TRUE then
+        return
     end
 end
 
 function IdleUnique727_onUpdate()
     if IdleUniqueCommonFunction(727) == TRUE then
+        return
     end
 end
 
 function IdleUnique728_onUpdate()
     if IdleUniqueCommonFunction(728) == TRUE then
+        return
     end
 end
 
 function IdleUnique729_onUpdate()
     if IdleUniqueCommonFunction(729) == TRUE then
+        return
     end
 end
 
 function Generate_onUpdate()
     if GenerateCommonFunction() == TRUE then
+        return
     end
 end
 
@@ -4912,6 +5100,7 @@ function BuddyGenerate_onUpdate()
         act(ChangeBuddyState)
     end
     if TRUE == GenerateCommonFunction() then
+        return
     end
 end
 
@@ -4930,6 +5119,7 @@ function BuddyGenerate2_onUpdate()
         act(ChangeBuddyState)
     end
     if TRUE == GenerateCommonFunction() then
+        return
     end
 end
 
@@ -4948,6 +5138,7 @@ function BuddyGenerate3_onUpdate()
         act(ChangeBuddyState)
     end
     if TRUE == GenerateCommonFunction() then
+        return
     end
 end
 
@@ -4970,16 +5161,19 @@ end
 
 function IdleUniqueToIdle1700_onUpdate()
     if EventCommonFunction(1700) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1701_onUpdate()
     if EventCommonFunction(1701) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1702_onUpdate()
     if EventCommonFunction(1702) == TRUE then
+        return
     end
 end
 
@@ -4993,306 +5187,367 @@ end
 
 function IdleUniqueToIdle1704_onUpdate()
     if EventCommonFunction(1704) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1705_onUpdate()
     if EventCommonFunction(1705) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1706_onUpdate()
     if EventCommonFunction(1706) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1707_onUpdate()
     if EventCommonFunction(1707) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1708_onUpdate()
     if EventCommonFunction(1708) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1709_onUpdate()
     if EventCommonFunction(1709) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1710_onUpdate()
     if EventCommonFunction(1710) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1711_onUpdate()
     if EventCommonFunction(1711) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1712_onUpdate()
     if EventCommonFunction(1712) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1713_onUpdate()
     if EventCommonFunction(1713) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1714_onUpdate()
     if EventCommonFunction(1714) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1715_onUpdate()
     if EventCommonFunction(1715) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1716_onUpdate()
     if EventCommonFunction(1716) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1717_onUpdate()
     if EventCommonFunction(1717) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1718_onUpdate()
     if EventCommonFunction(1718) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1719_onUpdate()
     if EventCommonFunction(1719) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1720_onUpdate()
     if EventCommonFunction(1720) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1721_onUpdate()
     if EventCommonFunction(1721) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1722_onUpdate()
     if EventCommonFunction(1722) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1723_onUpdate()
     if EventCommonFunction(1723) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1724_onUpdate()
     if EventCommonFunction(1724) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1725_onUpdate()
     if EventCommonFunction(1725) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1726_onUpdate()
     if EventCommonFunction(1726) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1727_onUpdate()
     if EventCommonFunction(1727) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1728_onUpdate()
     if EventCommonFunction(1728) == TRUE then
+        return
     end
 end
 
 function IdleUniqueToIdle1729_onUpdate()
     if EventCommonFunction(1729) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1750_onUpdate()
     if EventCommonFunction(1750) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1751_onUpdate()
     if EventCommonFunction(1751) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1752_onUpdate()
     if EventCommonFunction(1752) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1753_onUpdate()
     if EventCommonFunction(1753) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1754_onUpdate()
     if EventCommonFunction(1754) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1755_onUpdate()
     if EventCommonFunction(1755) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1756_onUpdate()
     if EventCommonFunction(1756) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1757_onUpdate()
     if EventCommonFunction(1757) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1758_onUpdate()
     if EventCommonFunction(1758) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1759_onUpdate()
     if EventCommonFunction(1759) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1760_onUpdate()
     if EventCommonFunction(1760) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1761_onUpdate()
     if EventCommonFunction(1761) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1762_onUpdate()
     if EventCommonFunction(1762) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1763_onUpdate()
     if EventCommonFunction(1763) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1764_onUpdate()
     if EventCommonFunction(1764) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1765_onUpdate()
     if EventCommonFunction(1765) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1766_onUpdate()
     if EventCommonFunction(1766) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1767_onUpdate()
     if EventCommonFunction(1767) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1768_onUpdate()
     if EventCommonFunction(1768) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1769_onUpdate()
     if EventCommonFunction(1769) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1770_onUpdate()
     if EventCommonFunction(1770) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1771_onUpdate()
     if EventCommonFunction(1771) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1772_onUpdate()
     if EventCommonFunction(1772) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1773_onUpdate()
     if EventCommonFunction(1773) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1774_onUpdate()
     if EventCommonFunction(1774) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1775_onUpdate()
     if EventCommonFunction(1775) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1776_onUpdate()
     if EventCommonFunction(1776) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1777_onUpdate()
     if EventCommonFunction(1777) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1778_onUpdate()
     if EventCommonFunction(1778) == TRUE then
+        return
     end
 end
 
 function IdleToIdleUnique1779_onUpdate()
     if EventCommonFunction(1779) == TRUE then
+        return
     end
 end
 
 function IdleDefault_onUpdate()
     if IdleCommonFunction(STYLE_DEFAULT, ANIME_ID_IDLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function IdleBattle_onUpdate()
     if IdleCommonFunction(STYLE_DEFAULT, ANIME_ID_IDLE_BATTLE) == TRUE then
+        return
     end
 end
 
 function TransToDefaultFromBattle_onUpdate()
     if TransIdleCommonFunction() == TRUE then
+        return
     end
 end
 
 function TransToBattleFromDefault_onUpdate()
     if TransIdleCommonFunction() == TRUE then
+        return
     end
 end
 
 function ParryStart_onUpdate()
     if TransStyleCommonFunction(STYLE_PARRY) == TRUE then
+        return
     end
 end
 
@@ -5302,121 +5557,145 @@ end
 
 function Attack4000_onUpdate()
     if AttackCommonFunction(4000, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
 function ParryEnd_onUpdate()
     if TransStyleCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function ParryIdle_onUpdate()
     if IdleCommonFunction(STYLE_PARRY, ANIME_ID_IDLE_PARRY) == TRUE then
+        return
     end
 end
 
 function ParryWalkFront_onUpdate()
     if MoveCommonFunction(STYLE_PARRY, MOVE_TYPE_WALK_FRONT) == TRUE then
+        return
     end
 end
 
 function ParryWalkBack_onUpdate()
     if MoveCommonFunction(STYLE_PARRY, MOVE_TYPE_WALK_BACK) == TRUE then
+        return
     end
 end
 
 function ParryWalkLeft_onUpdate()
     if MoveCommonFunction(STYLE_PARRY, MOVE_TYPE_WALK_LEFT) == TRUE then
+        return
     end
 end
 
 function ParryWalkRight_onUpdate()
     if MoveCommonFunction(STYLE_PARRY, MOVE_TYPE_WALK_RIGHT) == TRUE then
+        return
     end
 end
 
 function ParryRun_onUpdate()
     if MoveCommonFunction(STYLE_PARRY, MOVE_TYPE_RUN) == TRUE then
+        return
     end
 end
 
 function GuardStart_onUpdate()
     if TransStyleCommonFunction(STYLE_GUARD) == TRUE then
+        return
     end
 end
 
 function GuardEnd_onUpdate()
     if TransStyleCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function GuardIdle_onUpdate()
     if IdleCommonFunction(STYLE_GUARD, ANIME_ID_IDLE_GUARD) == TRUE then
+        return
     end
 end
 
 function GuardWalkFront_onUpdate()
     if MoveCommonFunction(STYLE_GUARD, MOVE_TYPE_WALK_FRONT) == TRUE then
+        return
     end
 end
 
 function GuardWalkBack_onUpdate()
     if MoveCommonFunction(STYLE_GUARD, MOVE_TYPE_WALK_BACK) == TRUE then
+        return
     end
 end
 
 function GuardWalkLeft_onUpdate()
     if MoveCommonFunction(STYLE_GUARD, MOVE_TYPE_WALK_LEFT) == TRUE then
+        return
     end
 end
 
 function GuardWalkRight_onUpdate()
     if MoveCommonFunction(STYLE_GUARD, MOVE_TYPE_WALK_RIGHT) == TRUE then
+        return
     end
 end
 
 function GuardRun_onUpdate()
     if MoveCommonFunction(STYLE_GUARD, MOVE_TYPE_RUN) == TRUE then
+        return
     end
 end
 
 function RunBattle_onUpdate()
     if MoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_RUN) == TRUE then
+        return
     end
 end
 
 function WalkFrontBattle_onUpdate()
     if MoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_WALK_FRONT) == TRUE then
+        return
     end
 end
 
 function WalkLeftBattle_onUpdate()
     if MoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_WALK_LEFT) == TRUE then
+        return
     end
 end
 
 function WalkBackBattle_onUpdate()
     if MoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_WALK_BACK) == TRUE then
+        return
     end
 end
 
 function WalkRightBattle_onUpdate()
     if MoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_WALK_RIGHT) == TRUE then
+        return
     end
 end
 
 function RunDefault_onUpdate()
     if MoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_RUN) == TRUE then
+        return
     end
 end
 
 function WalkFrontDefault_onUpdate()
     if MoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_WALK_FRONT) == TRUE then
+        return
     end
 end
 
 function ParallelMove_onUpdate()
     if MoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_PARALLEL) == TRUE then
+        return
     end
 end
 
@@ -5426,6 +5705,7 @@ end
 
 function Attack3000_onUpdate()
     if AttackCommonFunction(3000, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5435,6 +5715,7 @@ end
 
 function Attack3001_onUpdate()
     if AttackCommonFunction(3001, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5444,6 +5725,7 @@ end
 
 function Attack3002_onUpdate()
     if AttackCommonFunction(3002, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5453,6 +5735,7 @@ end
 
 function Attack3003_onUpdate()
     if AttackCommonFunction(3003, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5462,6 +5745,7 @@ end
 
 function Attack3004_onUpdate()
     if AttackCommonFunction(3004, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5471,6 +5755,7 @@ end
 
 function Attack3005_onUpdate()
     if AttackCommonFunction(3005, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5480,6 +5765,7 @@ end
 
 function Attack3006_onUpdate()
     if AttackCommonFunction(3006, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5489,6 +5775,7 @@ end
 
 function Attack3007_onUpdate()
     if AttackCommonFunction(3007, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5498,6 +5785,7 @@ end
 
 function Attack3008_onUpdate()
     if AttackCommonFunction(3008, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5507,6 +5795,7 @@ end
 
 function Attack3009_onUpdate()
     if AttackCommonFunction(3009, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5516,6 +5805,7 @@ end
 
 function Attack3010_onUpdate()
     if AttackCommonFunction(3010, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5525,6 +5815,7 @@ end
 
 function Attack3011_onUpdate()
     if AttackCommonFunction(3011, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5534,6 +5825,7 @@ end
 
 function Attack3012_onUpdate()
     if AttackCommonFunction(3012, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5543,6 +5835,7 @@ end
 
 function Attack3013_onUpdate()
     if AttackCommonFunction(3013, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5552,6 +5845,7 @@ end
 
 function Attack3014_onUpdate()
     if AttackCommonFunction(3014, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5561,6 +5855,7 @@ end
 
 function Attack3015_onUpdate()
     if AttackCommonFunction(3015, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5570,6 +5865,7 @@ end
 
 function Attack3016_onUpdate()
     if AttackCommonFunction(3016, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5579,6 +5875,7 @@ end
 
 function Attack3017_onUpdate()
     if AttackCommonFunction(3017, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5588,6 +5885,7 @@ end
 
 function Attack3018_onUpdate()
     if AttackCommonFunction(3018, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5597,6 +5895,7 @@ end
 
 function Attack3019_onUpdate()
     if AttackCommonFunction(3019, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5606,6 +5905,7 @@ end
 
 function Attack3020_onUpdate()
     if AttackCommonFunction(3020, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5615,6 +5915,7 @@ end
 
 function Attack3021_onUpdate()
     if AttackCommonFunction(3021, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5624,6 +5925,7 @@ end
 
 function Attack3022_onUpdate()
     if AttackCommonFunction(3022, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5633,6 +5935,7 @@ end
 
 function Attack3023_onUpdate()
     if AttackCommonFunction(3023, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5642,6 +5945,7 @@ end
 
 function Attack3024_onUpdate()
     if AttackCommonFunction(3024, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5651,6 +5955,7 @@ end
 
 function Attack3025_onUpdate()
     if AttackCommonFunction(3025, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5660,6 +5965,7 @@ end
 
 function Attack3026_onUpdate()
     if AttackCommonFunction(3026, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5669,6 +5975,7 @@ end
 
 function Attack3027_onUpdate()
     if AttackCommonFunction(3027, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5678,6 +5985,7 @@ end
 
 function Attack3028_onUpdate()
     if AttackCommonFunction(3028, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5687,6 +5995,7 @@ end
 
 function Attack3029_onUpdate()
     if AttackCommonFunction(3029, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5696,6 +6005,7 @@ end
 
 function Attack3030_onUpdate()
     if AttackCommonFunction(3030, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5705,6 +6015,7 @@ end
 
 function Attack3031_onUpdate()
     if AttackCommonFunction(3031, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5714,6 +6025,7 @@ end
 
 function Attack3032_onUpdate()
     if AttackCommonFunction(3032, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5723,6 +6035,7 @@ end
 
 function Attack3033_onUpdate()
     if AttackCommonFunction(3033, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5732,6 +6045,7 @@ end
 
 function Attack3034_onUpdate()
     if AttackCommonFunction(3034, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5741,6 +6055,7 @@ end
 
 function Attack3035_onUpdate()
     if AttackCommonFunction(3035, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5750,6 +6065,7 @@ end
 
 function Attack3036_onUpdate()
     if AttackCommonFunction(3036, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5759,6 +6075,7 @@ end
 
 function Attack3037_onUpdate()
     if AttackCommonFunction(3037, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5768,6 +6085,7 @@ end
 
 function Attack3038_onUpdate()
     if AttackCommonFunction(3038, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5777,6 +6095,7 @@ end
 
 function Attack3039_onUpdate()
     if AttackCommonFunction(3039, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5786,6 +6105,7 @@ end
 
 function Attack3110_onUpdate()
     if AttackCommonFunction(3110, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5795,6 +6115,7 @@ end
 
 function Attack3200_onUpdate()
     if AttackCommonFunction(3200, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5804,6 +6125,7 @@ end
 
 function Attack3201_onUpdate()
     if AttackCommonFunction(3201, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5813,6 +6135,7 @@ end
 
 function Attack3202_onUpdate()
     if AttackCommonFunction(3202, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5822,6 +6145,7 @@ end
 
 function Attack3203_onUpdate()
     if AttackCommonFunction(3203, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5831,6 +6155,7 @@ end
 
 function Attack3204_onUpdate()
     if AttackCommonFunction(3204, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5840,6 +6165,7 @@ end
 
 function GoalAction3500_onUpdate()
     if AttackCommonFunction(3500, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5849,6 +6175,7 @@ end
 
 function GoalAction3501_onUpdate()
     if AttackCommonFunction(3501, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5858,6 +6185,7 @@ end
 
 function GoalAction3502_onUpdate()
     if AttackCommonFunction(3502, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5867,6 +6195,7 @@ end
 
 function GoalAction3503_onUpdate()
     if AttackCommonFunction(3503, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5876,6 +6205,7 @@ end
 
 function GoalAction3504_onUpdate()
     if AttackCommonFunction(3504, STYLE_DEFAULT, TRUE) == TRUE then
+        return
     end
 end
 
@@ -5901,6 +6231,7 @@ end
 
 function Attack4601_onUpdate()
     if AttackCommonFunction(4601, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -5910,6 +6241,7 @@ end
 
 function Attack4602_onUpdate()
     if AttackCommonFunction(4602, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -5919,6 +6251,7 @@ end
 
 function Attack1500_onUpdate()
     if AttackCommonFunction(1500, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -5928,6 +6261,7 @@ end
 
 function Attack1600_onUpdate()
     if AttackCommonFunction(1600, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -5937,6 +6271,7 @@ end
 
 function Attack1810_onUpdate()
     if AttackCommonFunction(1810, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -5949,6 +6284,7 @@ function Step6000_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6000, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -5961,6 +6297,7 @@ function Step6001_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6001, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -5973,6 +6310,7 @@ function Step6002_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6002, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -5985,6 +6323,7 @@ function Step6003_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6003, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -5997,6 +6336,7 @@ function Step6010_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6010, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -6009,6 +6349,7 @@ function Step6011_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6011, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -6021,6 +6362,7 @@ function Step6012_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6012, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -6033,6 +6375,7 @@ function Step6013_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6013, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -6045,6 +6388,7 @@ function Step6020_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6020, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -6057,6 +6401,7 @@ function Step6021_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6021, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -6069,6 +6414,7 @@ function Step6022_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6022, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
@@ -6081,46 +6427,55 @@ function Step6023_onUpdate()
         act(Unknown2027)
     end
     if AttackCommonFunction(6023, STYLE_DEFAULT, FALSE) == TRUE then
+        return
     end
 end
 
 function TurnDefault_Left90_onUpdate()
     if TurnCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function TurnDefault_Right90_onUpdate()
     if TurnCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function TurnDefault_Left180_onUpdate()
     if TurnCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function TurnDefault_Right180_onUpdate()
     if TurnCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function TurnDefault_Left45_onUpdate()
     if TurnCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function TurnDefault_Right45_onUpdate()
     if TurnCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function TurnBattle_Left90_onUpdate()
     if TurnCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function TurnBattle_Right90_onUpdate()
     if TurnCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
@@ -6129,6 +6484,7 @@ function TurnBattle_Left180_onUpdate()
         Fire("W_Event20012")
         return
     elseif TRUE == TurnCommonFunction(STYLE_DEFAULT) then
+        return
     end
 end
 
@@ -6137,76 +6493,91 @@ function TurnBattle_Right180_onUpdate()
         Fire("W_Event20013")
         return
     elseif TRUE == TurnCommonFunction(STYLE_DEFAULT) then
+        return
     end
 end
 
 function TurnBattle_Left45_onUpdate()
     if TurnCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function TurnBattle_Right45_onUpdate()
     if TurnCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function TurnGuard_Left90_onUpdate()
     if TurnCommonFunction(STYLE_GUARD) == TRUE then
+        return
     end
 end
 
 function TurnGuard_Right90_onUpdate()
     if TurnCommonFunction(STYLE_GUARD) == TRUE then
+        return
     end
 end
 
 function TurnGuard_Left180_onUpdate()
     if TurnCommonFunction(STYLE_GUARD) == TRUE then
+        return
     end
 end
 
 function TurnGuard_Right180_onUpdate()
     if TurnCommonFunction(STYLE_GUARD) == TRUE then
+        return
     end
 end
 
 function TurnGuard_Left45_onUpdate()
     if TurnCommonFunction(STYLE_GUARD) == TRUE then
+        return
     end
 end
 
 function TurnGuard_Right45_onUpdate()
     if TurnCommonFunction(STYLE_GUARD) == TRUE then
+        return
     end
 end
 
 function TurnParry_Left90_onUpdate()
     if TurnCommonFunction(STYLE_PARRY) == TRUE then
+        return
     end
 end
 
 function TurnParry_Right90_onUpdate()
     if TurnCommonFunction(STYLE_PARRY) == TRUE then
+        return
     end
 end
 
 function TurnParry_Left180_onUpdate()
     if TurnCommonFunction(STYLE_PARRY) == TRUE then
+        return
     end
 end
 
 function TurnParry_Right180_onUpdate()
     if TurnCommonFunction(STYLE_PARRY) == TRUE then
+        return
     end
 end
 
 function TurnParry_Left45_onUpdate()
     if TurnCommonFunction(STYLE_PARRY) == TRUE then
+        return
     end
 end
 
 function TurnParry_Right45_onUpdate()
     if TurnCommonFunction(STYLE_PARRY) == TRUE then
+        return
     end
 end
 
@@ -6216,6 +6587,7 @@ end
 
 function DamageSpecial_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6225,6 +6597,7 @@ end
 
 function DamageMinimum_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6237,6 +6610,7 @@ end
 function SABreak_onUpdate()
     act(AddSpEffect, 5801)
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6246,6 +6620,7 @@ end
 
 function DamageSmall_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6255,6 +6630,7 @@ end
 
 function DamageSmallFront_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6264,6 +6640,7 @@ end
 
 function NewDamageSmall_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6273,6 +6650,7 @@ end
 
 function DamageMiddle_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6282,6 +6660,7 @@ end
 
 function DamageMiddleFront_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6291,6 +6670,7 @@ end
 
 function NewDamageMiddle_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6300,6 +6680,7 @@ end
 
 function DamageLarge_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6309,6 +6690,7 @@ end
 
 function DamageLargeFront_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6318,6 +6700,7 @@ end
 
 function NewDamageLarge_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6327,6 +6710,7 @@ end
 
 function DamageSpecialBlow_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6336,6 +6720,7 @@ end
 
 function DamageLargeBlow_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_UPWARD) == TRUE then
+        return
     end
 end
 
@@ -6345,6 +6730,7 @@ end
 
 function DamageSmallBlow_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_UPWARD) == TRUE then
+        return
     end
 end
 
@@ -6354,6 +6740,7 @@ end
 
 function DamageFling_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6363,6 +6750,7 @@ end
 
 function DamagePush_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6376,6 +6764,7 @@ function DamageUpper_onUpdate()
             return
         end
     elseif TRUE == DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) then
+        return
     end
 end
 
@@ -6385,6 +6774,7 @@ end
 
 function DamageWeak_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, TRUE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6394,6 +6784,7 @@ end
 
 function DamageSmallFire_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6403,6 +6794,7 @@ end
 
 function DamageLargeFire_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6413,6 +6805,7 @@ end
 function GuardDamageSmall_onUpdate()
     act(SetStaminaRecoveryDisabled)
     if DamageCommonFunction(STYLE_GUARD, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6423,6 +6816,7 @@ end
 function GuardDamageSmallLowStamina_onUpdate()
     act(SetStaminaRecoveryDisabled)
     if DamageCommonFunction(STYLE_GUARD, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6432,6 +6826,7 @@ end
 
 function GuardDamageMiddle_onUpdate()
     if DamageCommonFunction(STYLE_GUARD, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6442,6 +6837,7 @@ end
 function GuardDamageLarge_onUpdate()
     act(SetStaminaRecoveryDisabled)
     if DamageCommonFunction(STYLE_GUARD, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6452,6 +6848,7 @@ end
 function GuardDamageLargeLowStamina_onUpdate()
     act(SetStaminaRecoveryDisabled)
     if DamageCommonFunction(STYLE_GUARD, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6461,6 +6858,7 @@ end
 
 function GuardBreak_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6470,6 +6868,7 @@ end
 
 function DamageParryEnemy1_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6479,6 +6878,7 @@ end
 
 function DamageParryEnemy2_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6488,6 +6888,7 @@ end
 
 function AttackBoundEnemy1_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6497,6 +6898,7 @@ end
 
 function AttackBoundEnemy2_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -6510,16 +6912,19 @@ end
 
 function DeathStartDefault_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function DeathStartFire_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_FIRE) == TRUE then
+        return
     end
 end
 
 function DeathStartWeak_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_WEAK) == TRUE then
+        return
     end
 end
 
@@ -6529,11 +6934,13 @@ end
 
 function DeathStartBlast_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_BLAST) == TRUE then
+        return
     end
 end
 
 function DeathStartFling_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_FLING) == TRUE then
+        return
     end
 end
 
@@ -6545,66 +6952,79 @@ end
 
 function DeathStartUpper_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_UPPER) == TRUE then
+        return
     end
 end
 
 function DeathStartLandDefault_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_LAND_DEFAULT) == TRUE then
+        return
     end
 end
 
 function DeathStartLandUpward_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_LAND_UPWARD) == TRUE then
+        return
     end
 end
 
 function DeathStartLandDownward_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_LAND_DOWNWARD) == TRUE then
+        return
     end
 end
 
 function DeathStartSleep_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_SLEEP) == TRUE then
+        return
     end
 end
 
 function DeathStartSleepCollect_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_SLEEP_COLLECT) == TRUE then
+        return
     end
 end
 
 function FallingDefault_onUpdate()
     if FallCommonFunction(FALL_DEFAULT) == TRUE then
+        return
     end
 end
 
 function FallingUpward_onUpdate()
     if FallCommonFunction(FALL_UPWARD) == TRUE then
+        return
     end
 end
 
 function FallingDownward_onUpdate()
     if FallCommonFunction(FALL_DOWNWARD) == TRUE then
+        return
     end
 end
 
 function LandDefault_onUpdate()
     if LandCommonFunction() == TRUE then
+        return
     end
 end
 
 function LandHeavy_onUpdate()
     if LandCommonFunction() == TRUE then
+        return
     end
 end
 
 function LandUpward_onUpdate()
     if LandCommonFunction() == TRUE then
+        return
     end
 end
 
 function LandDownward_onUpdate()
     if LandCommonFunction() == TRUE then
+        return
     end
 end
 
@@ -6630,6 +7050,7 @@ function ThrowAtk_onUpdate()
         Fire("W_ThrowRelease")
         return
     elseif TRUE == ThrowCommonFunction() then
+        return
     end
 end
 
@@ -6639,6 +7060,11 @@ end
 
 function ThrowDef_onUpdate()
     if env(GetSpEffectID, 14570) == TRUE then
+    elseif env(GetSpEffectID,19660) == TRUE then
+        if env(IsThrowSelfDeath) == TRUE then
+            Fire("W_Event20003")
+            return
+        end
     elseif env(IsThrowSelfDeath) == TRUE then
         Fire("W_ThrowDefDeath")
         return
@@ -6656,16 +7082,19 @@ end
 
 function ThrowRelease_onUpdate()
     if ThrowCommonFunction() == TRUE then
+        return
     end
 end
 
 function ThrowKill_onUpdate()
     if ThrowCommonFunction() == TRUE then
+        return
     end
 end
 
 function ThrowDefDeath_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_THROW_DEF) == TRUE then
+        return
     end
 end
 
@@ -6675,31 +7104,37 @@ end
 
 function Event14000_onUpdate()
     if EventCommonFunction(14000) == TRUE then
+        return
     end
 end
 
 function Event14001_onUpdate()
     if EventCommonFunction(14001) == TRUE then
+        return
     end
 end
 
 function Event14010_onUpdate()
     if EventCommonFunction(14010) == TRUE then
+        return
     end
 end
 
 function Event14011_onUpdate()
     if EventCommonFunction(14011) == TRUE then
+        return
     end
 end
 
 function Event14020_onUpdate()
     if EventCommonFunction(14020) == TRUE then
+        return
     end
 end
 
 function Event14021_onUpdate()
     if EventCommonFunction(14021) == TRUE then
+        return
     end
 end
 
@@ -6716,12 +7151,14 @@ end
 function LadderIdleLeft_onUpdate()
     LadderSetActionState(LADDER_ACTION_IDLE_LEFT)
     if LadderIdleCommonFunction(LADDER_HAND_LEFT) == TRUE then
+        return
     end
 end
 
 function LadderIdleRight_onUpdate()
     LadderSetActionState(LADDER_ACTION_IDLE_RIGHT)
     if LadderIdleCommonFunction(LADDER_HAND_RIGHT) == TRUE then
+        return
     end
 end
 
@@ -6732,6 +7169,7 @@ end
 function LadderUpRight_onUpdate()
     LadderSetActionState(LADDER_ACTION_UP_RIGHT)
     if LadderMoveCommonFunction(LADDER_HAND_LEFT) == TRUE then
+        return
     end
 end
 
@@ -6742,6 +7180,7 @@ end
 function LadderUpLeft_onUpdate()
     LadderSetActionState(LADDER_ACTION_UP_LEFT)
     if LadderMoveCommonFunction(LADDER_HAND_RIGHT) == TRUE then
+        return
     end
 end
 
@@ -6752,6 +7191,7 @@ end
 function LadderDownRight_onUpdate()
     LadderSetActionState(LADDER_ACTION_DOWN_RIGHT)
     if LadderMoveCommonFunction(LADDER_HAND_LEFT) == TRUE then
+        return
     end
 end
 
@@ -6762,6 +7202,7 @@ end
 function LadderDownLeft_onUpdate()
     LadderSetActionState(LADDER_ACTION_DOWN_LEFT)
     if LadderMoveCommonFunction(LADDER_HAND_RIGHT) == TRUE then
+        return
     end
 end
 
@@ -6772,6 +7213,7 @@ end
 function LadderStartTop_onUpdate()
     LadderSetActionState(LADDER_ACTION_START_TOP)
     if LadderStartEndCommonFunction() == TRUE then
+        return
     end
 end
 
@@ -6782,6 +7224,7 @@ end
 function LadderStartBottom_onUpdate()
     LadderSetActionState(LADDER_ACTION_START_BOTTOM)
     if LadderStartEndCommonFunction() == TRUE then
+        return
     end
 end
 
@@ -6792,6 +7235,7 @@ end
 function LadderEndTopLeft_onUpdate()
     LadderSetActionState(LADDER_ACTION_END_TOP)
     if LadderStartEndCommonFunction() == TRUE then
+        return
     end
 end
 
@@ -6802,6 +7246,7 @@ end
 function LadderEndTopRight_onUpdate()
     LadderSetActionState(LADDER_ACTION_END_TOP)
     if LadderStartEndCommonFunction() == TRUE then
+        return
     end
 end
 
@@ -6812,6 +7257,7 @@ end
 function LadderEndBottomLeft_onUpdate()
     LadderSetActionState(LADDER_ACTION_END_BOTTOM)
     if LadderStartEndCommonFunction() == TRUE then
+        return
     end
 end
 
@@ -6822,54 +7268,63 @@ end
 function LadderEndBottomRight_onUpdate()
     LadderSetActionState(LADDER_ACTION_END_BOTTOM)
     if LadderStartEndCommonFunction() == TRUE then
+        return
     end
 end
 
 function LadderAttackDownLeft_onUpdate()
     LadderSetActionState(LADDER_ACTION_ATTACK_DOWN_LEFT)
     if LadderAttackCommonFunction(LADDER_HAND_LEFT) == TRUE then
+        return
     end
 end
 
 function LadderAttackDownRight_onUpdate()
     LadderSetActionState(LADDER_ACTION_ATTACK_DOWN_RIGHT)
     if LadderAttackCommonFunction(LADDER_HAND_RIGHT) == TRUE then
+        return
     end
 end
 
 function LadderAttackUpLeft_onUpdate()
     LadderSetActionState(LADDER_ACTION_ATTACK_UP_LEFT)
     if LadderAttackCommonFunction(LADDER_HAND_LEFT) == TRUE then
+        return
     end
 end
 
 function LadderAttackUpRight_onUpdate()
     LadderSetActionState(LADDER_ACTION_ATTACK_UP_RIGHT)
     if LadderAttackCommonFunction(LADDER_HAND_RIGHT) == TRUE then
+        return
     end
 end
 
 function LadderDamageSmallRight_onUpdate()
     LadderSetActionState(LADDER_ACTION_SMALL_DAMAGE)
     if LadderDamageCommonFunction(LADDER_HAND_RIGHT) == TRUE then
+        return
     end
 end
 
 function LadderDamageSmallLeft_onUpdate()
     LadderSetActionState(LADDER_ACTION_SMALL_DAMAGE)
     if LadderDamageCommonFunction(LADDER_HAND_LEFT) == TRUE then
+        return
     end
 end
 
 function LadderDamageLargeRight_onUpdate()
     LadderSetActionState(LADDER_ACTION_LARGE_DAMAGE)
     if LadderDamageCommonFunction(LADDER_HAND_RIGHT) == TRUE then
+        return
     end
 end
 
 function LadderDamageLargeLeft_onUpdate()
     LadderSetActionState(LADDER_ACTION_LARGE_DAMAGE)
     if LadderDamageCommonFunction(LADDER_HAND_LEFT) == TRUE then
+        return
     end
 end
 
@@ -6884,17 +7339,20 @@ end
 
 function LadderFall_onUpdate()
     if ExecLand(FALL_LADDER) == TRUE then
+        return
     end
 end
 
 function LadderFallLand_onUpdate()
     if LandCommonFunction() == TRUE then
+        return
     end
 end
 
 function LadderCoastStart_onUpdate()
     LadderSetActionState(LADDER_ACTION_COAST_START_LEFT)
     if LadderCoastCommonFunction(LADDER_HAND_LEFT) == TRUE then
+        return
     end
 end
 
@@ -6905,6 +7363,7 @@ end
 function LadderCoastLeft_onUpdate()
     LadderSetActionState(LADDER_ACTION_COAST_LEFT)
     if LadderCoastCommonFunction(LADDER_HAND_RIGHT) == TRUE then
+        return
     end
 end
 
@@ -6915,18 +7374,21 @@ end
 function LadderCoastRight_onUpdate()
     LadderSetActionState(LADDER_ACTION_COAST_RIGHT)
     if LadderCoastCommonFunction(LADDER_HAND_LEFT) == TRUE then
+        return
     end
 end
 
 function LadderCoastStopLeft_onUpdate()
     LadderSetActionState(LADDER_ACTION_COAST_STOP_LEFT)
     if LadderMoveCommonFunction(LADDER_HAND_LEFT) == TRUE then
+        return
     end
 end
 
 function LadderCoastStopRight_onUpdate()
     LadderSetActionState(LADDER_ACTION_COAST_STOP_RIGHT)
     if LadderMoveCommonFunction(LADDER_HAND_RIGHT) == TRUE then
+        return
     end
 end
 
@@ -6937,6 +7399,7 @@ end
 function LadderCoastEnd_onUpdate()
     LadderSetActionState(LADDER_ACTION_COAST_LANDING)
     if LadderStartEndCommonFunction() == TRUE then
+        return
     end
 end
 
@@ -6950,29 +7413,34 @@ end
 
 function LadderDeathFall_onUpdate()
     if ExecLand(FALL_LADDER_DEATH) == TRUE then
+        return
     end
 end
 
 function DeathStartLadder_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_LADDER) == TRUE then
+        return
     end
 end
 
 function LadderRemoveWeaponBottom_onUpdate()
     act(SetInsufficientStrengthAnimID)
     if LadderStartEndCommonFunction() == TRUE then
+        return
     end
 end
 
 function LadderRemoveWeaponTop_onUpdate()
     act(SetInsufficientStrengthAnimID)
     if LadderStartEndCommonFunction() == TRUE then
+        return
     end
 end
 
 function LadderEquipWeapon_onUpdate()
     LadderSetActionState(LADDER_ACTION_INVALID)
     if LadderEquipWeaponCommonFunction() == TRUE then
+        return
     end
 end
 
@@ -6982,6 +7450,7 @@ end
 
 function Attack3100_onUpdate()
     if AttackCommonFunction(3100, STYLE_GUARD, TRUE) == TRUE then
+        return
     end
 end
 
@@ -6991,6 +7460,7 @@ end
 
 function Attack3101_onUpdate()
     if AttackCommonFunction(3101, STYLE_GUARD, TRUE) == TRUE then
+        return
     end
 end
 
@@ -7000,6 +7470,7 @@ end
 
 function Attack3102_onUpdate()
     if AttackCommonFunction(3102, STYLE_GUARD, TRUE) == TRUE then
+        return
     end
 end
 
@@ -7009,6 +7480,7 @@ end
 
 function Attack3103_onUpdate()
     if AttackCommonFunction(3103, STYLE_GUARD, TRUE) == TRUE then
+        return
     end
 end
 
@@ -7018,6 +7490,7 @@ end
 
 function Attack3104_onUpdate()
     if AttackCommonFunction(3104, STYLE_GUARD, TRUE) == TRUE then
+        return
     end
 end
 
@@ -7029,7 +7502,19 @@ function Sleep_Start_onUpdate()
     if SleepCommonFunction(12001) == TRUE then
         act(AddSpEffect, 30050)
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(GetSpEffectID,SP_EFFECT_DEEP_SLEEP) == TRUE then
+        if env(GetSpEffectID,102304) == TRUE then
+            env(AddSpEffect, 102301)
+        end
+        if env(GetSpEffectID,102308) == TRUE then
+            env(AddSpEffect, 102305)
+        end
+        if env(GetSpEffectID,90300) == FALSE and env(GetSpEffectID,5841) == FALSE and env(GetSpEffectID,5842) == FALSE and env(GetSpEffectID,102308) == FALSE and env(GetSpEffectID,102304) == FALSE then
+            env(AddSpEffect, 102303)
+        end
+    end
+    if TRUE == env(IsAnimEnd, 1) then
         Fire("W_Sleep_Loop")
     end
 end
@@ -7039,6 +7524,10 @@ function Sleep_Loop_onActivate()
 end
 
 function Sleep_Loop_onUpdate()
+    local hp = env(GetHP)
+    if env(GetSpEffectID,SP_EFFECT_DEEP_SLEEP) == TRUE and hp > 0 then
+        return
+    end
     if SleepCommonFunction(12000) == TRUE then
         act(AddSpEffect, 30050)
     end
@@ -7061,7 +7550,11 @@ function Sleep_Resist_onActivate()
 end
 
 function Sleep_Resist_onUpdate()
+    if env(GetSpEffectID,SP_EFFECT_DEEP_SLEEP) == TRUE and env(GetSpEffectID,102308) == TRUE then
+        env(AddSpEffect, 102305)
+    end
     if SleepCommonFunction(12020) == TRUE then
+        return
     end
 end
 
@@ -7382,6 +7875,7 @@ end
 function Jump_onUpdate()
     act(Unknown4002)
     if JumpCommonFunction(STYLE_DEFAULT) == TRUE then
+        return
     end
 end
 
@@ -7407,6 +7901,7 @@ end
 function JumpDamage_Land_onUpdate()
     act(DenyEventAnimPlaybackRequest)
     if LandCommonFunction() == TRUE then
+        return
     end
 end
 
@@ -8249,6 +8744,7 @@ function Ride_Enemy_Idle_onUpdate()
     elseif RideRequestFunction(FALSE, MOVE_TYPE_NONE, TRUE, FALSE) == TRUE then
         return
     elseif TRUE == RideIdleCommonFunction(STYLE_DEFAULT) then
+        return
     end
 end
 
@@ -8289,6 +8785,7 @@ function Ride_Enemy_Walk_onUpdate()
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
     elseif RideRequestFunction(FALSE, RIDE_MOVE_TYPE_WALK, FALSE, FALSE) == TRUE then
+        return
     end
 end
 
@@ -8297,6 +8794,7 @@ function Ride_Enemy_Run_onUpdate()
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
     elseif RideRequestFunction(FALSE, RIDE_MOVE_TYPE_RUN, FALSE, FALSE) == TRUE then
+        return
     end
 end
 
@@ -8305,6 +8803,7 @@ function Ride_Enemy_Dash_onUpdate()
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
     elseif RideRequestFunction(FALSE, RIDE_MOVE_TYPE_DASH, FALSE, FALSE) == TRUE then
+        return
     end
 end
 
@@ -8313,6 +8812,7 @@ function Ride_Enemy_Gallop_onUpdate()
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
     elseif RideRequestFunction(FALSE, RIDE_MOVE_TYPE_GALLOP, FALSE, FALSE) == TRUE then
+        return
     end
 end
 
@@ -8322,6 +8822,7 @@ function Ride_Enemy_RunBattle_onUpdate()
     elseif RideRequestFunction(FALSE, MOVE_TYPE_RUN, FALSE, FALSE) == TRUE then
         return
     elseif TRUE == RideMoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_RUN) then
+        return
     end
 end
 
@@ -8331,6 +8832,7 @@ function Ride_Enemy_WalkFrontBattle_onUpdate()
     elseif RideRequestFunction(FALSE, MOVE_TYPE_WALK_FRONT, FALSE, FALSE) == TRUE then
         return
     elseif TRUE == RideMoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_WALK_FRONT) then
+        return
     end
 end
 
@@ -8340,6 +8842,7 @@ function Ride_Enemy_WalkBackBattle_onUpdate()
     elseif RideRequestFunction(FALSE, MOVE_TYPE_WALK_BACK, FALSE, FALSE) == TRUE then
         return
     elseif TRUE == RideMoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_WALK_BACK) then
+        return
     end
 end
 
@@ -8349,6 +8852,7 @@ function Ride_Enemy_WalkLeftBattle_onUpdate()
     elseif RideRequestFunction(FALSE, MOVE_TYPE_WALK_LEFT, FALSE, FALSE) == TRUE then
         return
     elseif TRUE == RideMoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_WALK_LEFT) then
+        return
     end
 end
 
@@ -8358,6 +8862,7 @@ function Ride_Enemy_WalkRightBattle_onUpdate()
     elseif RideRequestFunction(FALSE, MOVE_TYPE_WALK_RIGHT, FALSE, FALSE) == TRUE then
         return
     elseif TRUE == RideMoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_WALK_RIGHT) then
+        return
     end
 end
 
@@ -8367,6 +8872,7 @@ function Ride_Enemy_RunDefault_onUpdate()
     elseif RideRequestFunction(FALSE, MOVE_TYPE_RUN, FALSE, FALSE) == TRUE then
         return
     elseif TRUE == RideMoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_RUN) then
+        return
     end
 end
 
@@ -8376,6 +8882,7 @@ function Ride_Enemy_WalkFrontDefault_onUpdate()
     elseif RideRequestFunction(FALSE, MOVE_TYPE_WALK_FRONT, FALSE, FALSE) == TRUE then
         return
     elseif TRUE == RideMoveCommonFunction(STYLE_DEFAULT, MOVE_TYPE_WALK_FRONT) then
+        return
     end
 end
 
@@ -9295,12 +9802,14 @@ end
 function Ride_Enemy_Death_onUpdate()
     act(Unknown3005)
     if ExecTransToDeathIdle(DEATH_TYPE_DEFAULT) == TRUE then
+        return
     end
 end
 
 function Ride_Enemy_DeathOnlyTop_onUpdate()
     act(Unknown3005)
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_DEFAULT_ONLY_TOP) == TRUE then
+        return
     end
 end
 
@@ -9327,18 +9836,21 @@ end
 function Ride_Enemy_FireDeathOnlyTop_onUpdate()
     act(Unknown3005)
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_FIRE_ONLY_TOP) == TRUE then
+        return
     end
 end
 
 function Ride_Enemy_WeakDeathOnlyTop_onUpdate()
     act(Unknown3005)
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_WEAK_ONLY_TOP) == TRUE then
+        return
     end
 end
 
 function Ride_Enemy_ExLargeDeathOnlyTop_onUpdate()
     act(Unknown3005)
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_EXLARGE_ONLY_TOP) == TRUE then
+        return
     end
 end
 
@@ -9352,6 +9864,7 @@ function Ride_Enemy_ExLargeDeathOnlyUnder_onUpdate()
         act(Unknown2027)
     end
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
@@ -9365,6 +9878,7 @@ end
 
 function Ride_Enemy_Fall_Loop_onUpdate()
     if RideFallCommonFunction() == TRUE then
+        return
     end
 end
 
@@ -9760,6 +10274,7 @@ end
 function Ridden_Enemy_Jump_onUpdate()
     act(Unknown4002)
     if RideCommonFunction(RIDE_MOVE_TYPE_OTHER) == TRUE then
+        return
     end
 end
 
@@ -9843,6 +10358,7 @@ end
 
 function Ridden_Enemy_Death_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_DEFAULT) == TRUE then
+        return
     end
 end
 
@@ -9862,6 +10378,7 @@ end
 
 function Ridden_Enemy_DeathOnlyUnder_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_DEFAULT_ONLY_UNDER) == TRUE then
+        return
     end
 end
 
@@ -9909,6 +10426,7 @@ end
 
 function Ridden_Enemy_ExLargeDeathOnlyUnder_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_EXLARGE_ONLY_UNDER) == TRUE then
+        return
     end
 end
 
@@ -10242,6 +10760,7 @@ end
 
 function RideJumpHigh_onUpdate()
     if RideCommonFunction(RIDE_MOVE_TYPE_OTHER) == TRUE then
+        return
     end
 end
 
@@ -10327,16 +10846,19 @@ end
 
 function RideJump_Loop_onUpdate()
     if RideCommonFunction(RIDE_MOVE_TYPE_OTHER) == TRUE then
+        return
     end
 end
 
 function RideJump2_Loop_onUpdate()
     if RideCommonFunction(RIDE_MOVE_TYPE_OTHER) == TRUE then
+        return
     end
 end
 
 function RideJumpHigh_FallLoop_onUpdate()
     if RideCommonFunction(RIDE_MOVE_TYPE_OTHER) == TRUE then
+        return
     end
 end
 
@@ -10376,8 +10898,20 @@ function RideDamageBackFall_onUpdate()
     end
 end
 
+function RideDamage_Fall_AbyssalForest_onUpdate()
+    if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
+    end
+    if env(IsAnimEnd, 0) == TRUE then
+        Fire("W_Idle")
+        return TRUE
+    end
+    
+end
+
 function RideDeath_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_DEFAULT) == TRUE then
+        return
     end
 end
 
@@ -10391,11 +10925,13 @@ end
 
 function RideDeathOnlyTop_onUpdate()
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
+        return
     end
 end
 
 function RideDeathOnlyUnder_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_DEFAULT_ONLY_UNDER) == TRUE then
+        return
     end
 end
 
@@ -10440,12 +10976,14 @@ end
 function Ride_Enemy_DeathLandDefault_onUpdate()
     act(Unknown3005)
     if ExecTransToDeathIdle(DEATH_TYPE_LAND_DEFAULT) == TRUE then
+        return
     end
 end
 
 function Ride_Enemy_DeathLandDefaultOnlyTop_onUpdate()
     act(Unknown3005)
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_LAND_ONLY_TOP) == TRUE then
+        return
     end
 end
 
@@ -10567,6 +11105,7 @@ end
 
 function Ridden_Enemy_DeathLandDefault_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_LAND_DEFAULT) == TRUE then
+        return
     end
 end
 
@@ -10586,6 +11125,7 @@ end
 
 function Ridden_Enemy_DeathLandDefaultOnlyUnder_onUpdate()
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_LAND_ONLY_UNDER) == TRUE then
+        return
     end
 end
 
@@ -11081,6 +11621,7 @@ SP_EFFECT_DISABLE_SLEEP = 11721
 SP_EFFECT_IGNORE_TURN45 = 10922
 SP_EFFECT_KING_OF_STORM = 12060
 SP_EFFECT_BUDDY_DELETE = 295190
+SP_EFFECT_DEEP_SLEEP = 102300
 SP_EFFECT_TYPE_POISON = 2
 SP_EFFECT_TYPE_PLAGUE = 5
 SP_EFFECT_TYPE_CAT_LANDING = 47
@@ -11530,6 +12071,8 @@ IsCeremonyInterrupt = 2018
 IsSpeaking = 3000
 GetTalkID_3001 = 3001
 GetTalkID_3002 = 3002
+
+Unknown9999 = 9999
 
 ------------------------
 -- Commands
