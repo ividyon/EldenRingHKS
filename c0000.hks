@@ -442,7 +442,7 @@ function ExecGuard(event, blend_type)
                 elseif sp_kind == 292 then
                     SetVariable("IndexTorchColor", 2) -- St. Trina's Torch
                 elseif sp_kind == 288 then
-                    SetVariable("IndexTorchColor", 3) -- Unk Torch
+                    SetVariable("IndexTorchColor", 3) -- Nanaya's Torch
                 else
                     SetVariable("IndexTorchColor", 0) -- Torch
                 end
@@ -668,8 +668,8 @@ function GetSwordArtInfo()
         is_both = TRUE
     end
 
+    local weapon_id = 0
     local art_hand = 0
-    local weapon_id = nil
 
     if is_both == TRUE then
         if style == HAND_RIGHT_BOTH then
@@ -757,6 +757,7 @@ function IsAttackSwordArts(arts_id)
             return TRUE
         else
             return FALSE
+        end
     else
         return TRUE
     end
@@ -1233,11 +1234,10 @@ function IsQuickMagic()
         MAGIC_REQUEST_QUICK_FLAME
     }
 
-    if not (magic_type ~= MAGIC_REQUEST_WEAPON_ENCHANT2 or c_Style ~= HAND_RIGHT) or Contains(magic_type_list, magic_type) == TRUE then
+    if (magic_type == MAGIC_REQUEST_WEAPON_ENCHANT2 and c_Style == HAND_RIGHT) or Contains(magic_type_list, magic_type) == TRUE then
         return TRUE
-    else
-        return FALSE
     end
+    return FALSE
 end
 
 function IsWeaponEnchantMagic()
@@ -1253,9 +1253,8 @@ function IsWeaponEnchantMagic()
 
     if Contains(magic_type_list, magic_type) == TRUE then
         return TRUE
-    else
-        return FALSE
     end
+    return FALSE
 end
 
 function IsJumpMagic()
@@ -1268,9 +1267,8 @@ function IsJumpMagic()
 
     if Contains(magic_type_list, magic_type) == TRUE then
         return TRUE
-    else
-        return FALSE
     end
+    return FALSE
 end
 
 function IsComboMagic()
@@ -7119,7 +7117,7 @@ function ArtsCommonFunction(r1, r2, l1, l2, b1, b2, guardcondition, artsr1, arts
         ClearAttackQueue()
 
         return TRUE
-    if ExecArtsStanceOnCancelTiming(ALLBODY) == TRUE then
+    elseif ExecArtsStanceOnCancelTiming(ALLBODY) == TRUE then
 
         return TRUE
     elseif ExecAttack(r1, r2, l1, l2, b1, b2, guardcondition, blend_type, artsr1, artsr2, FALSE) == TRUE then
@@ -12074,6 +12072,7 @@ function SwordArtsHalfLoopLoop_Upper_onUpdate()
     end
     if ArtsCommonFunction("W_AttackRightLight1", "W_AttackRightHeavy1Start", "W_AttackLeftLight1", "W_AttackLeftHeavy1", "W_AttackBothLight1", "W_AttackBothHeavy1Start", FALSE, TRUE, TRUE, TRUE, canThrow, blend_type) == TRUE then
         return
+    end
 
     if c_SwordArtsID == 334 then
         SetVariable("IsMadTorch", 1)
@@ -12087,7 +12086,8 @@ function SwordArtsHalfLoopLoop_Upper_onUpdate()
             ExecEventHalfBlend(Event_SwordArtsHalfLoopEnd, blend_type)
             return
         end
-    elseif lower_state == LOWER_IDLE then
+    end
+    if lower_state == LOWER_IDLE then
         act(LockonSystemUnableToTurnAngle, 45, 45)
     elseif lower_state == LOWER_TURN then
         SetVariable("TurnType", TURN_TYPE_DEFAULT)
@@ -14434,6 +14434,7 @@ function MagicFireLeft3_Upper_onUpdate()
     local blend_type, lower_state = GetHalfBlendInfo()
     if MagicCommonFunction(ALLBODY, QUICKTYPE_NORMAL, FALSE) == TRUE then
         return
+    end
 
     local button = ACTION_ARM_L1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
@@ -16746,7 +16747,7 @@ function SpeedUpdate()
         ChangeMoveSpeedIndex(0)
     elseif env(GetSpEffectID, 4101) == TRUE then
         ChangeMoveSpeedIndex(0)
-    elseif TRUE == g_IsMimicry then
+    elseif g_IsMimicry == TRUE then
         if stick_level > 1.100000023841858 then
             ResetMimicry()
         else
@@ -16878,9 +16879,9 @@ function GetConstVariable()
     c_HasActionRequest = CheckActionRequest()
     c_RollingAngle = env(GetRollAngle) * 0.009999999776482582
     c_ArtsRollingAngle = env(GetSwordArtsRollAngle) * 0.009999999776482582
+    c_Style = env(GetWeaponSwitchState)
     c_SwordArtsID, c_SwordArtsHand = GetSwordArtInfo()
     c_IsEnableSwordArts = IsEnableSwordArts()
-    c_Style = env(GetWeaponSwitchState)
     c_IsStealth = env(GetSpEffectID, 8001)
 end
 
@@ -16931,7 +16932,7 @@ function Update()
 
     ChangeWaistTwist(-10, 0, -20, 0)
 
-    if TRUE == IsLowerQuickTurn() then
+    if IsLowerQuickTurn() == TRUE then
         SetVariable("LookAtTwist30_OnGain", 1)
     else
         SetVariable("LookAtTwist30_OnGain", 0.10000000149011612)
@@ -16955,7 +16956,7 @@ function Update()
 
     g_IsMimicry = env(GetSpEffectID, 503040)
 
-    if FALSE == g_EnableMimicry and TRUE == g_IsMimicry then
+    if g_EnableMimicry == FALSE and g_IsMimicry == TRUE then
         ResetMimicry()
     end
 
@@ -17097,9 +17098,8 @@ function ExecRide()
         act(Unknown3000)
 
         return TRUE
-    else
-        return FALSE
     end
+    return FALSE
 end
 
 function FireRideEvent(upper_event, lower_event, lower_only)
@@ -17142,8 +17142,9 @@ function ExecRideOff(is_force, rideOffAnyway)
     if unhorseDir < 0 then
         if rideOffAnyway == FALSE then
             return FALSE
+        else
+            unhorseDir = 2
         end
-        unhorseDir = 2
     end
 
     local event = "W_RideOff"
@@ -17184,7 +17185,7 @@ function ExecRideOff(is_force, rideOffAnyway)
         SetVariable("SwingPose", 0)
         SetVariable("IsEnableDirectionJumpTAE", true)
 
-        if 2 == GetVariable("IsEnableToggleDashTest") then
+        if GetVariable("IsEnableToggleDashTest") == 2 then
             SetVariable("ToggleDash", 0)
         end
     elseif unhorseDir == 2 then
@@ -17217,15 +17218,17 @@ function RideReActionFunction()
             act(AddSpEffect, 181)
         end
         return TRUE
-    elseif TRUE == ExecRideDeath() then
-        return TRUE
-    elseif TRUE == ExecRideDamage() then
-        return TRUE
-    elseif TRUE == ExecRideEventAnim() then
-        return TRUE
-    else
-        return FALSE
     end
+    if ExecRideDeath() == TRUE then
+        return TRUE
+    end
+    if ExecRideDamage() == TRUE then
+        return TRUE
+    end
+    if ExecRideEventAnim() == TRUE then
+        return TRUE
+    end
+    return FALSE
 end
 
 function ExecRideDeath()
@@ -17332,12 +17335,11 @@ function ExecRideDamage()
         Replanning()
 
         return TRUE
-    if env(Unknown362, 32) == TRUE then
+    elseif env(Unknown362, 32) == TRUE then
         FireRideEvent("W_RideDamageBind_Start", "W_RideDeath", FALSE)
         Replanning()
 
         return TRUE
-    end
     elseif (env(GetSpecialAttribute) == 5 or env(GetMountSpecialAttribute) == 5) and GetVariable("MoveSpeedLevel") > 1.5 then
         SetVariable("DamageDirection", 2)
         act(ApplyRideBlend, "DamageDirection", 2)
