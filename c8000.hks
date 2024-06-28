@@ -4,638 +4,789 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 1 for ER version 1.08.1
+-- Version 1 for ER version 1.12.1
 ------------------------------------------
 -- Changelog:
 -- 2023-02-14 - Vawser: Cleaned up and added.
+-- 2024-06-28 - Exelot: Recreated on raw decompiler. No functional changes present.
 ------------------------------------------
 function Event20000_onUpdate()
     if EventCommonFunction(20000) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_PhantomIdle")
+        return
     end
 end
 
 function Event20001_onUpdate()
     if EventCommonFunction(20001) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20002_onUpdate()
     if EventCommonFunction(20002) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20003_onUpdate()
     if EventCommonFunction(20003) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20004_onUpdate()
     if EventCommonFunction(20004) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20005_onUpdate()
     if EventCommonFunction(20005) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20006_onUpdate()
     if EventCommonFunction(20006) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20007_onUpdate()
     if EventCommonFunction(20007) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20008_onUpdate()
     if EventCommonFunction(20008) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20009_onUpdate()
     if EventCommonFunction(20009) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20010_onUpdate()
     if EventCommonFunction(20010) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20011_onUpdate()
     if EventCommonFunction(20011) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20012_onUpdate()
     if EventCommonFunction(20012) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20013_onUpdate()
     if EventCommonFunction(20013) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20014_onUpdate()
     if EventCommonFunction(20014) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20015_onUpdate()
     if EventCommonFunction(20015) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20016_onUpdate()
     if EventCommonFunction(20016) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20017_onUpdate()
     if EventCommonFunction(20017) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20018_onUpdate()
     if EventCommonFunction(20018) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20019_onUpdate()
     if EventCommonFunction(20019) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20020_onUpdate()
     if EventCommonFunction(20020) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20021_onUpdate()
     if EventCommonFunction(20021) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20022_onUpdate()
     if EventCommonFunction(20022) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20023_onUpdate()
     if EventCommonFunction(20023) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20024_onUpdate()
     if EventCommonFunction(20024) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20025_onUpdate()
     if EventCommonFunction(20025) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20026_onUpdate()
     if EventCommonFunction(20026) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20027_onUpdate()
     if EventCommonFunction(20027) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20028_onUpdate()
     if EventCommonFunction(20028) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20029_onUpdate()
     if EventCommonFunction(20029) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20030_onUpdate()
     if EventCommonFunction(20030) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20031_onUpdate()
     if EventCommonFunction(20031) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20032_onUpdate()
     if EventCommonFunction(20032) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20033_onUpdate()
     if EventCommonFunction(20033) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20034_onUpdate()
     if EventCommonFunction(20034) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20035_onUpdate()
     if EventCommonFunction(20035) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20036_onUpdate()
     if EventCommonFunction(20036) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20037_onUpdate()
     if EventCommonFunction(20037) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20038_onUpdate()
     if EventCommonFunction(20038) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20039_onUpdate()
     if EventCommonFunction(20039) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20040_onUpdate()
     if EventCommonFunction(20040) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20041_onUpdate()
     if EventCommonFunction(20041) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20042_onUpdate()
     if EventCommonFunction(20042) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20043_onUpdate()
     if EventCommonFunction(20043) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20044_onUpdate()
     if EventCommonFunction(20044) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20045_onUpdate()
     if EventCommonFunction(20045) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20046_onUpdate()
     if EventCommonFunction(20046) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20047_onUpdate()
     if EventCommonFunction(20047) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20048_onUpdate()
     if EventCommonFunction(20048) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20049_onUpdate()
     if EventCommonFunction(20049) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20050_onUpdate()
     if EventCommonFunction(20050) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20051_onUpdate()
     if EventCommonFunction(20051) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20052_onUpdate()
     if EventCommonFunction(20052) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20053_onUpdate()
     if EventCommonFunction(20053) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20054_onUpdate()
     if EventCommonFunction(20054) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20055_onUpdate()
     if EventCommonFunction(20055) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20056_onUpdate()
     if EventCommonFunction(20056) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20057_onUpdate()
     if EventCommonFunction(20057) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20058_onUpdate()
     if EventCommonFunction(20058) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event20059_onUpdate()
     if EventCommonFunction(20059) == TRUE then
         return
-    elseif TRUE == env(IsAnimEnd, 1) then
+    end
+    if env(IsAnimEnd, 1) == TRUE then
         Fire("W_Idle")
+        return
     end
 end
 
 function Event30000_onUpdate()
     if EventCommonFunction(30000) == TRUE then
+        return
     end
 end
 
 function Event30001_onUpdate()
     if EventCommonFunction(30001) == TRUE then
+        return
     end
 end
 
 function Event30002_onUpdate()
     if EventCommonFunction(30002) == TRUE then
+        return
     end
 end
 
 function Event30003_onUpdate()
     if EventCommonFunction(30003) == TRUE then
+        return
     end
 end
 
 function Event30004_onUpdate()
     if EventCommonFunction(30004) == TRUE then
+        return
     end
 end
 
 function Event30005_onUpdate()
     if EventCommonFunction(30005) == TRUE then
+        return
     end
 end
 
 function Event30006_onUpdate()
     if EventCommonFunction(30006) == TRUE then
+        return
     end
 end
 
 function Event30007_onUpdate()
     if EventCommonFunction(30007) == TRUE then
+        return
     end
 end
 
 function Event30008_onUpdate()
     if EventCommonFunction(30008) == TRUE then
+        return
     end
 end
 
 function Event30009_onUpdate()
     if EventCommonFunction(30009) == TRUE then
+        return
     end
 end
 
 function Event30010_onUpdate()
     if EventCommonFunction(30010) == TRUE then
+        return
     end
 end
 
 function Event30011_onUpdate()
     if EventCommonFunction(30011) == TRUE then
+        return
     end
 end
 
 function Event30012_onUpdate()
     if EventCommonFunction(30012) == TRUE then
+        return
     end
 end
 
 function Event30013_onUpdate()
     if EventCommonFunction(30013) == TRUE then
+        return
     end
 end
 
 function Event30014_onUpdate()
     if EventCommonFunction(30014) == TRUE then
+        return
     end
 end
 
 function Event30015_onUpdate()
     if EventCommonFunction(30015) == TRUE then
+        return
     end
 end
 
 function Event30016_onUpdate()
     if EventCommonFunction(30016) == TRUE then
+        return
     end
 end
 
 function Event30017_onUpdate()
     if EventCommonFunction(30017) == TRUE then
+        return
     end
 end
 
 function Event30018_onUpdate()
     if EventCommonFunction(30018) == TRUE then
+        return
     end
 end
 
 function Event30019_onUpdate()
     if EventCommonFunction(30019) == TRUE then
+        return
     end
 end
 
 function Event30020_onUpdate()
     if EventCommonFunction(30020) == TRUE then
+        return
     end
 end
 
 function Event30021_onUpdate()
     if EventCommonFunction(30021) == TRUE then
+        return
     end
 end
 
 function Event30022_onUpdate()
     if EventCommonFunction(30022) == TRUE then
+        return
     end
 end
 
 function Event30023_onUpdate()
     if EventCommonFunction(30023) == TRUE then
+        return
     end
 end
 
 function Event30024_onUpdate()
     if EventCommonFunction(30024) == TRUE then
+        return
     end
 end
 
 function Event30025_onUpdate()
     if EventCommonFunction(30025) == TRUE then
+        return
     end
 end
 
 function Event30026_onUpdate()
     if EventCommonFunction(30026) == TRUE then
+        return
     end
 end
 
 function Event30027_onUpdate()
     if EventCommonFunction(30027) == TRUE then
+        return
     end
 end
 
 function Event30028_onUpdate()
     if EventCommonFunction(30028) == TRUE then
+        return
     end
 end
 
 function Event30029_onUpdate()
     if EventCommonFunction(30029) == TRUE then
+        return
     end
 end
 
@@ -670,22 +821,22 @@ function ConvergeValue(target_val, cur_val, max_inc, max_dec)
 end
 
 function Move_onGenerate()
+    local speed = 0
     local turnangle = GetVariable("TurnAngle")
     local internaloffset = GetVariable("InternalOffset")
-    local offset_multiplier = nil
-    
+
     if math.abs(turnangle) <= 1 then
-        offset_multiplier = 1
+        speed = 1
     elseif math.abs(turnangle) <= 2.5999999046325684 then
-        offset_multiplier = 1.2999999523162842
+        speed = 1.2999999523162842
     else
-        offset_multiplier = 2
+        speed = 2
     end
-    
-    local maxoffset = 0.10000000149011612 * offset_multiplier
-    local minoffset = -0.10000000149011612 * offset_multiplier
+
+    local maxoffset = 0.10000000149011612 * speed
+    local minoffset = -0.10000000149011612 * speed
     local target_val = 0
-    
+
     if math.abs(turnangle) <= 0.20000000298023224 then
         target_val = 0
     elseif turnangle > 0.20000000298023224 then
@@ -693,7 +844,7 @@ function Move_onGenerate()
     elseif turnangle < -0.20000000298023224 then
         target_val = maxoffset
     end
-    
+
     local offset = ConvergeValue(target_val, internaloffset, 0.30000001192092896, 0.30000001192092896)
     local rootpos_pose_modelspace = hkbGetBoneModelSpace("Root")
     local rootpos_pose_localspace = hkbGetBoneLocalSpace("Root")
@@ -711,7 +862,7 @@ function Move_onGenerate()
 end
 
 ------------------------
--- Conditions 
+-- Conditions
 -- env( <condition>, <args> )
 -- *<args> are optional
 ------------------------
@@ -743,7 +894,7 @@ GetAIChainStepType = 118
 GetTransitionToSpecialStayAnimID = 119
 GetAIAtkCancelType = 120
 GetWeaponCancelType = 121 -- args: <hand index>
-IsWeaponCancelPossible = 122 
+IsWeaponCancelPossible = 122
 GetAIDefenseCancelType = 123
 GetAIVersusBackstabCancelType = 124
 
@@ -905,7 +1056,7 @@ GetStayAnimCategory = 358
 GetWeaponSwitchStatus = 359
 IsEquipmentMenuOpen = 360
 GetRemainingArrowCount = 361
-GetSpEffectType = 362 -- args: <unknown>
+GetSpEffectType = 362 -- args: <enum> SP_EFFECT_TYPE_
 Unknown363 = 363
 GetEventID = 364
 Unknown365 = 365
@@ -939,7 +1090,7 @@ IsMountTrulyLanding = 540
 GetMountSpecialAttribute = 543
 IsMountDead = 545
 GetMountIsWeakPoint = 546
-Unknown547 = 547
+GetMountDamageAnimID = 547
 Unknown548 = 548
 GetMountSpEffectID = 549
 GetMountSpEffectType = 550
@@ -1012,6 +1163,8 @@ IsSpeaking = 3000
 GetTalkID_3001 = 3001
 GetTalkID_3002 = 3002
 
+Unknown9999 = 9999
+
 ------------------------
 -- Commands
 -- act( <command>, <args> )
@@ -1033,7 +1186,7 @@ ChangeBlendAnimationCategorized = 12
 ChangeUpperAndLowerBodySyncedAnimCategorized = 13
 
 SetActiveActionState = 100
-SwitchMotion = 101 -- args: <bool> 
+SwitchMotion = 101 -- args: <bool>
 SetAllowedThrowAttackType = 102 -- args: <index> # ENUM: THROW_STATE
 SetAllowedThrowDefenseType = 103 -- args: <index> # ENUM: THROW_STATE
 SwitchEquippedWeapon = 104
@@ -1147,9 +1300,9 @@ Unknown3005 = 3005
 Unknown3006 = 3006
 ApplyDamageFlag = 3007 -- args: <index>
 
-Unknown4000 = 4000
-Unknown4001 = 4001
-Unknown4002 = 4002
+GetPoise0 = 4000
+GetPoise1 = 4001
+GetPoise2 = 4002
 
 DebugLogOutput = 9000
 Test_SpEffectDelete = 9001
@@ -1169,11 +1322,13 @@ Unknown9999 = 9999 -- args: <value> # 1, 2, 3
 ------------------------------------------
 -- Must be last for the global variables to be read
 ------------------------------------------
-global = {["__index"] = function (table, element)
-    return dummy
-end}
+global = {}
 
 function dummy()
+end
+
+global.__index = function (table, element)
+    return dummy
 end
 
 setmetatable(_G, global)
