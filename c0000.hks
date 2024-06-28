@@ -36,12 +36,10 @@
 --                 SWORD_ART_DIFF_CAT_LARGE_WEAPON_LARGE_SHIELD instead of 
 --                 SWORD_ART_DIFF_CAT_POLEARM_LARGE_SHIELD.
 --              - Reintroduced missing variables that were in use (blend time related).
---              - Known issues below might no longer be present after the recreation.
+--              - Recreation fixed the torrent bugs
 ------------------------------------------
 -- Known issues:
--- Torrent will retain his "gallop" state even if you come to a standstill, fall, or
--- perform any other action which would normally cancel the gallop and return to
--- default speed. This makes him janky for precision parkour things.
+-- N/A
 ------------------------------------------
 -- Core: Functions
 ------------------------------------------
