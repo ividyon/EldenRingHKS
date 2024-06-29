@@ -3,7 +3,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 9 for ER version 1.12.1
+-- Version 10 for ER version 1.12.1
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -37,6 +37,7 @@
 --                 SWORD_ART_DIFF_CAT_POLEARM_LARGE_SHIELD.
 --              - Reintroduced missing variables that were in use (blend time related).
 --              - Recreation fixed the torrent bugs
+-- 2024-06-29 - ivi: Fixed a bug with IsAttackSwordArts which prevented Ashes of War from working
 ------------------------------------------
 -- Known issues:
 -- N/A
@@ -759,7 +760,7 @@ function IsAttackSwordArts(arts_id)
         157, -- Raptor of the Mists
         160  -- White Shadow's Lure
     }
-    local oaw_whtelist = {
+    local aow_whitelist = {
         273, -- Raging Beast
         276, -- Blind Spot
         313, -- Dynastic Sickleplay
@@ -768,7 +769,7 @@ function IsAttackSwordArts(arts_id)
 
     if IsShieldArts(arts_id) == TRUE or IsRollingArts(arts_id) == TRUE or IsEnchantArts(arts_id) == TRUE
         or Contains(aow_blacklist, arts_id) == TRUE then
-        if Contains(oaw_whtelist, art_id) then
+        if Contains(aow_whitelist, arts_id) then
             return TRUE
         else
             return FALSE
