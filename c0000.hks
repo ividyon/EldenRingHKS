@@ -3,7 +3,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 10 for ER version 1.12.1
+-- Version 11 for ER version 1.12.1
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -38,6 +38,10 @@
 --              - Reintroduced missing variables that were in use (blend time related).
 --              - Recreation fixed the torrent bugs
 -- 2024-06-29 - ivi: Fixed a bug with IsAttackSwordArts which prevented Ashes of War from working
+-- 2024-07-17 - Exelot: 
+--              - Fixed a bug with SetSwordArtsPointInfo causing various ashes to not having the right Ash of War
+--                while not having enough stats.
+--              - Added a missing check.
 ------------------------------------------
 -- Known issues:
 -- N/A
