@@ -1006,7 +1006,15 @@ end
 
 function SetSwordArtsPointInfo(button, is_point_consume, to_state_event)
     local hand = c_SwordArtsHand
-
+    
+    if is_point_consume == TRUE then
+        act(ReserveArtsPointsUse, button, hand)
+    end
+    
+    local sel = 0
+    local isNoMPUse = FALSE
+    local artsID = env(GetWeaponID, hand)
+    
     local aow_list_noFPUse = {
         17, -- Torch Attack
         92, -- Parry
@@ -1015,15 +1023,7 @@ function SetSwordArtsPointInfo(button, is_point_consume, to_state_event)
         112 -- Kick
     }
 
-    if is_point_consume == TRUE then
-        act(ReserveArtsPointsUse, button, hand)
-    end
-
-    local sel = 0
-    local isNoMPUse = FALSE
-    local artsID = env(GetWeaponID, hand)
-
-    if Contains(aow_list_noFPUse, arts_id) == TRUE then
+    if Contains(aow_list_noFPUse, artsID) == TRUE then
         isNoMPUse = TRUE
     end
 
