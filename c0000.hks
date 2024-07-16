@@ -23638,6 +23638,8 @@ function JumpCommonFunction(jump_type)
                 -- Sanguine Noble: Slow
             elseif TRUE == env(GetSpEffectID, 4100) then
                 JumpMoveLevel = 0
+            elseif env(GetSpEffectID, 19670) == TRUE then
+                JumpMoveLevel = 0
             end
 
             if JumpMoveLevel == 2 then
