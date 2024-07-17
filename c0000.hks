@@ -1023,7 +1023,7 @@ function SetSwordArtsPointInfo(button, is_point_consume, to_state_event)
     if is_point_consume == TRUE then
         act(ReserveArtsPointsUse, button, hand)
     end
-    
+
     local sel = 0
     local isNoMPUse = FALSE
     local artsID = env(GetWeaponID, hand)
