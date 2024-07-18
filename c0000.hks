@@ -25665,7 +25665,7 @@ function GetSwordArtsPutOppositeWeapon()
         if c_Style == HAND_RIGHT then
             if HAND_RIGHT == c_SwordArtsHand then
                 if c_SwordArtsID == 276 and GetVariable("SwordArtsRollingDirection") == 3 then
-                    retval = TRUE
+                    result = TRUE
                 else
                     result = SwordArtPutOppositeWeapon[c_SwordArtsID][1] -- Right hand, weapon art cast from right hand
                 end
@@ -25673,7 +25673,7 @@ function GetSwordArtsPutOppositeWeapon()
                 result = SwordArtPutOppositeWeapon[c_SwordArtsID][2] -- Right hand, weapon art cast from left hand
             end
         elseif env(GetEquipWeaponCategory, c_SwordArtsHand) == 53 or env(GetEquipWeaponCategory, c_SwordArtsHand) == 58 then
-            retval = SwordArtPutOppositeWeapon[c_SwordArtsID][1]
+            result = SwordArtPutOppositeWeapon[c_SwordArtsID][1]
         else
             result = SwordArtPutOppositeWeapon[c_SwordArtsID][3] -- Left hand
         end
