@@ -43,7 +43,7 @@
 --                while not having enough stats.
 --              - Added a missing check for jumping.
 --              - Fixed a bug that would cause Ashes of War such as Carian Grandeur to not have the ability to be cast uncharged.
--- 2024-07-18 - ivi: Fixed SwordArtsDiffCategory function changes not carried over from new common_define (Twinblade AotC: Wings)
+-- 2024-07-18 - ivi: Fixed SwordArtsDiffCategory & SwordArtsPutOppositeWeapon function changes not carried over from new common_define (Twinblade AotC: Wings)
 ------------------------------------------
 -- Known issues:
 -- N/A
@@ -25664,10 +25664,16 @@ function GetSwordArtsPutOppositeWeapon()
     if SwordArtPutOppositeWeapon[c_SwordArtsID] ~= nil then
         if c_Style == HAND_RIGHT then
             if HAND_RIGHT == c_SwordArtsHand then
-                result = SwordArtPutOppositeWeapon[c_SwordArtsID][1] -- Right hand, weapon art cast from right hand
+                if c_SwordArtsID == 276 and GetVariable("SwordArtsRollingDirection") == 3 then
+                    retval = TRUE
+                else
+                    result = SwordArtPutOppositeWeapon[c_SwordArtsID][1] -- Right hand, weapon art cast from right hand
+                end
             else
                 result = SwordArtPutOppositeWeapon[c_SwordArtsID][2] -- Right hand, weapon art cast from left hand
             end
+        elseif env(GetEquipWeaponCategory, c_SwordArtsHand) == 53 or env(GetEquipWeaponCategory, c_SwordArtsHand) == 58 then
+            retval = SwordArtPutOppositeWeapon[c_SwordArtsID][1]
         else
             result = SwordArtPutOppositeWeapon[c_SwordArtsID][3] -- Left hand
         end
