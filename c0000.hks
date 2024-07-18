@@ -25252,7 +25252,7 @@ function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
         idle_cat0 = SWORD_ART_DIFF_CAT_DEFAULT
     end
 
-    if (artID == 90 or artID == 98 or artID == 151 or artID == 152) and env(225, c_SwordArtsHand) == WEAPON_CATEGORY_DUELING_SHIELD and (c_Style == HAND_LEFT or c_Style == HAND_RIGHT) then
+    if (artID == 90 or artID == 98 or artID == 151 or artID == 152) and env(GetEquipWeaponCategory, c_SwordArtsHand) == WEAPON_CATEGORY_DUELING_SHIELD and (c_Style == HAND_LEFT or c_Style == HAND_RIGHT) then
         return 0
     end
 
@@ -25672,7 +25672,7 @@ function GetSwordArtsPutOppositeWeapon()
             else
                 result = SwordArtPutOppositeWeapon[c_SwordArtsID][2] -- Right hand, weapon art cast from left hand
             end
-        elseif env(GetEquipWeaponCategory, c_SwordArtsHand) == 53 or env(GetEquipWeaponCategory, c_SwordArtsHand) == 58 then
+        elseif env(GetEquipWeaponCategory, c_SwordArtsHand) == WEAPON_CATEGORY_THROW_DAGGER or env(GetEquipWeaponCategory, c_SwordArtsHand) == WEAPON_CATEGORY_BACKHAND_SWORD then
             result = SwordArtPutOppositeWeapon[c_SwordArtsID][1]
         else
             result = SwordArtPutOppositeWeapon[c_SwordArtsID][3] -- Left hand
