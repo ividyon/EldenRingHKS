@@ -3,7 +3,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 11 for ER version 1.12.1
+-- Version 12 (For ER HKS last updated in 1.12.1)
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -43,6 +43,7 @@
 --                while not having enough stats.
 --              - Added a missing check for jumping.
 --              - Fixed a bug that would cause Ashes of War such as Carian Grandeur to not have the ability to be cast uncharged.
+-- 2024-07-18 - ivi: Fixed SwordArtsDiffCategory function changes not carried over from new common_define (Twinblade AotC: Wings)
 ------------------------------------------
 -- Known issues:
 -- N/A
@@ -25222,20 +25223,22 @@ SwordArtsCategory = {
 -- 9: Idle (Polearm) + Large Shield
 -- 20-59: Weapon Category
 function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
-    -- If TAE ID above 770 (except 796), no overrides, only a single default animation.
-    if artID >= 170 and artID ~= 196 then
+    -- If TAE ID above 770 (except 796), no overrides, only a single default animation. Also DLC stuff
+    if 170 <= artID and artID < 255 and artID ~= 196 or artID >= 300 and artID ~= 305 and artID ~= 357 and artID ~= 399 or artID == 275 or artID == 272 then
         return SWORD_ART_DIFF_CAT_DEFAULT
-
-        -- For TAE ID 769 (Radahn's Rain), return 45 (Greatbow)
-    elseif artID == 169 then
+    end
+    -- For TAE ID 769 (Radahn's Rain), return 45 (Greatbow)
+    if artID == 169 then
         return WEAPON_CATEGORY_LARGE_ARROW
     end
 
     -- Allows some weapon categories to query for whether the Sword Art permits a cousin category.
     -- Only used to allow Claws to use Fist Sword Arts.
-    local wep_cat1
+    local wep_cat1 = wepCat
     if wepCat == WEAPON_CATEGORY_CLAW then
         wep_cat1 = WEAPON_CATEGORY_FIST
+    elseif wep_cat1 == WEAPON_CATEGORY_LIGHT_LARGE_SWORD then
+        return 0
     end
 
     -- Idle animation TAEs. Two-hand is ignored.
@@ -25247,6 +25250,10 @@ function GetSwordArtsDiffCategory(artID, idleCat, wepCat)
     -- Override for heavy thrusting swords (usually 3)
     if wepCat == WEAPON_CATEGORY_LARGE_RAPIER then
         idle_cat0 = SWORD_ART_DIFF_CAT_DEFAULT
+    end
+
+    if (artID == 90 or artID == 98 or artID == 151 or artID == 152) and env(225, c_SwordArtsHand) == WEAPON_CATEGORY_DUELING_SHIELD and (c_Style == HAND_LEFT or c_Style == HAND_RIGHT) then
+        return 0
     end
 
     -- ivi: CASE 0: Not in table
