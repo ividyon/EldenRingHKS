@@ -3,7 +3,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 10 for ER version 1.12.1
+-- Version 11 for ER version 1.12.1
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -38,6 +38,11 @@
 --              - Reintroduced missing variables that were in use (blend time related).
 --              - Recreation fixed the torrent bugs
 -- 2024-06-29 - ivi: Fixed a bug with IsAttackSwordArts which prevented Ashes of War from working
+-- 2024-07-17 - Exelot: 
+--              - Fixed a bug with SetSwordArtsPointInfo causing various ashes to not having the right Ash of War
+--                while not having enough stats.
+--              - Added a missing check for jumping.
+--              - Fixed a bug that would cause Ashes of War such as Carian Grandeur to not have the ability to be cast uncharged.
 ------------------------------------------
 -- Known issues:
 -- N/A
@@ -1005,8 +1010,6 @@ function HasSwordArtPoint(button, hand)
 end
 
 function SetSwordArtsPointInfo(button, is_point_consume, to_state_event)
-    local hand = c_SwordArtsHand
-
     local aow_list_noFPUse = {
         17, -- Torch Attack
         92, -- Parry
@@ -1014,6 +1017,8 @@ function SetSwordArtsPointInfo(button, is_point_consume, to_state_event)
         94, -- UNUSED
         112 -- Kick
     }
+
+    local hand = c_SwordArtsHand
 
     if is_point_consume == TRUE then
         act(ReserveArtsPointsUse, button, hand)
@@ -1023,7 +1028,7 @@ function SetSwordArtsPointInfo(button, is_point_consume, to_state_event)
     local isNoMPUse = FALSE
     local artsID = env(GetWeaponID, hand)
 
-    if Contains(aow_list_noFPUse, arts_id) == TRUE then
+    if Contains(aow_list_noFPUse, artsID) == TRUE then
         isNoMPUse = TRUE
     end
 
@@ -12048,9 +12053,9 @@ function SwordArtsOneShot_onUpdate()
     end
     if env(ActionDuration, ACTION_ARM_L2) <= 0 then
         if env(GetSpEffectID, 100285) == TRUE then
-            local arts_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
             local idle_cat = env(GetStayAnimCategory)
             local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
+            local arts_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
             local arts_idx = 0
 
             if arts_cat == WEAPON_CATEGORY_LARGE_SHIELD then
@@ -12463,6 +12468,7 @@ function SwordArtsOneShotShieldLeft_onUpdate()
         local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
         local arts_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
         local arts_idx = 0
+
         if arts_cat == WEAPON_CATEGORY_LARGE_SHIELD then
             arts_idx = 1
         elseif arts_cat == WEAPON_CATEGORY_SMALL_SHIELD then
@@ -12631,6 +12637,7 @@ function SwordArtsOneShotShieldBoth_onUpdate()
         local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
         local arts_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
         local arts_idx = 0
+
         if arts_cat == 47 then
             arts_idx = 1
         elseif arts_cat == 48 then
@@ -12693,10 +12700,10 @@ function SwordArtsHalfOneShotShieldBoth_Upper_onUpdate()
         canThrow = TRUE
     end
     local blend_type, lower_state = GetHalfBlendInfo()
-    local arts_cat = 0
     local idle_cat = env(GetStayAnimCategory)
     local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
-    arts_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
+    local arts_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
+
     local arts_idx = 0
     if arts_cat == 47 then
         arts_idx = 1
@@ -13492,6 +13499,7 @@ function SetSwordArtsWepCategory_DrawStanceRightAttackLight()
     local wep_cat = env(GetEquipWeaponCategory, c_SwordArtsHand)
     local arts_cat = GetSwordArtsDiffCategory(c_SwordArtsID, idle_cat, wep_cat)
     local arts_idx = 0
+
     if arts_cat == WEAPON_CATEGORY_LARGE_ARROW then
         arts_idx = 1
     end
@@ -23637,6 +23645,8 @@ function JumpCommonFunction(jump_type)
                 JumpMoveLevel = 0
                 -- Sanguine Noble: Slow
             elseif TRUE == env(GetSpEffectID, 4100) then
+                JumpMoveLevel = 0
+            elseif env(GetSpEffectID, 19670) == TRUE then
                 JumpMoveLevel = 0
             end
 
