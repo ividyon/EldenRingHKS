@@ -46,7 +46,7 @@
 -- 2024-07-18 - ivi: Fixed SwordArtsDiffCategory & SwordArtsPutOppositeWeapon function changes not carried over from new common_define (Twinblade AotC: Wings)
 -- 2024-07-23 - Exelot:
 --              - Renamed env GetWeaponID into a less confusing name: GetSwordArtID
---              - Renamed act Test_SpEffectDelete into DeleteSpEffect and added a comment for it's args.
+--              - Renamed act Test_SpEffectDelete into ClearSpEffect and added a comment for it's args.
 --              - Added a new logic expansion section with a new function that allows for easy addition of new Weapon Catalysts.
 
 ------------------------------------------
@@ -26231,7 +26231,7 @@ GetPoise1 = 4001
 GetPoise2 = 4002
 
 DebugLogOutput = 9000
-DeleteSpEffect = 9001 -- args: <id>
+ClearSpEffect = 9001 -- args: <id>
 Test_SpEffectTypeSpecifyDelete = 9002
 MarkerStart = 9003
 MarkerEnd = 9004
