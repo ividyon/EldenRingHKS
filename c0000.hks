@@ -3,7 +3,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 12 (For ER HKS last updated in 1.12.1)
+-- Version 13 (For ER HKS last updated in 1.12.3)
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -44,9 +44,15 @@
 --              - Added a missing check for jumping.
 --              - Fixed a bug that would cause Ashes of War such as Carian Grandeur to not have the ability to be cast uncharged.
 -- 2024-07-18 - ivi: Fixed SwordArtsDiffCategory & SwordArtsPutOppositeWeapon function changes not carried over from new common_define (Twinblade AotC: Wings)
+-- 2024-07-23 - Exelot:
+--              - Renamed env GetWeaponID into a less confusing name: GetSwordArtID
+--              - Renamed act Test_SpEffectDelete into DeleteSpEffect and added a comment for it's args.
+--              - Added a new logic expansion section with a new function that allows for easy addition of new Weapon Catalysts.
+
 ------------------------------------------
 -- Known issues:
 -- N/A
+
 ------------------------------------------
 -- Core: Functions
 ------------------------------------------
@@ -694,13 +700,13 @@ function GetSwordArtInfo()
             art_hand = HAND_LEFT
         end
 
-        art_id = env(GetWeaponID, art_hand)
+        art_id = env(GetSwordArtID, art_hand)
     else
-        local weaponswordartid = env(GetWeaponID, HAND_LEFT)
+        local weaponswordartid = env(GetSwordArtID, HAND_LEFT)
 
         if IsShieldArts(weaponswordartid) == FALSE and IsArrowStanceArts(weaponswordartid) == FALSE then
             art_hand = HAND_RIGHT
-            art_id = env(GetWeaponID, HAND_RIGHT)
+            art_id = env(GetSwordArtID, HAND_RIGHT)
         else
             art_hand = HAND_LEFT
             art_id = weaponswordartid
@@ -729,7 +735,7 @@ function IsEnableSwordArts()
     end
 
     if style ~= HAND_LEFT_BOTH and c_SwordArtsHand == 0 then
-        if sp_kind == 293 then
+        if IsWeaponCatalyst(sp_kind) == TRUE then
             return FALSE
         end
         if IsShieldArts(arts_id) == TRUE then
@@ -738,7 +744,7 @@ function IsEnableSwordArts()
             return FALSE
         end
     else
-        if style == HAND_RIGHT and sp_kind == 293 then
+        if style == HAND_RIGHT and IsWeaponCatalyst(sp_kind) == TRUE then
             return FALSE
         end
         if arts_id ~= 17 and arts_id ~= SWORDARTS_INVALID then
@@ -1027,7 +1033,7 @@ function SetSwordArtsPointInfo(button, is_point_consume, to_state_event)
 
     local sel = 0
     local isNoMPUse = FALSE
-    local artsID = env(GetWeaponID, hand)
+    local artsID = env(GetSwordArtID, hand)
 
     if Contains(aow_list_noFPUse, artsID) == TRUE then
         isNoMPUse = TRUE
@@ -1518,7 +1524,7 @@ function GetAttackRequest(is_guard)
             -- 2H Heavy
         else
             local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, hand)
-            if sp_kind == 293 then
+            if IsWeaponCatalyst(sp_kind) == TRUE then
                 return ATTACK_REQUEST_INVALID
             end
             if is_both == TRUE then
@@ -1605,7 +1611,7 @@ function GetAttackRequest(is_guard)
                 return ATTACK_REQUEST_LEFT_CROSSBOW2
             end
             local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
-            if sp_kind == 293 then
+            if IsWeaponCatalyst(sp_kind) == TRUE then
                 return ATTACK_REQUEST_INVALID
             end
         end
@@ -3133,10 +3139,10 @@ function ExecMagic(quick_type, blend_type, is_ride)
     local buttonR = ACTION_ARM_MAGIC_R
     local buttonL = ACTION_ARM_MAGIC_L
 
-    if sp_kind_R == 293 then
+    if IsWeaponCatalyst(sp_kind_R) == TRUE then
         buttonR = ACTION_ARM_MAGIC_R2
     end
-    if sp_kind_L == 293 and is_ride == FALSE then
+    if IsWeaponCatalyst(sp_kind_L) == TRUE and is_ride == FALSE then
         buttonL = ACTION_ARM_MAGIC_L2
     end
 
@@ -3166,13 +3172,13 @@ function ExecMagic(quick_type, blend_type, is_ride)
         delayActRequestNo = ACTION_ARM_MAGIC_R2
         if style == HAND_LEFT_BOTH then
             local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
-            if sp_kind ~= 293 then
+            if IsWeaponCatalyst(sp_kind) == FALSE then
                 return FALSE
             end
             wep_hand = HAND_LEFT
         else
             local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT)
-            if sp_kind ~= 293 then
+            if IsWeaponCatalyst(sp_kind) == FALSE then
                 return FALSE
             end
             wep_hand = HAND_RIGHT
@@ -3194,7 +3200,7 @@ function ExecMagic(quick_type, blend_type, is_ride)
         delayActRequestNo = ACTION_ARM_MAGIC_L2
         if style == HAND_RIGHT then
             local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
-            if sp_kind ~= 293 then
+            if IsWeaponCatalyst(sp_kind) == FALSE then
                 return FALSE
             end
             wep_hand = HAND_LEFT
@@ -3278,7 +3284,7 @@ function ExecMagic(quick_type, blend_type, is_ride)
         == MAGIC_REQUEST_BLASTING or magic_index == MAGIC_REQUEST_DRILL or magic_index == MAGIC_REQUEST_MAGIC_SPARK
         or magic_index == 115 or magic_index == 120 or magic_index == 121 or magic_index == 157 or magic_index == 82
         or magic_index == 150 or magic_index == 156 or magic_index == 161 then
-        if env(GetEquipWeaponSpecialCategoryNumber, wep_hand) == 293 then
+        if IsWeaponCatalyst(env(GetEquipWeaponSpecialCategoryNumber, wep_hand)) == TRUE then
             SetVariable("Magic_SpecialStaffCategory", 2)
         else
             SetVariable("Magic_SpecialStaffCategory", 0)
@@ -15245,7 +15251,7 @@ function MagicLoopRight_Upper_onUpdate()
 
     local button = ACTION_ARM_R1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         button = ACTION_ARM_R2
     end
 
@@ -15280,7 +15286,7 @@ function MagicFireRight_Upper_onUpdate()
 
     local button = ACTION_ARM_R1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         button = ACTION_ARM_R2
     end
 
@@ -15364,7 +15370,7 @@ function MagicLoopLeft_Upper_onUpdate()
     end
     local button = ACTION_ARM_L1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         button = ACTION_ARM_L2
     end
     if env(ActionDuration, button) <= 0 or env(IsMagicUseable, HAND_LEFT, 1) == FALSE or env(GetStamina) <= 0 then
@@ -15415,7 +15421,7 @@ function MagicFireRight2_Upper_onUpdate()
     end
     local button = ACTION_ARM_R1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         button = ACTION_ARM_R2
     end
     if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, button) <= 0 or mp_condition >= env(GetFP)) then
@@ -15449,7 +15455,7 @@ function MagicFireRight3_Upper_onUpdate()
     end
     local button = ACTION_ARM_R1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         button = ACTION_ARM_R2
     end
     if env(GetSpEffectID, 100610) == TRUE and (env(ActionDuration, button) <= 0 or mp_condition >= env(GetFP)) then
@@ -15481,7 +15487,7 @@ function MagicFireLeft_Upper_onUpdate()
 
     local button = ACTION_ARM_L1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         button = ACTION_ARM_L2
     end
 
@@ -15579,7 +15585,7 @@ function MagicFireLeft2_Upper_onUpdate()
 
     local button = ACTION_ARM_L1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         button = ACTION_ARM_L2
     end
 
@@ -15625,7 +15631,7 @@ function MagicFireLeft3_Upper_onUpdate()
 
     local button = ACTION_ARM_L1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         button = ACTION_ARM_L2
     end
 
@@ -15828,7 +15834,7 @@ function MagicFireRightJump_Upper_onUpdate()
 
     local button = ACTION_ARM_R1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         button = ACTION_ARM_R2
     end
 
@@ -15874,7 +15880,7 @@ function MagicFireLeftJump_Upper_onUpdate()
     local wep_hand = HAND_LEFT
     local button = ACTION_ARM_L1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         button = ACTION_ARM_L2
     end
     if env(GetSpEffectID, 100610) == TRUE
@@ -18270,17 +18276,17 @@ function Update()
     end
 
     if env(GetSpEffectID, 19875) == TRUE then
-        if env(GetWeaponID, HAND_LEFT) == 328 then
+        if env(GetSwordArtID, HAND_LEFT) == 328 then
             act(AddSpEffect, 19887)
         end
-        if env(GetWeaponID, HAND_RIGHT) == 328 then
+        if env(GetSwordArtID, HAND_RIGHT) == 328 then
             act(AddSpEffect, 19883)
         end
     elseif env(GetSpEffectID, 19874) == TRUE then
-        if env(GetWeaponID, HAND_LEFT) == 328 then
+        if env(GetSwordArtID, HAND_LEFT) == 328 then
             act(AddSpEffect, 19885)
         end
-        if env(GetWeaponID, HAND_RIGHT) == 328 then
+        if env(GetSwordArtID, HAND_RIGHT) == 328 then
             act(AddSpEffect, 19881)
         end
     end
@@ -18935,7 +18941,7 @@ function ExecRideAttack(r1, r2, l1, l2)
     local is_staff = GetEquipType(attackHand, WEAPON_CATEGORY_STAFF)
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, attackHand)
     local is_weaponStaff = FALSE
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         is_weaponStaff = TRUE
     end
 
@@ -19566,7 +19572,7 @@ function RideMagicFire_onUpdate()
     local buttonL = ACTION_ARM_L1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
 
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         buttonR = ACTION_ARM_R2
         buttonL = ACTION_ARM_L2
     end
@@ -19616,7 +19622,7 @@ function RideMagicLoop_onUpdate()
     local buttonL = ACTION_ARM_L1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
 
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         buttonR = ACTION_ARM_R2
         buttonL = ACTION_ARM_L2
     end
@@ -19674,7 +19680,7 @@ function RideMagicFireCombo1_onUpdate()
     local buttonR = ACTION_ARM_R1
     local buttonL = ACTION_ARM_L1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         buttonR = ACTION_ARM_R2
         buttonL = ACTION_ARM_L2
     end
@@ -19733,7 +19739,7 @@ function RideMagicFireCombo2_onUpdate()
     local buttonR = ACTION_ARM_R1
     local buttonL = ACTION_ARM_L1
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         buttonR = ACTION_ARM_R2
         buttonL = ACTION_ARM_L2
     end
@@ -23509,7 +23515,7 @@ function JumpCommonFunction(jump_type)
     local isWeaponStaff = FALSE
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
 
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         isWeaponStaff = TRUE
     end
 
@@ -23712,12 +23718,12 @@ function ExecJumpMagic(jump_type)
     local buttonL = ACTION_ARM_MAGIC_L
 
     local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, wep_hand)
-    if sp_kind == 293 then
+    if IsWeaponCatalyst(sp_kind) == TRUE then
         buttonR = ACTION_ARM_MAGIC_R2
     end
 
     local sp_kind_L = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
-    if c_Style == HAND_RIGHT and sp_kind_L == 293 then
+    if c_Style == HAND_RIGHT and IsWeaponCatalyst(sp_kind_L) == TRUE then
         buttonL = ACTION_ARM_MAGIC_L2
     end
 
@@ -23746,13 +23752,13 @@ function ExecJumpMagic(jump_type)
         delayActRequestNo = ACTION_ARM_MAGIC_R
 
         if style == HAND_LEFT_BOTH then
-            if GetEquipType(HAND_LEFT, WEAPON_CATEGORY_STAFF) == FALSE and sp_kind ~= 293 then
+            if GetEquipType(HAND_LEFT, WEAPON_CATEGORY_STAFF) == FALSE and IsWeaponCatalyst(sp_kind) == FALSE then
                 return FALSE
             end
 
             wep_hand = HAND_LEFT
         else
-            if GetEquipType(HAND_RIGHT, WEAPON_CATEGORY_STAFF) == FALSE and sp_kind ~= 293 then
+            if GetEquipType(HAND_RIGHT, WEAPON_CATEGORY_STAFF) == FALSE and IsWeaponCatalyst(sp_kind) == FALSE then
                 return FALSE
             end
 
@@ -23763,7 +23769,7 @@ function ExecJumpMagic(jump_type)
         if style == HAND_RIGHT_BOTH or style == HAND_LEFT_BOTH then
             return FALSE
         end
-        if GetEquipType(HAND_LEFT, WEAPON_CATEGORY_STAFF) == FALSE and sp_kind_L ~= 293 then
+        if GetEquipType(HAND_LEFT, WEAPON_CATEGORY_STAFF) == FALSE and IsWeaponCatalyst(sp_kind_L) == FALSE then
             return FALSE
         end
 
@@ -23917,7 +23923,7 @@ function ExecFallMagic()
         if style == HAND_LEFT_BOTH then
             local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
 
-            if sp_kind ~= 293 then
+            if IsWeaponCatalyst(sp_kind) == FALSE then
                 return FALSE
             end
 
@@ -23925,7 +23931,7 @@ function ExecFallMagic()
         else
             local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_RIGHT)
 
-            if sp_kind ~= 293 then
+            if IsWeaponCatalyst(sp_kind) == FALSE then
                 return FALSE
             end
 
@@ -23940,7 +23946,7 @@ function ExecFallMagic()
 
         local sp_kind = env(GetEquipWeaponSpecialCategoryNumber, HAND_LEFT)
 
-        if sp_kind ~= 293 then
+        if IsWeaponCatalyst(sp_kind) == FALSE then
             return FALSE
         end
 
@@ -25695,6 +25701,19 @@ function Contains(tab, val)
     return FALSE
 end
 
+------------------------------------------
+-- Core: Logic Expansion
+------------------------------------------
+function IsWeaponCatalyst(sp_kind)
+    local weaponCatalystSpKinds = {
+        293, -- Carian Sorcery Sword
+    }
+    if Contains(weaponCatalystSpKinds, sp_kind) == TRUE then
+    	return TRUE
+    end
+    return FALSE
+end
+
 ------------------------
 -- Core: Global Variables
 ------------------------
@@ -25927,7 +25946,7 @@ IsObjActInterpolatedMotion = 322
 GetObjActTargetDirection = 323
 GetObjActRemainingInterpolateTime = 324
 IsGap = 325
-GetWeaponID = 326 -- args: <hand index>
+GetSwordArtID = 326 -- args: <hand index>
 IsMovingLaterally = 327
 IsNet = 328
 HasBrokenSA = 329
@@ -26212,7 +26231,7 @@ GetPoise1 = 4001
 GetPoise2 = 4002
 
 DebugLogOutput = 9000
-Test_SpEffectDelete = 9001
+DeleteSpEffect = 9001 -- args: <id>
 Test_SpEffectTypeSpecifyDelete = 9002
 MarkerStart = 9003
 MarkerEnd = 9004
