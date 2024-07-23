@@ -19,5 +19,5 @@ With input by the community this project may grow in scope.
 * AshenOne: Early fixes to faulty ExecMagic decompilation
 * Kirnifr: Early fixes to faulty Torrent decompilation
 * Halvard: Updates for 1.10.1
-* Lord Exelot: Rebasing the HKS on the latest raw decompilation, updates for 1.12.1
+* Lord Exelot: Rebasing the HKS on the latest raw decompilation, better support for new Weapon Catalysts, updates for 1.12.1
 * ividyon: Better support for custom Ashes of War, general maintenance
