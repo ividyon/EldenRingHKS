@@ -3,7 +3,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 13 (For ER HKS last updated in 1.12.3)
+-- Version 14 (For ER HKS last updated in 1.13)
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -1818,6 +1818,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         if (c_SwordArtsID == 313 or c_SwordArtsID == 273)
             and (r2 == "W_SwordArtsOneShotComboEnd" or r2 == "W_SwordArtsOneShotComboEnd_2") then
             artsr2 = TRUE
+            SetVariable("SwordArtsOneShotComboCategory", 0)
         end
 
         if artsr2 == TRUE then
@@ -1956,6 +1957,11 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
 
         ExecEventAllBody(l1)
     elseif request == ATTACK_REQUEST_BOTH_HEAVY then
+        if (c_SwordArtsID == 313 or c_SwordArtsID == 273) and (r2 == "W_SwordArtsOneShotComboEnd" or r2 == "W_SwordArtsOneShotComboEnd_2") then
+            artsr2 = TRUE
+            SetVariable("SwordArtsOneShotComboCategory", 0)
+        end
+
         if artsr2 == TRUE then
             SetSwordArtsPointInfo(ACTION_ARM_R2, TRUE, b2)
         end
@@ -3088,6 +3094,8 @@ function ExecArtsStance(blend_type)
         blend_type = UPPER
     end
 
+    SetVariable("SwordArtsOneShotComboCategory", 0)
+
     if c_SwordArtsID == 318 then
         SetSwordArtsPointInfo(ACTION_ARM_R1, TRUE)
     else
@@ -4141,6 +4149,7 @@ function ExecJump()
     SetVariable("JumpMotion_Override", 0.009999999776482582)
     SetVariable("JumpAttack_Land", 0)
     SetVariable("SwingPose", 0)
+    IS_ATTACKED_JUMPMAGIC = FALSE
 
     if GetVariable("IsEnableToggleDashTest") == 2 then
         SetVariable("ToggleDash", 0)
@@ -8181,6 +8190,7 @@ function DefaultBackStep_onActivate()
 end
 
 function DefaultBackStep_onUpdate()
+    act(Unknown163)
     act(DisallowAdditiveTurning, TRUE)
 
     if EvasionCommonFunction(FALL_TYPE_DEFAULT, "W_AttackRightBackstep", "W_AttackRightHeavy1Start",
@@ -8195,6 +8205,7 @@ function DefaultBackStep_onDeactivate()
 end
 
 function BackStepGuardOn_UpperLayer_onUpdate()
+    act(Unknown163)
     if ExecGuardOnCancelTiming(TO_GUARDON, ALLBODY) == TRUE then
         return
     end
@@ -8206,6 +8217,7 @@ function BackStepGuardOn_UpperLayer_onUpdate()
 end
 
 function BackStepGuardEnd_UpperLayer_onUpdate()
+    act(Unknown163)
     if env(IsAnimEnd, 1) == TRUE or env(GetEventEzStateFlag, 0) == TRUE then
         ExecEventSyncNoReset("Event_BackStepGuardOut")
     end
@@ -13593,13 +13605,15 @@ function CrossbowStanceCommonFunction(blend_type, IsShooting)
         act(ResetInputQueue)
         g_ArrowSlot = 1
         act(ChooseBowAndArrowSlot, 1)
+
         if env(IsOutOfAmmo, arrowHand) == TRUE then
             ExecEventHalfBlend(Event_AttackCrossbowRightEmpty, blend_type)
             return TRUE
         end
         if env(GetStamina) > 0 then
-            SetSwordArtsPointInfo(ACTION_ARM_R2, TRUE)
+            SetSwordArtsPointInfo(ACTION_ARM_R1, TRUE)
             SetSwordArtsWepCategory_DrawStanceRightAttackLight()
+
             if IsHalfBlendArts(c_SwordArtsID) == TRUE then
                 local blend_type, lower_state = GetHalfBlendInfo()
                 ExecEventHalfBlend(Event_DrawStanceHalfRightAttackLight, blend_type)
@@ -17135,7 +17149,6 @@ function Event60810_onActivate()
 end
 
 function Event60810_onUpdate()
-    act(SetIsEventActionPossible, TRUE)
     if EventCommonFunction() == TRUE then
         return
     end
@@ -17146,7 +17159,6 @@ function Event60811_onActivate()
 end
 
 function Event60811_onUpdate()
-    act(SetIsEventActionPossible, TRUE)
     if EventCommonFunction() == TRUE then
         return
     end
@@ -23495,7 +23507,7 @@ function JumpCommonFunction(jump_type)
     local is_arrow = GetEquipType(arrowHand, WEAPON_CATEGORY_SMALL_ARROW, WEAPON_CATEGORY_ARROW,
         WEAPON_CATEGORY_LARGE_ARROW, WEAPON_CATEGORY_CROSSBOW, WEAPON_CATEGORY_BALLISTA)
 
-    if is_arrow == TRUE then
+    if GetVariable("JumpAttackForm") == 0 and is_arrow == TRUE then
         if env(ActionRequest, ACTION_ARM_R1) == TRUE then
             act(ChooseBowAndArrowSlot, 0)
             g_ArrowSlot = 0
