@@ -4,11 +4,12 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 2 for ER version 1.12.1
+-- Version 3 for ER version 1.13
 ------------------------------------------
 -- Changelog:
 -- 2023-02-14 - Vawser: Cleaned up and added.
 -- 2024-06-28 - Exelot: Recreated to update to ER v1.12.1 [DLC Initial Release]
+-- 2024-07-30 - Exelot: Updated to ER v1.13
 ------------------------------------------
 -- Core: Functions
 ------------------------------------------
@@ -2361,6 +2362,11 @@ function ExecNpcDamage(damage_level, damage_type, is_damaged)
             act(SetDamageAnimType, DAMAGE_FLAG_LARGE)
             Replanning()
             Fire("W_Event20017")
+            return TRUE
+        end
+        if env(GetSpEffectID, 9795) == TRUE and env(GetSpEffectID, 9940) == TRUE then
+            act(SetDamageAnimType, DAMAGE_FLAG_LARGE)
+            Replanning()
             return TRUE
         end
         if env(GetSpEffectID, 18680) == TRUE then

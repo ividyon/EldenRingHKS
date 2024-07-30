@@ -48,6 +48,7 @@
 --              - Renamed env GetWeaponID into a less confusing name: GetSwordArtID
 --              - Renamed act Test_SpEffectDelete into ClearSpEffect and added a comment for it's args.
 --              - Added a new logic expansion section with a new function that allows for easy addition of new Weapon Catalysts.
+-- 2024-07-30 - Exelot: Updated to ER v1.13
 
 ------------------------------------------
 -- Known issues:
