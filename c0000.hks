@@ -3,7 +3,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 14 (For ER HKS last updated in 1.13)
+-- Version 15 (For ER HKS last updated in 1.14)
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -50,6 +50,7 @@
 --              - Added a new logic expansion section with a new function that allows for easy addition of new Weapon Catalysts.
 -- 2024-07-30 - Exelot: Updated to ER v1.13
 -- 2024-08-29 - ivi: Fixed SwordArtsCategory table missing variations of existing arts for new weapon types
+-- 2024-09-11 - Exelot: Updated to ER v1.14
 
 ------------------------------------------
 -- Known issues:
@@ -2440,7 +2441,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         SetVariable("TurnAngleReal", turn_angle_real)
         SetSwordArtsPointInfo(ACTION_ARM_L2, TRUE)
 
-        if env(GetSpEffectID, 102360) == FALSE then
+        if env(GetSpEffectID, 102360) == FALSE and arts_id ~= 313 then
             if GetVariable("IsEnoughArtPointsL2") == 1 then
                 AddStamina(STAMINA_REDUCE_ARTS_QUICKSTEP * STAMINA_CONSUMERATE_LOWSTATUS)
             else
@@ -3015,7 +3016,7 @@ function IsUseStealthAttack(is_dual)
 
     if is_dual == TRUE then
         if GetEquipType(HAND_RIGHT, WEAPON_CATEGORY_STRAIGHT_SWORD, WEAPON_CATEGORY_TWINBLADE, WEAPON_CATEGORY_RAPIER,
-            WEAPON_CATEGORY_CURVEDSWORD, WEAPON_CATEGORY_SPEAR, WEAPON_CATEGORY_LARGE_SPEAR) == TRUE then
+            WEAPON_CATEGORY_CURVEDSWORD, WEAPON_CATEGORY_SPEAR, WEAPON_CATEGORY_LARGE_SPEAR, WEAPON_CATEGORY_BACKHAND_SWORD) == TRUE then
             return TRUE
         end
     elseif c_Style == HAND_RIGHT_BOTH or c_Style == HAND_LEFT_BOTH then
@@ -3036,7 +3037,7 @@ function IsUseStealthAttack(is_dual)
         end
         if GetEquipType(hand, WEAPON_CATEGORY_TORCH, WEAPON_CATEGORY_STRAIGHT_SWORD, WEAPON_CATEGORY_TWINBLADE,
             WEAPON_CATEGORY_EXTRALARGE_SWORD, WEAPON_CATEGORY_RAPIER, WEAPON_CATEGORY_LARGE_RAPIER,
-            WEAPON_CATEGORY_CURVEDSWORD) == TRUE then
+            WEAPON_CATEGORY_CURVEDSWORD, WEAPON_CATEGORY_BACKHAND_SWORD) == TRUE then
             return TRUE
         end
     else
@@ -3051,7 +3052,7 @@ function IsUseStealthAttack(is_dual)
         end
         if GetEquipType(hand, WEAPON_CATEGORY_TORCH, WEAPON_CATEGORY_STRAIGHT_SWORD, WEAPON_CATEGORY_TWINBLADE,
             WEAPON_CATEGORY_EXTRALARGE_SWORD, WEAPON_CATEGORY_RAPIER, WEAPON_CATEGORY_LARGE_RAPIER,
-            WEAPON_CATEGORY_CURVEDSWORD) == TRUE then
+            WEAPON_CATEGORY_CURVEDSWORD, WEAPON_CATEGORY_BACKHAND_SWORD) == TRUE then
             return TRUE
         end
     end
@@ -3064,8 +3065,8 @@ function ExecArtsStance(blend_type)
     end
     local arts_id = c_SwordArtsID
     local is_arrow = GetEquipType(c_SwordArtsHand, WEAPON_CATEGORY_ARROW, WEAPON_CATEGORY_SMALL_ARROW,
-        WEAPON_CATEGORY_LARGE_ARROW, WEAPON_CATEGORY_BALISTA)
-    local is_crossbow = GetEquipType(HAND_LEFT, WEAPON_CATEGORY_CROSSBOW)
+        WEAPON_CATEGORY_LARGE_ARROW)
+    local is_crossbow = GetEquipType(HAND_LEFT, WEAPON_CATEGORY_CROSSBOW, WEAPON_CATEGORY_BALLISTA)
 
     if c_Style == HAND_RIGHT and (is_arrow == TRUE or is_crossbow == TRUE) then
         return FALSE
@@ -5454,7 +5455,7 @@ function ExecDamage(is_parry, is_attackwhileguard)
     if env(IsFalling) == TRUE and env(GetBehaviorID, 10) == TRUE and height >= 10 then
         damage_level = DAMAGE_LEVEL_NONE
     end
-    if env(GetIsWeakPoint) == TRUE then
+    if env(GetIsWeakPoint) == TRUE and env(GetBehaviorID, 15) == FALSE then
         CalcDamageCount()
         SetVariable("DamageDirection", damage_angle)
         act(SetDamageAnimType, DAMAGE_FLAG_WEAK)
@@ -7555,7 +7556,7 @@ function ArtsParryCommonFunction()
     return FALSE
 end
 
-function ArtsStanceCommonFunction(r1, r2, l1, l2, b1, b2, blend_type, turn_type, artsr1, artsr2, is_stance_end)
+function ArtsStanceCommonFunction(r1, r2, l1, l2, b1, b2, blend_type, turn_type, artsr1, artsr2, is_stance_end, enable_turn)
     if is_stance_end == FALSE then
         SetThrowAtkInvalid()
     end
@@ -7594,7 +7595,7 @@ function ArtsStanceCommonFunction(r1, r2, l1, l2, b1, b2, blend_type, turn_type,
     if ExecAttack(r1, r2, l1, l2, b1, b2, FALSE, blend_type, artsr1, artsr2, FALSE) == TRUE then
         return TRUE
     end
-    if blend_type ~= UPPER and ExecQuickTurn(LOWER, turn_type) == TRUE then
+    if blend_type ~= UPPER and enable_turn and ExecQuickTurn(LOWER, turn_type) == TRUE then
         return TRUE
     end
     if MoveStartonCancelTiming(Event_Move, FALSE) == TRUE then
@@ -11489,8 +11490,12 @@ function DrawStanceRightStart_Upper_onUpdate()
         b1 = "W_SwordArtsStanceAttackLight180"
         b2 = "W_SwordArtsStanceAttackHeavy180"
     end
+    local enable_turn = TRUE
+    if c_SwordArtsID == 309 then
+        enable_turn = FALSE
+    end
     if ArtsStanceCommonFunction(r1, r2, "W_AttackLeftLight1", "W_AttackLeftHeavy1", b1, b2, blend_type,
-        TURN_TYPE_STANCE, TRUE, TRUE, FALSE) == TRUE then
+        TURN_TYPE_STANCE, TRUE, TRUE, FALSE, enable_turn) == TRUE then
         return
     end
 
@@ -11571,7 +11576,7 @@ function DrawStanceRightLoop_Upper_onUpdate()
         b2 = "W_SwordArtsStanceAttackHeavy180"
     end
     if ArtsStanceCommonFunction(r1, r2, "W_AttackLeftLight1", "W_AttackLeftHeavy1", b1, b2, blend_type,
-        TURN_TYPE_STANCE, TRUE, TRUE, FALSE) == TRUE then
+        TURN_TYPE_STANCE, TRUE, TRUE, FALSE, TRUE) == TRUE then
         return
     end
 
@@ -11635,7 +11640,7 @@ function DrawStanceNoSyncLoop_Upper_onUpdate()
         b2 = "W_SwordArtsStanceAttackHeavy180"
     end
     if ArtsStanceCommonFunction(r1, r2, "W_AttackLeftLight1", "W_AttackLeftHeavy1", b1, b2, blend_type,
-        TURN_TYPE_STANCE, TRUE, TRUE, FALSE) == TRUE then
+        TURN_TYPE_STANCE, TRUE, TRUE, FALSE, FALSE) == TRUE then
         return
     end
 
@@ -11683,7 +11688,7 @@ function DrawStanceNoSyncLoopMax_Upper_onUpdate()
         b2 = "W_DrawStanceRightAttackMaxHeavyL90"
     end
     if ArtsStanceCommonFunction(r1, r2, "W_AttackLeftLight1", "W_AttackLeftHeavy1", b1, b2, blend_type, TRUE, TRUE,
-        FALSE) == TRUE then
+        FALSE, FALSE) == TRUE then
         return
     end
 
@@ -11719,9 +11724,13 @@ function DrawStanceRightEnd_Upper_onUpdate()
             return
         end
     end
-    if ArtsStanceCommonFunction("W_AttackRightLight1", "W_AttackRightHeavy1Start", "W_AttackLeftLight1",
-        "W_AttackLeftHeavy1", "W_AttackBothLight1", "W_AttackBothHeavy1Start", blend_type, TURN_TYPE_DEFAULT, FALSE,
-        FALSE, TRUE) == TRUE then
+    local enable_turn = TRUE
+    if c_SwordArtsID == 309 then
+        enable_turn = FALSE
+    end
+    if ArtsStanceCommonFunction("W_AttackRightLight1", "W_AttackRightHeavy1Start", "W_AttackLeftLight1", "W_AttackLeftHeavy1",
+        "W_AttackBothLight1", "W_AttackBothHeavy1Start", blend_type,
+        TURN_TYPE_DEFAULT, FALSE, FALSE, TRUE, enable_turn) == TRUE then
         return
     end
     if HalfBlendUpperCommonFunction(lower_state) == TRUE then
@@ -18290,18 +18299,31 @@ function Update()
         end
     end
 
+    -- Euporia
+    local isChangingWeaponRight = FALSE
+    local isChangingWeaponLeft = FALSE
+    if IsNodeActive("WeaponChangeStart_Selector00") == TRUE or IsNodeActive("WeaponChangeEnd_Selector00") == TRUE or
+        IsNodeActive("WeaponChangeStart_Selector01") == TRUE or IsNodeActive("WeaponChangeEnd_Selector01") == TRUE or
+        IsNodeActive("RideWeaponChangeStart_Selector") == TRUE or IsNodeActive("RideWeaponChangeEnd_Selector") == TRUE then
+
+        if GetVariable("WeaponChangeType") <= WEAPON_CHANGE_REQUEST_RIGHT_SPEAR and GetVariable("WeaponChangeType") ~= WEAPON_CHANGE_REQUEST_INVALID then
+            isChangingWeaponRight = TRUE
+        else
+            isChangingWeaponLeft = TRUE
+        end
+    end
     if env(GetSpEffectID, 19875) == TRUE then
-        if env(GetSwordArtID, HAND_LEFT) == 328 then
+        if isChangingWeaponLeft == FALSE and (c_Style == HAND_RIGHT or c_Style == HAND_LEFT_BOTH) and env(GetSwordArtID, HAND_LEFT) == 328 then
             act(AddSpEffect, 19887)
         end
-        if env(GetSwordArtID, HAND_RIGHT) == 328 then
+        if isChangingWeaponRight == FALSE and (c_Style == HAND_RIGHT or c_Style == HAND_RIGHT_BOTH) and env(GetSwordArtID, HAND_RIGHT) == 328 then
             act(AddSpEffect, 19883)
         end
     elseif env(GetSpEffectID, 19874) == TRUE then
-        if env(GetSwordArtID, HAND_LEFT) == 328 then
+        if isChangingWeaponLeft == FALSE and (c_Style == HAND_RIGHT or c_Style == HAND_LEFT_BOTH) and env(GetSwordArtID, HAND_LEFT) == 328 then
             act(AddSpEffect, 19885)
         end
-        if env(GetSwordArtID, HAND_RIGHT) == 328 then
+        if isChangingWeaponRight == FALSE and (c_Style == HAND_RIGHT or c_Style == HAND_RIGHT_BOTH) and env(GetSwordArtID, HAND_RIGHT) == 328 then
             act(AddSpEffect, 19881)
         end
     end
