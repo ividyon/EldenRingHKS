@@ -214,7 +214,7 @@ function SetWeightIndex()
 end
 
 function SetAIActionState()
-    act(SetAIAttackState, env(Unknown405))
+    act(SetAIAttackState, env(GetNpcAIAttackRequestIDAfterBlend))
 end
 
 function SetAttackHand(hand)
@@ -2415,7 +2415,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
                 if GetVariable("IsLockon") == true then
                     act(TurnToLockonTargetImmediately, turn_target_angle)
                 else
-                    act(Unknown2029, turn_target_angle)
+                    act(FaceDirection, turn_target_angle)
                 end
             end
         end
@@ -2711,7 +2711,7 @@ function ExecAttack(r1, r2, l1, l2, b1, b2, is_guard, blend_type, artsr1, artsr2
         act(SetThrowPossibilityState_Defender, 400000)
     end
 
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     SetAIActionState()
 
     return TRUE
@@ -3110,7 +3110,7 @@ function ExecArtsStance(blend_type)
         ExecEventHalfBlend(Event_DrawStanceRightStart, blend_type)
     end
 
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     SetAIActionState()
 
     return TRUE
@@ -3226,8 +3226,8 @@ function ExecMagic(quick_type, blend_type, is_ride)
         act(OpenMenuWhenUsingMagic, delayActRequestNo)
         return TRUE
     end
-    act(Unknown2026)
-    act(MarkOfGreedyPersonSlipDamageDisable)
+    act(DecideMagicUse)
+    act(NotifyAIMagicCast)
     local magic_index = env(GetMagicAnimType)
     g_MagicIndex = magic_index
     g_Magichand = wep_hand
@@ -3251,7 +3251,7 @@ function ExecMagic(quick_type, blend_type, is_ride)
             ExecEventHalfBlend(Event_MagicInvalid, blend_type)
         end
         act(SetIsMagicInUse, TRUE)
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
         return TRUE
     end
@@ -3265,7 +3265,7 @@ function ExecMagic(quick_type, blend_type, is_ride)
             ExecEventHalfBlend(Event_MagicInvalid, blend_type)
         end
         act(SetIsMagicInUse, TRUE)
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
         return TRUE
     end
@@ -3276,7 +3276,7 @@ function ExecMagic(quick_type, blend_type, is_ride)
         act(DebugLogOutput, "Event_MagicInvalid_Left")
         ExecEventHalfBlend(Event_MagicInvalid, blend_type)
         act(SetIsMagicInUse, TRUE)
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
         return TRUE
     end
@@ -3343,7 +3343,7 @@ function ExecMagic(quick_type, blend_type, is_ride)
     end
 
     act(SetIsMagicInUse, TRUE)
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     SetAIActionState()
 
     return TRUE
@@ -3599,7 +3599,7 @@ function ExecStealthItem(blend_type, item_type)
     end
 
     act(SetIsItemAnimationPlaying)
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     SetAIActionState()
 
     return TRUE
@@ -3892,7 +3892,7 @@ function ExecItem(quick_type, blend_type)
     end
 
     act(SetIsItemAnimationPlaying)
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     SetAIActionState()
 
     return TRUE
@@ -4064,7 +4064,7 @@ function ExecWeaponChange(blend_type)
     end
 
     ExecEventHalfBlend(event, blend_type)
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     SetAIActionState()
 
     return TRUE
@@ -4098,10 +4098,10 @@ end
 function ExecJump()
     -- Note: Restored original value during full remake. Repo values was ACTION_ARM_JUMP instead of ACTION_ARM_CHANGE_STYLE
     -- note: Original decompile of 1.10 has ACTION_ARM_CHANGE_STYLE instead of jump
-    if env(ActionRequest, ACTION_ARM_CHANGE_STYLE) == FALSE and env(Unknown700) == FALSE then
+    if env(ActionRequest, ACTION_ARM_CHANGE_STYLE) == FALSE and env(IsAIJumpRequested) == FALSE then
         return FALSE
     end
-    if env(GetStamina) <= 0 and env(Unknown700) == FALSE then
+    if env(GetStamina) <= 0 and env(IsAIJumpRequested) == FALSE then
         ResetRequest()
         return FALSE
     end
@@ -4112,7 +4112,7 @@ function ExecJump()
     SetWeightIndex()
 
     -- Jump: Overweight
-    if GetVariable("EvasionWeightIndex") == EVASION_WEIGHT_INDEX_OVERWEIGHT and env(Unknown700) == FALSE then
+    if GetVariable("EvasionWeightIndex") == EVASION_WEIGHT_INDEX_OVERWEIGHT and env(IsAIJumpRequested) == FALSE then
         local jumpangle = env(GetJumpAngle) * 0.009999999776482582
 
         if jumpangle > -45 and jumpangle < 45 then
@@ -4125,7 +4125,7 @@ function ExecJump()
             SetVariable("JumpOverweightIndex", 1)
         end
 
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
         ExecEventAllBody("W_Jump_Overweight")
 
@@ -4186,11 +4186,11 @@ function ExecJump()
     end
 
     if JumpMoveLevel == 2 then
-        if env(Unknown700) == TRUE then
-            act(GetPoise1)
+        if env(IsAIJumpRequested) == TRUE then
+            act(NotifyAIOfJumpState)
         end
 
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
         ExecEvent("W_Jump_D")
 
@@ -4224,17 +4224,17 @@ function ExecJump()
             if GetVariable("IsLockon") == true then
                 act(TurnToLockonTargetImmediately, turn_target_angle)
             else
-                act(Unknown2029, turn_target_angle)
+                act(FaceDirection, turn_target_angle)
             end
         end
 
         SetVariable("IsEnableDirectionJumpTAE", true)
 
-        if env(Unknown700) == TRUE then
-            act(GetPoise1)
+        if env(IsAIJumpRequested) == TRUE then
+            act(NotifyAIOfJumpState)
         end
 
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
         ExecEvent("W_Jump_F")
 
@@ -4242,11 +4242,11 @@ function ExecJump()
     else
         SetVariable("JumpReachSelector", 0)
 
-        if env(Unknown700) == TRUE then
-            act(GetPoise1)
+        if env(IsAIJumpRequested) == TRUE then
+            act(NotifyAIOfJumpState)
         end
 
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
         ExecEvent("W_Jump_N")
 
@@ -4427,7 +4427,7 @@ function ExecHandChange(hand, is_force, blend_type, no_reset)
     else
         ExecEventHalfBlend(event, blend_type)
     end
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     SetAIActionState()
     return TRUE
 end
@@ -4601,7 +4601,7 @@ function ExecEvasion(backstep_limit, estep, is_usechainrecover)
             if GetVariable("IsLockon") == true then
                 act(TurnToLockonTargetImmediately, turn_target_angle)
             else
-                act(Unknown2029, turn_target_angle)
+                act(FaceDirection, turn_target_angle)
             end
 
             turn_angle_real = math.abs(GetVariable("TurnAngle") - c_RollingAngle)
@@ -4655,7 +4655,7 @@ function ExecEvasion(backstep_limit, estep, is_usechainrecover)
         SetVariable("ToggleDash", 0)
     end
 
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     SetAIActionState()
 
     return TRUE
@@ -5430,16 +5430,16 @@ function ExecDamage(is_parry, is_attackwhileguard)
 
     if env(GetSpEffectID, 89) == TRUE or env(GetSpEffectID, 100640) == TRUE then
         if damage_level == DAMAGE_LEVEL_EXLARGE then
-            act(GetPoise0)
+            act(RequestAIJumpInterupt)
         elseif damage_level == DAMAGE_LEVEL_LARGE or damage_level == DAMAGE_LEVEL_PUSH or damage_level
             == DAMAGE_LEVEL_FLING or damage_level == DAMAGE_LEVEL_SMALL_BLOW or damage_level == DAMAGE_LEVEL_UPPER
             or damage_level == DAMAGE_LEVEL_EX_BLAST or damage_level == DAMAGE_LEVEL_BREATH or env(GetIsWeakPoint)
             == TRUE then
-            act(GetPoise0)
+            act(RequestAIJumpInterupt)
             damage_level = DAMAGE_LEVEL_SMALL_BLOW
         elseif damage_level == DAMAGE_LEVEL_MIDDLE or damage_level == DAMAGE_LEVEL_SMALL then
             CalcDamageCount()
-            act(GetPoise0)
+            act(RequestAIJumpInterupt)
             hkbFireEvent("W_JumpDamage_Start")
             SetVariable("Int16Variable04", 0)
             act(SetDamageAnimType, 3)
@@ -5617,7 +5617,7 @@ function FallCommonFunction(is_enable_falling_death, is_jump, fall_style)
         return TRUE
     end
 
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
 
     if env(IsLanding) == TRUE then
         IS_ATTACKED_JUMPMAGIC = FALSE
@@ -5833,7 +5833,7 @@ function ExecGuardOnCancelTiming(guardcondition, blend_type)
 end
 
 function LadderIdleCommonFunction(hand)
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
 
     if ExecLadderDeath() == TRUE then
         return TRUE
@@ -5854,7 +5854,7 @@ function LadderIdleCommonFunction(hand)
 end
 
 function LadderMoveCommonFunction(hand, is_no_damage)
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
 
     if ExecLadderDeath() == TRUE then
         return TRUE
@@ -5888,7 +5888,7 @@ function LadderMoveCommonFunction(hand, is_no_damage)
 end
 
 function LadderAttackCommonFunction(hand)
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
 
     if ExecLadderDeath() == TRUE then
         return TRUE
@@ -5919,7 +5919,7 @@ function LadderAttackCommonFunction(hand)
 end
 
 function LadderDamageCommonFunction(hand)
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
 
     if ExecLadderDeath() == TRUE then
         return TRUE
@@ -5949,7 +5949,7 @@ function LadderDamageCommonFunction(hand)
 end
 
 function LadderEndCommonFunction()
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
 
     if ExecLadderDeath() == TRUE then
         LadderSetActionState(LADDER_ACTION_INVALID)
@@ -6004,7 +6004,7 @@ end
 
 function LadderItemCommonFunction(hand, tonext)
     act(SetIsItemAnimationPlaying)
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
     if ExecLadderDeath() == TRUE then
         return TRUE
     end
@@ -6300,7 +6300,7 @@ function ExecLadderAttack(hand)
 end
 
 function LadderCoastCommonFunction(hand, is_start)
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
 
     if ExecLadderDeath() == TRUE then
         return TRUE
@@ -6345,7 +6345,7 @@ function IdleCommonFunction()
     end
 
     act(Wait)
-    act(Unknown2040)
+    act(AllowBuddyWarp)
     SetEnableAimMode()
 
     if ExecPassiveAction(FALSE, FALL_TYPE_DEFAULT, FALSE) == TRUE then
@@ -6436,7 +6436,7 @@ function AttackCommonFunction(r1, r2, l1, l2, b1, b2, guardcondition, use_atk_qu
 
     SetVariable("ToggleDash", 0)
 
-    act(Unknown2027)
+    act(FallPreventionAssist)
     SetThrowAtkInvalid()
     SetAIActionState()
 
@@ -6672,7 +6672,7 @@ function MagicCommonFunction(blend_type, quick_type, is_throw)
     end
 
     if GetVariable("MoveSpeedLevel") <= 0 then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
 
     if is_throw ~= TRUE then
@@ -6928,8 +6928,8 @@ function DamageCommonFunction(guardcondition, estep, fall_type)
 end
 
 function QuickTurnCommonFunction()
-    act(Unknown163)
-    act(Unknown2040)
+    act(SetIsEquipmentMenuAccessOff)
+    act(AllowBuddyWarp)
 
     if ExecPassiveAction(FALSE, FALL_TYPE_DEFAULT, FALSE) == TRUE then
         return TRUE
@@ -6969,7 +6969,7 @@ function QuickTurnCommonFunction()
 end
 
 function LandCommonFunction()
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
 
     if ExecPassiveAction(FALSE, FALL_TYPE_DEFAULT, FALSE) == TRUE then
         return TRUE
@@ -7018,7 +7018,7 @@ function ItemCommonFunction(blend_type)
     end
 
     if GetVariable("MoveSpeedLevel") <= 0 then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
 
     SetAIActionState()
@@ -7071,7 +7071,7 @@ function StealthItemCommonFunction(blend_type)
     end
 
     if GetVariable("MoveSpeedLevel") <= 0 then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
 
     SetAIActionState()
@@ -7121,7 +7121,7 @@ function QuickItemCommonFunction(g_r1, g_r2, g_l1, g_l2, g_b1, g_b2, blend_type,
     act(SetIsItemAnimationPlaying)
 
     if GetVariable("MoveSpeedLevel") <= 0 then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
 
     SetAIActionState()
@@ -7261,7 +7261,7 @@ end
 
 function MoveCommonFunction(blend_type)
     act(Wait)
-    act(Unknown2040)
+    act(AllowBuddyWarp)
     SetEnableAimMode()
 
     if ExecPassiveAction(FALSE, FALL_TYPE_DEFAULT, FALSE) == TRUE then
@@ -7445,7 +7445,7 @@ function ArtsCommonFunction(r1, r2, l1, l2, b1, b2, guardcondition, artsr1, arts
     end
 
     SetAIActionState()
-    act(Unknown163)
+    act(SetIsEquipmentMenuAccessOff)
 
     if ExecPassiveAction(FALSE, FALL_TYPE_DEFAULT, FALSE) == TRUE then
         ClearAttackQueue()
@@ -7560,7 +7560,7 @@ function ArtsStanceCommonFunction(r1, r2, l1, l2, b1, b2, blend_type, turn_type,
     end
 
     SetAIActionState()
-    act(Unknown163)
+    act(SetIsEquipmentMenuAccessOff)
 
     if ExecPassiveAction(FALSE, FALL_TYPE_DEFAULT, FALSE) == TRUE then
         return TRUE
@@ -7801,7 +7801,7 @@ function EventCommonFunction()
         act(SetIsEventAnim)
     end
 
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
 
     if env(HasThrowRequest) == TRUE then
         return TRUE
@@ -8192,7 +8192,7 @@ function DefaultBackStep_onActivate()
 end
 
 function DefaultBackStep_onUpdate()
-    act(Unknown163)
+    act(SetIsEquipmentMenuAccessOff)
     act(DisallowAdditiveTurning, TRUE)
 
     if EvasionCommonFunction(FALL_TYPE_DEFAULT, "W_AttackRightBackstep", "W_AttackRightHeavy1Start",
@@ -8207,7 +8207,7 @@ function DefaultBackStep_onDeactivate()
 end
 
 function BackStepGuardOn_UpperLayer_onUpdate()
-    act(Unknown163)
+    act(SetIsEquipmentMenuAccessOff)
     if ExecGuardOnCancelTiming(TO_GUARDON, ALLBODY) == TRUE then
         return
     end
@@ -8219,7 +8219,7 @@ function BackStepGuardOn_UpperLayer_onUpdate()
 end
 
 function BackStepGuardEnd_UpperLayer_onUpdate()
-    act(Unknown163)
+    act(SetIsEquipmentMenuAccessOff)
     if env(IsAnimEnd, 1) == TRUE or env(GetEventEzStateFlag, 0) == TRUE then
         ExecEventSyncNoReset("Event_BackStepGuardOut")
     end
@@ -8956,7 +8956,7 @@ function GuardBreakRight_onUpdate()
 end
 
 function Repelled_Wall_onUpdate()
-    act(Unknown2027)
+    act(FallPreventionAssist)
 
     if DamageCommonFunction(FALSE, ESTEP_NONE, FALL_TYPE_DEFAULT) == TRUE then
         return
@@ -14234,7 +14234,7 @@ function ItemPray_Upper_onUpdate()
             return TRUE
         end
     elseif env(IsSummoningRide) == TRUE then
-        if env(Unknown552) == TRUE then
+        if env(IsNewRidingTest) == TRUE then
             SetVariable("RideOnSummonTest", 1)
             FireRideEvent("W_RideOn", "W_RideOn", FALSE)
         else
@@ -14243,7 +14243,7 @@ function ItemPray_Upper_onUpdate()
         end
         return TRUE
     elseif env(GetEventEzStateFlag, 0) == TRUE then
-        act(Unknown3000)
+        act(Mounting)
         return TRUE
     end
     if HalfBlendUpperCommonFunction(lower_state) == TRUE then
@@ -14885,11 +14885,11 @@ function ItemDash_Upper_onUpdate()
     end
     if env(IsSummoningRide) == TRUE then
         act(DebugLogOutput, "SummonHorse SummonRequest true")
-        if env(Unknown552) == TRUE and IsSummonDash == TRUE then
+        if env(IsNewRidingTest) == TRUE and IsSummonDash == TRUE then
             act(DebugLogOutput, "SummonHorse RideOnDash")
             SetVariable("RideOnSummonTest", 2)
             FireRideEvent("W_RideOn", "W_RideOnDash", FALSE)
-        elseif env(Unknown552) == TRUE then
+        elseif env(IsNewRidingTest) == TRUE then
             act(DebugLogOutput, "SummonHorse RideOn")
             SetVariable("RideOnSummonTest", 1)
             FireRideEvent("W_RideOn", "W_RideOn", FALSE)
@@ -14906,7 +14906,7 @@ function ItemDash_Upper_onUpdate()
         if env(IsAnimEnd, 1) == TRUE then
             ExecEventAllBody("W_Idle")
         end
-        act(Unknown3000)
+        act(Mounting)
         return
     end
     if HalfBlendUpperCommonFunction(lower_state) == TRUE then
@@ -15263,7 +15263,7 @@ function MagicLaunchRight_Upper_onUpdate()
 end
 
 function MagicLoopRight_Upper_onUpdate()
-    act(Unknown2050, IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE_CHARGEMAGIC)
+    act(NotifyAIOfBehaviourState, IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE_CHARGEMAGIC)
     local blend_type, lower_state = GetHalfBlendInfo()
     if MagicCommonFunction(blend_type, QUICKTYPE_NORMAL, FALSE) == TRUE then
         return
@@ -15387,7 +15387,7 @@ function MagicLaunchLeft_Upper_onUpdate()
 end
 
 function MagicLoopLeft_Upper_onUpdate()
-    act(Unknown2050, IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE_CHARGEMAGIC)
+    act(NotifyAIOfBehaviourState, IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE_CHARGEMAGIC)
     local blend_type, lower_state = GetHalfBlendInfo()
     if MagicCommonFunction(blend_type, QUICKTYPE_NORMAL, FALSE) == TRUE then
         return
@@ -17671,7 +17671,7 @@ end
 
 function Ladder_Activate()
     act(ClearSlopeInfo)
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
     Flag_LadderDamage = LADDER_DAMAGE_NONE
     Flag_LadderJump = LADDER_JUMP_INVALID
     SetThrowInvalid()
@@ -17970,7 +17970,7 @@ end
 
 function LadderDrop_onUpdate()
     act(SetMovementScaleMult, math.random(160, 200) / 100)
-    act(SetIsEquipmentChangeableFromMenu)
+    act(SetIsEquipmentMenuAccessOn)
     if env(IsFalling) == TRUE then
         ExecEventAllBody("W_FallLoop")
         return
@@ -18385,7 +18385,7 @@ end
 
 function Ride_Deactivate()
     if IsNodeActive("Jump_RideOff LayerGenerator") == FALSE then
-        act(Unknown3005)
+        act(Dismount)
     end
 end
 
@@ -18412,7 +18412,7 @@ function ExecRide()
         FireRideEvent("W_RideOn", "W_RideOn", FALSE)
         return TRUE
     elseif env(ActionRequest, ACTION_ARM_RIDEON) == TRUE then
-        act(Unknown3000)
+        act(Mounting)
         return TRUE
     end
     return FALSE
@@ -18521,11 +18521,11 @@ end
 function RideReActionFunction()
     local isEnableForceRideOff = FALSE
 
-    if env(Unknown368) == TRUE then
-        if env(Unknown548) == TRUE and env(Unknown555) == TRUE and env(IsMountInFallLoop) == TRUE then
+    if env(IsAutomaticTesting) == TRUE then
+        if env(InNoRidingArea) == TRUE and env(IsRidingPcMount) == TRUE and env(IsMountInFallLoop) == TRUE then
             isEnableForceRideOff = TRUE
         end
-    elseif (env(Unknown548) == TRUE or env(Unknown365) == TRUE or env(GetSpEffectType, 433) == TRUE) and env(Unknown555)
+    elseif (env(InNoRidingArea) == TRUE or env(IsMultiplayer) == TRUE or env(GetSpEffectType, 433) == TRUE) and env(IsRidingPcMount)
         == TRUE and env(IsMountInFallLoop) == TRUE then
         isEnableForceRideOff = TRUE
     end
@@ -18832,7 +18832,7 @@ end
 
 function RideRequestFunction(ride_move_type, enable_turn, lower_only)
     if env(IsOnMount) == FALSE then
-        act(Unknown3005)
+        act(Dismount)
         ExecEventAllBody("W_Idle")
 
         return TRUE
@@ -19164,7 +19164,7 @@ function ExecRideItem()
 
     act(ApplyRideBlend, "Ride_Feed_AddBlend", 0)
     act(SetIsItemAnimationPlaying)
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     SetAIActionState()
 
     return TRUE
@@ -19248,7 +19248,7 @@ function ExecRideWeaponChange(blend_type)
     SetVariable("WeaponChangeType", startkind)
     SetVariable("RideWeaponChangeEndType", endKind)
     ExecEventAllBody("W_RideWeaponChangeStart")
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     SetAIActionState()
     return TRUE
 end
@@ -19356,7 +19356,7 @@ function ExecRideHandChange(hand, is_force)
     end
 
     ExecEventAllBody("W_RideHandChangeStart")
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     SetAIActionState()
 
     return TRUE
@@ -19364,7 +19364,7 @@ end
 
 function RideWeaponChangeStart_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -19392,7 +19392,7 @@ end
 
 function RideWeaponChangeEnd_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -19429,7 +19429,7 @@ end
 
 function RideHandChangeStart_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -19459,7 +19459,7 @@ end
 
 function RideHandChangeEnd_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -19839,7 +19839,7 @@ end
 
 function RideItemDrinkStart_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -19888,7 +19888,7 @@ end
 
 function RideItemDrinking_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -19926,7 +19926,7 @@ end
 
 function RideItemDrinkEnd_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -19960,7 +19960,7 @@ end
 
 function RideItemDrinkEmpty_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -19997,7 +19997,7 @@ end
 
 function RideItemInvalid_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20033,7 +20033,7 @@ end
 
 function RideItemDrinkNothing_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20070,7 +20070,7 @@ end
 
 function RideItemWhistle_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20107,7 +20107,7 @@ end
 
 function RideItemElixir_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20144,7 +20144,7 @@ end
 
 function RideItemHorn_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20181,7 +20181,7 @@ end
 
 function RideItemQuick1_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20217,7 +20217,7 @@ end
 
 function RideItemQuick2_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20254,7 +20254,7 @@ end
 
 function RideItemQuick3_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20291,7 +20291,7 @@ end
 
 function RideItemOneShot_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20344,7 +20344,7 @@ end
 
 function RideItemDragonThrowSpearCancel_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20382,7 +20382,7 @@ end
 
 function RideItemLanternOff_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20419,7 +20419,7 @@ end
 
 function RideItemCombo_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -20660,11 +20660,11 @@ function RideOff_onUpdate()
 
     if EvasionCommonFunction(FALL_TYPE_DEFAULT, "W_AttackRightLight1", "W_AttackRightHeavy1Start", "W_AttackLeftLight1",
         "W_AttackLeftHeavy1", "W_AttackBothLight1", "W_AttackBothHeavy1Start", QUICKTYPE_NORMAL) == TRUE then
-        act(Unknown3005)
+        act(Dismount)
         return
     end
     if env(MovementRequest) == TRUE or env(IsAnimEnd, 0) == TRUE then
-        act(Unknown3005)
+        act(Dismount)
         ExecEventAllBody("W_Idle")
         return TRUE
     end
@@ -21027,7 +21027,7 @@ function RideDamage_Fall_onUpdate()
     act(SetAllowedThrowAttackType, 1)
     SetAIActionState()
     SetVariable("Int16Variable01", 0)
-    act(Unknown3005)
+    act(Dismount)
 
     if DamageCommonFunction(FALSE, ESTEP_NONE, FALL_TYPE_FORCE) == TRUE then
         return TRUE
@@ -21055,7 +21055,7 @@ function RideDamage_Fall_AbyssalForest_onUpdate()
 end
 
 function RideDamage_Fall_AbyssalForest_onDeactivate()
-    act(Unknown3005)
+    act(Dismount)
 end
 
 function RideDamageMad_onUpdate()
@@ -21070,7 +21070,7 @@ function RideDamageMad_onUpdate()
         return
     end
 
-    act(Unknown3005)
+    act(Dismount)
 
     if DamageCommonFunction(FALSE, ESTEP_NONE, FALL_TYPE_FORCE) == TRUE then
         return TRUE
@@ -21087,7 +21087,7 @@ function RideDamageBind_Start_onUpdate()
     act(SetAllowedThrowAttackType, 1)
     SetAIActionState()
     SetVariable("Int16Variable01", 0)
-    act(Unknown3005)
+    act(Dismount)
 
     if DamageCommonFunction(FALSE, ESTEP_NONE, FALL_TYPE_FORCE) == TRUE then
         return TRUE
@@ -21104,7 +21104,7 @@ function RideDamageBind_Loop_onUpdate()
     act(SetAllowedThrowAttackType, 1)
     SetAIActionState()
     SetVariable("Int16Variable01", 0)
-    act(Unknown3005)
+    act(Dismount)
     if DamageCommonFunction(FALSE, ESTEP_NONE, FALL_TYPE_FORCE) == TRUE then
         return TRUE
     end
@@ -21119,7 +21119,7 @@ function RideDamageBind_End_onUpdate()
     act(SetAllowedThrowAttackType, 1)
     SetAIActionState()
     SetVariable("Int16Variable01", 0)
-    act(Unknown3005)
+    act(Dismount)
     if DamageCommonFunction(FALSE, ESTEP_NONE, FALL_TYPE_FORCE) == TRUE then
         return TRUE
     end
@@ -21335,7 +21335,7 @@ end
 
 function RideAttack_BackKick_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -21363,7 +21363,7 @@ end
 
 function RideAttack_R_Top_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -21395,7 +21395,7 @@ end
 
 function RideAttack_R_Top02_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -21427,7 +21427,7 @@ end
 
 function RideAttack_R_Top03_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -21459,7 +21459,7 @@ end
 
 function RideAttack_R_Hard1_Start_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
     SetVariable("RideAttack_JumpCondition", 0)
 end
@@ -21561,7 +21561,7 @@ end
 
 function RideAttack_R_Hard2_Start_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
     SetVariable("RideAttack_JumpCondition", 0)
 end
@@ -21653,7 +21653,7 @@ end
 
 function RideAttack_L_Hard1_Start_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
     SetVariable("RideAttack_JumpCondition", 0)
 end
@@ -21753,7 +21753,7 @@ end
 
 function RideAttack_L_Hard2_Start_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
     SetVariable("RideAttack_JumpCondition", 0)
 end
@@ -21847,7 +21847,7 @@ end
 
 function RideAttack_L_Top_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -21880,7 +21880,7 @@ end
 
 function RideAttack_L_Top02_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -21913,7 +21913,7 @@ end
 
 function RideAttack_L_Top03_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
     act(ResetInputQueue)
 end
 
@@ -22387,7 +22387,7 @@ end
 
 function RideJump_N_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump_N_onUpdate()
@@ -22398,7 +22398,7 @@ end
 
 function RideJump_F_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump_F_onUpdate()
@@ -22409,7 +22409,7 @@ end
 
 function RideJump_D_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump_D_onUpdate()
@@ -22420,7 +22420,7 @@ end
 
 function RideJump_Loop_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump_Loop_onUpdate()
@@ -22443,7 +22443,7 @@ end
 
 function RideJump2_N_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump2_N_onUpdate()
@@ -22454,7 +22454,7 @@ end
 
 function RideJump2_F_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump2_F_onUpdate()
@@ -22465,7 +22465,7 @@ end
 
 function RideJump2_D_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump2_D_onUpdate()
@@ -22476,7 +22476,7 @@ end
 
 function RideJump2_Loop_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump2_Loop_onUpdate()
@@ -22499,7 +22499,7 @@ end
 
 function RideJump_Land_N_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump_Land_N_onUpdate()
@@ -22523,7 +22523,7 @@ end
 
 function RideJump_Land_F_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump_Land_F_onUpdate()
@@ -22544,7 +22544,7 @@ end
 
 function RideJump_Land_D_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump_Land_D_onUpdate()
@@ -22565,7 +22565,7 @@ end
 
 function RideJump_Land_To_Dash_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump_Land_To_Dash_onUpdate()
@@ -22584,7 +22584,7 @@ end
 
 function RideJump_Land_To_Gallop_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump_Land_To_Gallop_onUpdate()
@@ -22603,7 +22603,7 @@ end
 
 function RideJumpHigh_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJumpHigh_onUpdate()
@@ -22627,7 +22627,7 @@ end
 
 function RideJumpHighLoop_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJumpHighLoop_onUpdate()
@@ -22664,7 +22664,7 @@ end
 
 function RideJumpHighEnd_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJumpHighEnd_onUpdate()
@@ -22681,7 +22681,7 @@ end
 
 function RideJumpHigh2_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJumpHigh2_onUpdate()
@@ -22693,7 +22693,7 @@ end
 
 function RideJumpHigh_FallLoop_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJumpHigh_FallLoop_onUpdate()
@@ -22705,7 +22705,7 @@ end
 
 function RideJump_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideJump_onUpdate()
@@ -22772,7 +22772,7 @@ end
 
 function RideAttack_Jump_R_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideAttack_Jump_R_onUpdate()
@@ -22815,7 +22815,7 @@ end
 
 function RideAttack_Jump_R_Hard1_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideAttack_Jump_R_Hard1_onUpdate()
@@ -22856,7 +22856,7 @@ end
 
 function RideAttack_Jump_R_Hard2_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideAttack_Jump_R_Hard2_onUpdate()
@@ -22894,7 +22894,7 @@ end
 
 function RideAttack_Jump_L_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideAttack_Jump_L_onUpdate()
@@ -22933,7 +22933,7 @@ end
 
 function RideAttack_Jump_L_Hard1_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideAttack_Jump_L_Hard1_onUpdate()
@@ -22974,7 +22974,7 @@ end
 
 function RideAttack_Jump_L_Hard2_onActivate()
     SetAIActionState()
-    act(Unknown2025, env(Unknown404))
+    act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
 end
 
 function RideAttack_Jump_L_Hard2_onUpdate()
@@ -23362,12 +23362,12 @@ end
 
 function JumpAttack_Start_Falling_onActivate()
     act(ResetInputQueue)
-    act(GetPoise2)
+    act(AIJumpState)
     SetAIActionState()
 end
 
 function JumpAttack_Start_Falling_onUpdate()
-    act(GetPoise2)
+    act(AIJumpState)
     SetAIActionState()
 
     if Act_Jump() == TRUE then
@@ -23412,12 +23412,12 @@ end
 
 function JumpAttack_Start_Falling_F_onActivate()
     act(ResetInputQueue)
-    act(GetPoise2)
+    act(AIJumpState)
     SetAIActionState()
 end
 
 function JumpAttack_Start_Falling_F_onUpdate()
-    act(GetPoise2)
+    act(AIJumpState)
     SetAIActionState()
 
     if Act_Jump() == TRUE then
@@ -23454,12 +23454,12 @@ end
 
 function JumpAttack_Start_Falling_D_onActivate()
     act(ResetInputQueue)
-    act(GetPoise2)
+    act(AIJumpState)
     SetAIActionState()
 end
 
 function JumpAttack_Start_Falling_D_onUpdate()
-    act(GetPoise2)
+    act(AIJumpState)
     SetAIActionState()
 
     if Act_Jump() == TRUE then
@@ -23495,10 +23495,10 @@ function JumpAttack_Start_Falling_D_onUpdate()
 end
 
 function JumpCommonFunction(jump_type)
-    act(GetPoise2)
+    act(AIJumpState)
 
     if GetVariable("JumpAttackForm") == 0 then
-        act(Unknown2050, IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE_JUMP_NONATTACK)
+        act(NotifyAIOfBehaviourState, IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE_JUMP_NONATTACK)
     elseif env(GetSpEffectID, 102050) == TRUE then
         act(LockonFixedAngleCancel)
     end
@@ -23573,7 +23573,7 @@ function JumpCommonFunction(jump_type)
             SetVariable("JumpAttackFormRequest", 0)
             SetVariable("JumpAttackForm", 1)
             SetInterruptType(INTERRUPT_FINDATTACK)
-            act(Unknown2025, env(Unknown404))
+            act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
             SetAIActionState()
 
             return TRUE
@@ -23582,7 +23582,7 @@ function JumpCommonFunction(jump_type)
             SetVariable("JumpAttackFormRequest", 1)
             SetVariable("JumpAttackForm", 2)
             SetInterruptType(INTERRUPT_FINDATTACK)
-            act(Unknown2025, env(Unknown404))
+            act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
             SetAIActionState()
 
             return TRUE
@@ -23591,7 +23591,7 @@ function JumpCommonFunction(jump_type)
             SetVariable("JumpAttackFormRequest", 2)
             SetVariable("JumpAttackForm", 3)
             SetInterruptType(INTERRUPT_FINDATTACK)
-            act(Unknown2025, env(Unknown404))
+            act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
             SetAIActionState()
 
             return TRUE
@@ -23616,7 +23616,7 @@ function JumpCommonFunction(jump_type)
         if env(ActionRequest, ACTION_ARM_R1) == TRUE or is_arrow == TRUE and env(ActionRequest, ACTION_ARM_R2) == TRUE then
             SetVariable("JumpAttackFormRequest", 0)
             SetInterruptType(INTERRUPT_FINDATTACK)
-            act(Unknown2025, env(Unknown404))
+            act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
             SetAIActionState()
 
             if jump_type == 0 then
@@ -23631,7 +23631,7 @@ function JumpCommonFunction(jump_type)
         elseif env(ActionRequest, ACTION_ARM_R2) == TRUE then
             SetVariable("JumpAttackFormRequest", 1)
             SetInterruptType(INTERRUPT_FINDATTACK)
-            act(Unknown2025, env(Unknown404))
+            act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
             SetAIActionState()
             if jump_type == 0 then
                 ExecEventNoReset("W_JumpAttack_Start_Falling")
@@ -23644,7 +23644,7 @@ function JumpCommonFunction(jump_type)
             return TRUE
         elseif env(ActionRequest, ACTION_ARM_L1) == TRUE and IsEnableDualWielding() == HAND_RIGHT then
             SetInterruptType(INTERRUPT_FINDATTACK)
-            act(Unknown2025, env(Unknown404))
+            act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
             SetAIActionState()
             SetVariable("JumpAttackFormRequest", 2)
             if jump_type == 0 then
@@ -23660,7 +23660,7 @@ function JumpCommonFunction(jump_type)
     end
     -- Landing
     if env(GetSpEffectID, 98) == TRUE and env(IsTruelyLanding) == TRUE and env(GetSpEffectID, 140) == FALSE
-        and env(Unknown701) == FALSE then
+        and env(IsAIJumping) == FALSE then
         local landIndex = GetLandIndex(height, FALSE)
         SetVariable("LandIndex", landIndex)
 
@@ -23815,8 +23815,8 @@ function ExecJumpMagic(jump_type)
         return FALSE
     end
 
-    act(Unknown2026)
-    act(MarkOfGreedyPersonSlipDamageDisable)
+    act(DecideMagicUse)
+    act(NotifyAIMagicCast)
 
     if IsJumpMagic() == FALSE and IsQuickMagic() == FALSE then
         ResetRequest()
@@ -23851,7 +23851,7 @@ function ExecJumpMagic(jump_type)
 
         IS_ATTACKED_JUMPMAGIC = TRUE
         act(SetIsMagicInUse, TRUE)
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
 
         return TRUE
@@ -23867,7 +23867,7 @@ function ExecJumpMagic(jump_type)
         end
 
         act(SetIsMagicInUse, TRUE)
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
 
         return TRUE
@@ -23892,7 +23892,7 @@ function ExecJumpMagic(jump_type)
         end
 
         act(SetIsMagicInUse, TRUE)
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
 
         return TRUE
@@ -23992,8 +23992,8 @@ function ExecFallMagic()
         return FALSE
     end
 
-    act(Unknown2026)
-    act(MarkOfGreedyPersonSlipDamageDisable)
+    act(DecideMagicUse)
+    act(NotifyAIMagicCast)
 
     if IsJumpMagic() == FALSE and IsQuickMagic() == FALSE then
         ResetRequest()
@@ -24028,7 +24028,7 @@ function ExecFallMagic()
 
         IS_ATTACKED_JUMPMAGIC = TRUE
         act(SetIsMagicInUse, TRUE)
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
 
         return TRUE
@@ -24046,7 +24046,7 @@ function ExecFallMagic()
 
         ExecEventNoReset("W_JumpAttack_Start_Falling")
         act(SetIsMagicInUse, TRUE)
-        act(Unknown2025, env(Unknown404))
+        act(SetNpcAIAttackRequestIDAfterBlend, env(GetNpcAIAttackRequestID))
         SetAIActionState()
 
         return TRUE
@@ -24071,7 +24071,7 @@ function Jump_Overweight_onDeactivate()
 end
 
 function Jump_N_onActivate()
-    act(GetPoise2)
+    act(AIJumpState)
     SetAIActionState()
 end
 
@@ -24110,7 +24110,7 @@ function Jump_N_onDeactivate()
 end
 
 function Jump_F_onActivate()
-    act(GetPoise2)
+    act(AIJumpState)
     SetAIActionState()
 end
 
@@ -24137,7 +24137,7 @@ function Jump_F_onDeactivate()
 end
 
 function Jump_D_onActivate()
-    act(GetPoise2)
+    act(AIJumpState)
     SetAIActionState()
 end
 
@@ -24161,7 +24161,7 @@ function Jump_D_onDeactivate()
 end
 
 function Jump_RideOff_onActivate()
-    act(GetPoise2)
+    act(AIJumpState)
     SetAIActionState()
 end
 
@@ -24176,13 +24176,13 @@ function Jump_RideOff_onUpdate()
     end
 
     if JumpCommonFunction(2) == TRUE then
-        act(Unknown3005)
+        act(Dismount)
         return
     end
 end
 
 function Jump_RideOff_onDeactivate()
-    act(Unknown3005)
+    act(Dismount)
     act(DisallowAdditiveTurning, FALSE)
 end
 
@@ -26018,53 +26018,62 @@ GetWeaponSwitchStatus = 359
 IsEquipmentMenuOpen = 360
 GetRemainingArrowCount = 361
 GetSpEffectType = 362 -- args: <enum> SP_EFFECT_TYPE_
-Unknown363 = 363
+IsPlayerInRangeOfMount = 363
 GetEventID = 364
-Unknown365 = 365
+IsMultiplayer = 365
 GetSpiritspringJumpHeight = 366
-Unknown368 = 368
+IsAutomaticTesting = 368
 
 GetPoise = 400
 GetMaxPoise = 402
 GetSpEffectEventAnimID = 403
-Unknown404 = 404
-Unknown405 = 405
+GetNpcAIAttackRequestID = 404
+GetNpcAIAttackRequestIDAfterBlend = 405
 GetRollAngle = 406
 GetJumpAngle = 407
 GetSwordArtsRollAngle = 408
 GetDamageSpecialAttribute = 409 -- args: <index>
 
 IsOnMount = 500
-Unknown502 = 502
+IsMount = 502
 IsSummoningRide = 504
 IsMovingOnMount = 505
 IsIdleOnMount = 506
+GetMountRidingAnimID = 507
+GetDismountingDirection = 520
+GetDismountingDirectionRun = 521
 GetMountReceivedDamageDirection = 522 -- args: <unknown>
 GetMountDamageLevel = 530
+GetMountGuardLevel = 531
+GetMountAttackDirection = 532
 GetMountRecievedDamageAngle = 533
 GetMountRecievedDamageType = 534
 HasMountReceivedAnyDamage = 535
+GetMountGuardLevelAction = 536
 IsMountFalling = 537
 GetMountFallHeight = 538
 IsMountInFallLoop = 539
 IsMountTrulyLanding = 540
+IsMountFallingDeadly = 541
+GetPhysicalAttributeMount = 542
 GetMountSpecialAttribute = 543
+GetSlope = 544
 IsMountDead = 545
 GetMountIsWeakPoint = 546
 GetMountDamageAnimID = 547
-Unknown548 = 548
+InNoRidingArea = 548
 GetMountSpEffectID = 549
 GetMountSpEffectType = 550
 GetMountStateInfo = 551
-Unknown552 = 552
+IsNewRidingTest = 552
 GetMountBehaviorID = 553
 GetMountStatusEffect = 554
-Unknown555 = 555
+IsRidingPcMount = 555
 
 GetFlyRouteState = 600
 
-Unknown700 = 700
-Unknown701 = 701
+IsAIJumpRequested = 700
+IsAIJumping = 701
 
 GetHP = 1000
 GetStamina = 1001
@@ -26121,8 +26130,8 @@ IsCeremonyComplete = 2017
 IsCeremonyInterrupt = 2018
 
 IsSpeaking = 3000
-GetTalkID_3001 = 3001
-GetTalkID_3002 = 3002
+GetTalkBehavior = 3001
+GetTalkEzStateBehaviourID = 3002
 
 Unknown9999 = 9999
 
@@ -26193,7 +26202,7 @@ InterruptAttack = 143
 SkyDeathWarp = 144
 ClearSlopeInfo = 145
 ReceiveStateInput = 146
-SetIsEquipmentChangeableFromMenu = 147
+SetIsEquipmentMenuAccessOn = 147
 SetHavokVariable = 148 -- args: <string>, <value>
 AimAtSelfPosition = 149
 SetIsItemAnimationPlaying = 150
@@ -26208,8 +26217,8 @@ RequestAIReplanning = 158
 TurnTowardAttacker = 159
 SetThrowPossibilityState_Attacker = 160 -- args: <index>
 SetThrowPossibilityState_Defender = 161 -- args: <index>
-MarkOfGreedyPersonSlipDamageDisable = 162
-Unknown163 = 163
+NotifyAIMagicCast = 162
+SetIsEquipmentMenuAccessOff = 163
 
 StateIdentifier = 200
 
@@ -26243,27 +26252,27 @@ LadderSlideDownCancel = 2021
 DisableMagicIDSwitching = 2022
 DisableToolIDSwitching = 2023
 UseItemDecision = 2024
-Unknown2025 = 2025 -- args: <value>
-Unknown2026 = 2026
-Unknown2027 = 2027
-Unknown2029 = 2029 -- args: <value>
+SetNpcAIAttackRequestIDAfterBlend = 2025 -- args: <value>
+DecideMagicUse = 2026
+FallPreventionAssist = 2027
+FaceDirection = 2029 -- args: <degrees>
 ChangeBuddyState = 2030
 PlayEventSync = 2031
-Unknown2040 = 2040
-Unknown2050 = 2050 -- args: <index>, <index> # IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE
+AllowBuddyWarp = 2040
+NotifyAIOfBehaviourState = 2050 -- args: <index>, <index> # IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE
 
-Unknown3000 = 3000
+Mounting = 3000
 Unknown3001 = 3001
 Unknown3002 = 3002
 PlayRideAnim = 3003
 ApplyRideBlend = 3004 -- args: <blend anim>, <rate>
-Unknown3005 = 3005
-Unknown3006 = 3006
+Dismount = 3005
+AllowMounting = 3006
 ApplyDamageFlag = 3007 -- args: <index>
 
-GetPoise0 = 4000
-GetPoise1 = 4001
-GetPoise2 = 4002
+RequestAIJumpInterupt = 4000
+NotifyAIOfJumpState = 4001
+AIJumpState = 4002
 
 DebugLogOutput = 9000
 ClearSpEffect = 9001 -- args: <id>
