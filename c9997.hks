@@ -12680,7 +12680,7 @@ InterruptAttack = 143
 SkyDeathWarp = 144
 ClearSlopeInfo = 145
 ReceiveStateInput = 146
-SetIsEquipmentMenuAccessOn = 147
+SetCanChangeEquipmentOn = 147
 SetHavokVariable = 148 -- args: <string>, <value>
 AimAtSelfPosition = 149
 SetIsItemAnimationPlaying = 150
@@ -12696,7 +12696,7 @@ TurnTowardAttacker = 159
 SetThrowPossibilityState_Attacker = 160 -- args: <index>
 SetThrowPossibilityState_Defender = 161 -- args: <index>
 NotifyAIMagicCast = 162
-SetIsEquipmentMenuAccessOff = 163
+SetCanChangeEquipmentOff = 163
 
 StateIdentifier = 200
 

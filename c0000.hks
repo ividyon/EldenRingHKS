@@ -5617,7 +5617,7 @@ function FallCommonFunction(is_enable_falling_death, is_jump, fall_style)
         return TRUE
     end
 
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
 
     if env(IsLanding) == TRUE then
         IS_ATTACKED_JUMPMAGIC = FALSE
@@ -5833,7 +5833,7 @@ function ExecGuardOnCancelTiming(guardcondition, blend_type)
 end
 
 function LadderIdleCommonFunction(hand)
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
 
     if ExecLadderDeath() == TRUE then
         return TRUE
@@ -5854,7 +5854,7 @@ function LadderIdleCommonFunction(hand)
 end
 
 function LadderMoveCommonFunction(hand, is_no_damage)
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
 
     if ExecLadderDeath() == TRUE then
         return TRUE
@@ -5888,7 +5888,7 @@ function LadderMoveCommonFunction(hand, is_no_damage)
 end
 
 function LadderAttackCommonFunction(hand)
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
 
     if ExecLadderDeath() == TRUE then
         return TRUE
@@ -5919,7 +5919,7 @@ function LadderAttackCommonFunction(hand)
 end
 
 function LadderDamageCommonFunction(hand)
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
 
     if ExecLadderDeath() == TRUE then
         return TRUE
@@ -5949,7 +5949,7 @@ function LadderDamageCommonFunction(hand)
 end
 
 function LadderEndCommonFunction()
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
 
     if ExecLadderDeath() == TRUE then
         LadderSetActionState(LADDER_ACTION_INVALID)
@@ -6004,7 +6004,7 @@ end
 
 function LadderItemCommonFunction(hand, tonext)
     act(SetIsItemAnimationPlaying)
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
     if ExecLadderDeath() == TRUE then
         return TRUE
     end
@@ -6300,7 +6300,7 @@ function ExecLadderAttack(hand)
 end
 
 function LadderCoastCommonFunction(hand, is_start)
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
 
     if ExecLadderDeath() == TRUE then
         return TRUE
@@ -6928,7 +6928,7 @@ function DamageCommonFunction(guardcondition, estep, fall_type)
 end
 
 function QuickTurnCommonFunction()
-    act(SetIsEquipmentMenuAccessOff)
+    act(SetCanChangeEquipmentOff)
     act(AllowBuddyWarp)
 
     if ExecPassiveAction(FALSE, FALL_TYPE_DEFAULT, FALSE) == TRUE then
@@ -6969,7 +6969,7 @@ function QuickTurnCommonFunction()
 end
 
 function LandCommonFunction()
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
 
     if ExecPassiveAction(FALSE, FALL_TYPE_DEFAULT, FALSE) == TRUE then
         return TRUE
@@ -7445,7 +7445,7 @@ function ArtsCommonFunction(r1, r2, l1, l2, b1, b2, guardcondition, artsr1, arts
     end
 
     SetAIActionState()
-    act(SetIsEquipmentMenuAccessOff)
+    act(SetCanChangeEquipmentOff)
 
     if ExecPassiveAction(FALSE, FALL_TYPE_DEFAULT, FALSE) == TRUE then
         ClearAttackQueue()
@@ -7560,7 +7560,7 @@ function ArtsStanceCommonFunction(r1, r2, l1, l2, b1, b2, blend_type, turn_type,
     end
 
     SetAIActionState()
-    act(SetIsEquipmentMenuAccessOff)
+    act(SetCanChangeEquipmentOff)
 
     if ExecPassiveAction(FALSE, FALL_TYPE_DEFAULT, FALSE) == TRUE then
         return TRUE
@@ -7801,7 +7801,7 @@ function EventCommonFunction()
         act(SetIsEventAnim)
     end
 
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
 
     if env(HasThrowRequest) == TRUE then
         return TRUE
@@ -8192,7 +8192,7 @@ function DefaultBackStep_onActivate()
 end
 
 function DefaultBackStep_onUpdate()
-    act(SetIsEquipmentMenuAccessOff)
+    act(SetCanChangeEquipmentOff)
     act(DisallowAdditiveTurning, TRUE)
 
     if EvasionCommonFunction(FALL_TYPE_DEFAULT, "W_AttackRightBackstep", "W_AttackRightHeavy1Start",
@@ -8207,7 +8207,7 @@ function DefaultBackStep_onDeactivate()
 end
 
 function BackStepGuardOn_UpperLayer_onUpdate()
-    act(SetIsEquipmentMenuAccessOff)
+    act(SetCanChangeEquipmentOff)
     if ExecGuardOnCancelTiming(TO_GUARDON, ALLBODY) == TRUE then
         return
     end
@@ -8219,7 +8219,7 @@ function BackStepGuardOn_UpperLayer_onUpdate()
 end
 
 function BackStepGuardEnd_UpperLayer_onUpdate()
-    act(SetIsEquipmentMenuAccessOff)
+    act(SetCanChangeEquipmentOff)
     if env(IsAnimEnd, 1) == TRUE or env(GetEventEzStateFlag, 0) == TRUE then
         ExecEventSyncNoReset("Event_BackStepGuardOut")
     end
@@ -17671,7 +17671,7 @@ end
 
 function Ladder_Activate()
     act(ClearSlopeInfo)
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
     Flag_LadderDamage = LADDER_DAMAGE_NONE
     Flag_LadderJump = LADDER_JUMP_INVALID
     SetThrowInvalid()
@@ -17970,7 +17970,7 @@ end
 
 function LadderDrop_onUpdate()
     act(SetMovementScaleMult, math.random(160, 200) / 100)
-    act(SetIsEquipmentMenuAccessOn)
+    act(SetCanChangeEquipmentOn)
     if env(IsFalling) == TRUE then
         ExecEventAllBody("W_FallLoop")
         return
@@ -26202,7 +26202,7 @@ InterruptAttack = 143
 SkyDeathWarp = 144
 ClearSlopeInfo = 145
 ReceiveStateInput = 146
-SetIsEquipmentMenuAccessOn = 147
+SetCanChangeEquipmentOn = 147
 SetHavokVariable = 148 -- args: <string>, <value>
 AimAtSelfPosition = 149
 SetIsItemAnimationPlaying = 150
@@ -26218,7 +26218,7 @@ TurnTowardAttacker = 159
 SetThrowPossibilityState_Attacker = 160 -- args: <index>
 SetThrowPossibilityState_Defender = 161 -- args: <index>
 NotifyAIMagicCast = 162
-SetIsEquipmentMenuAccessOff = 163
+SetCanChangeEquipmentOff = 163
 
 StateIdentifier = 200
 
