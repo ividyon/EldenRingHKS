@@ -7009,6 +7009,7 @@ function LandCommonFunction()
 end
 
 function ItemCommonFunction(blend_type)
+    act(SetCanChangeEquipmentOff)
     if env(GetStateChangeType, 15) == FALSE then
         act(SetIsItemAnimationPlaying)
     end
@@ -13963,19 +13964,64 @@ function QuickItemEnchantDash_Upper_onUpdate()
 end
 
 function QuickItemEnchantStep_Upper_onUpdate()
-    if QuickItemCommonFunction(g_r1, g_r2, g_l1, g_l2, g_b1, g_b2, ALLBODY, QUICKTYPE_NORMAL) == TRUE then
+    local blend_type, lower_state = GetHalfBlendInfo()
+    
+    if QuickItemCommonFunction(g_r1, g_r2, g_l1, g_l2, g_b1, g_b2, blend_type, QUICKTYPE_NORMAL) == TRUE then
+        return
+    end
+
+    if blend_type ~= UPPER and ExecQuickTurn(LOWER, TURN_TYPE_DEFAULT) == TRUE then
+        return TRUE
+    end
+
+    if HalfBlendUpperCommonFunction(lower_state) == TRUE then
+        ClearAttackQueue()
+        return
+    end
+
+    if HalfBlendLowerCommonFunction(Event_QuickItemEnchantStep, lower_state, FALSE, TRUE) == TRUE then
         return
     end
 end
 
 function QuickItemEnchantAttackRight_Upper_onUpdate()
-    if QuickItemCommonFunction(g_r1, g_r2, g_l1, g_l2, g_b1, g_b2, ALLBODY, QUICKTYPE_NORMAL) == TRUE then
+    local blend_type, lower_state = GetHalfBlendInfo()
+
+    if QuickItemCommonFunction(g_r1, g_r2, g_l1, g_l2, g_b1, g_b2, blend_type, QUICKTYPE_NORMAL) == TRUE then
         return
     end
+
+    if blend_type ~= UPPER and ExecQuickTurn(LOWER, TURN_TYPE_DEFAULT) == TRUE then
+        return TRUE
+    end
+
+    if HalfBlendUpperCommonFunction(lower_state) == TRUE then
+        ClearAttackQueue()
+        return
+    end
+
+    if HalfBlendLowerCommonFunction(Event_QuickItemEnchantAttackRight, lower_state, FALSE, TRUE) == TRUE then
+        return
+    end 
 end
 
 function QuickItemEnchantAttackLeft_Upper_onUpdate()
-    if QuickItemCommonFunction(g_r1, g_r2, g_l1, g_l2, g_b1, g_b2, ALLBODY, QUICKTYPE_NORMAL) == TRUE then
+    local blend_type, lower_state = GetHalfBlendInfo()
+
+    if QuickItemCommonFunction(g_r1, g_r2, g_l1, g_l2, g_b1, g_b2, blend_type, QUICKTYPE_NORMAL) == TRUE then
+        return
+    end
+
+    if blend_type ~= UPPER and ExecQuickTurn(LOWER, TURN_TYPE_DEFAULT) == TRUE then
+        return TRUE
+    end
+
+    if HalfBlendUpperCommonFunction(lower_state) == TRUE then
+        ClearAttackQueue()
+        return
+    end
+
+    if HalfBlendLowerCommonFunction(Event_QuickItemEnchantAttackLeft, lower_state, FALSE, TRUE) == TRUE then
         return
     end
 end
