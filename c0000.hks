@@ -14022,6 +14022,10 @@ function QuickItemEnchantAttackLeft_Upper_onUpdate()
         ClearAttackQueue()
         return
     end
+
+    if HalfBlendLowerCommonFunction(Event_QuickItemEnchantAttackLeft, lower_state, FALSE, TRUE) == TRUE then
+        return
+    end
 end
 
 function QuickItemThrowKnifeNormal_Upper_onUpdate()
