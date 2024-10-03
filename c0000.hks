@@ -26310,8 +26310,6 @@ AllowBuddyWarp = 2040
 NotifyAIOfBehaviourState = 2050 -- args: <index>, <index> # IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE
 
 Mounting = 3000
-Unknown3001 = 3001
-Unknown3002 = 3002
 PlayRideAnim = 3003
 ApplyRideBlend = 3004 -- args: <blend anim>, <rate>
 Dismount = 3005
