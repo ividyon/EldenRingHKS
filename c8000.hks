@@ -4,11 +4,12 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 1 for ER version 1.12.1
+-- Version 2 for ER version 1.15.1
 ------------------------------------------
 -- Changelog:
 -- 2023-02-14 - Vawser: Cleaned up and added.
 -- 2024-06-28 - Exelot: Recreated on raw decompiler. No functional changes present.
+-- 2024-10-03 - Exelot: Named almost all remaining acts and envs thanks to a list provided by ElaDiDu. Some of the existing ones have been renamed.
 ------------------------------------------
 function Event20000_onUpdate()
     if EventCommonFunction(20000) == TRUE then
@@ -1057,24 +1058,24 @@ GetWeaponSwitchStatus = 359
 IsEquipmentMenuOpen = 360
 GetRemainingArrowCount = 361
 GetSpEffectType = 362 -- args: <enum> SP_EFFECT_TYPE_
-Unknown363 = 363
+IsPlayerInRangeOfMount = 363
 GetEventID = 364
-Unknown365 = 365
+IsMultiplayer = 365
 GetSpiritspringJumpHeight = 366
-Unknown368 = 368
+IsAutomaticTesting = 368
 
 GetPoise = 400
 GetMaxPoise = 402
 GetSpEffectEventAnimID = 403
-Unknown404 = 404
-Unknown405 = 405
+GetNpcAIAttackRequestID = 404
+GetNpcAIAttackRequestIDAfterBlend = 405
 GetRollAngle = 406
 GetJumpAngle = 407
 GetSwordArtsRollAngle = 408
 GetDamageSpecialAttribute = 409 -- args: <index>
 
 IsOnMount = 500
-Unknown502 = 502
+IsMount = 502
 IsSummoningRide = 504
 IsMovingOnMount = 505
 IsIdleOnMount = 506
@@ -1091,19 +1092,19 @@ GetMountSpecialAttribute = 543
 IsMountDead = 545
 GetMountIsWeakPoint = 546
 GetMountDamageAnimID = 547
-Unknown548 = 548
+InNoRidingArea = 548
 GetMountSpEffectID = 549
 GetMountSpEffectType = 550
 GetMountStateInfo = 551
-Unknown552 = 552
+IsNewRidingTest = 552
 GetMountBehaviorID = 553
 GetMountStatusEffect = 554
-Unknown555 = 555
+IsRidingPcMount = 555
 
 GetFlyRouteState = 600
 
-Unknown700 = 700
-Unknown701 = 701
+IsAIJumpRequested = 700
+IsAIJumping = 701
 
 GetHP = 1000
 GetStamina = 1001
@@ -1232,7 +1233,7 @@ InterruptAttack = 143
 SkyDeathWarp = 144
 ClearSlopeInfo = 145
 ReceiveStateInput = 146
-SetIsEquipmentChangeableFromMenu = 147
+SetCanChangeEquipmentOn = 147
 SetHavokVariable = 148 -- args: <string>, <value>
 AimAtSelfPosition = 149
 SetIsItemAnimationPlaying = 150
@@ -1247,8 +1248,8 @@ RequestAIReplanning = 158
 TurnTowardAttacker = 159
 SetThrowPossibilityState_Attacker = 160 -- args: <index>
 SetThrowPossibilityState_Defender = 161 -- args: <index>
-MarkOfGreedyPersonSlipDamageDisable = 162
-Unknown163 = 163
+NotifyAIMagicCast = 162
+SetCanChangeEquipmentOff = 163
 
 StateIdentifier = 200
 
@@ -1282,27 +1283,27 @@ LadderSlideDownCancel = 2021
 DisableMagicIDSwitching = 2022
 DisableToolIDSwitching = 2023
 UseItemDecision = 2024
-Unknown2025 = 2025 -- args: <value>
-Unknown2026 = 2026
-Unknown2027 = 2027
-Unknown2029 = 2029 -- args: <value>
+SetNpcAIAttackRequestIDAfterBlend = 2025 -- args: <value>
+DecideMagicUse = 2026
+FallPreventionAssist = 2027
+FaceDirection = 2029 -- args: <value>
 ChangeBuddyState = 2030
 PlayEventSync = 2031
-Unknown2040 = 2040
-Unknown2050 = 2050 -- args: <index>, <index> # IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE
+AllowBuddyWarp = 2040
+NotifyAIOfBehaviourState = 2050 -- args: <index>, <index> # IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE
 
-Unknown3000 = 3000
+Mounting = 3000
 Unknown3001 = 3001
 Unknown3002 = 3002
 PlayRideAnim = 3003
 ApplyRideBlend = 3004 -- args: <blend anim>, <rate>
-Unknown3005 = 3005
-Unknown3006 = 3006
+Dismount = 3005
+AllowMounting = 3006
 ApplyDamageFlag = 3007 -- args: <index>
 
-GetPoise0 = 4000
-GetPoise1 = 4001
-GetPoise2 = 4002
+RequestAIJumpInterupt = 4000
+NotifyAIOfJumpState = 4001
+AIJumpState = 4002
 
 DebugLogOutput = 9000
 Test_SpEffectDelete = 9001

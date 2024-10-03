@@ -4,12 +4,14 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 3 for ER version 1.13
+-- Version 4 for ER version 1.15.1
 ------------------------------------------
 -- Changelog:
 -- 2023-02-14 - Vawser: Cleaned up and added.
 -- 2024-06-28 - Exelot: Recreated to update to ER v1.12.1 [DLC Initial Release]
 -- 2024-07-30 - Exelot: Updated to ER v1.13
+-- 2024-10-03 - Exelot: Named almost all remaining acts and envs thanks to a list provided by ElaDiDu. Some of the existing ones have been renamed.
+
 ------------------------------------------
 -- Core: Functions
 ------------------------------------------
@@ -2259,26 +2261,26 @@ function ExecJumpDamage(damage_level, damage_type, is_damaged)
             return FALSE
         end
         if env(IsDamageMotionOff) == FALSE and ExecSaBreakDamage(damage_level, is_damaged) == TRUE then
-            act(GetPoise0)
+            act(RequestAIJumpInterupt)
             return TRUE
         end
         if damage_level == DAMAGE_LEVEL_LARGE_BLOW then
             if IsExistAnime(ANIME_ID_DAMAGE_LARGE_BLOW) == TRUE then
-                act(GetPoise0)
+                act(RequestAIJumpInterupt)
                 act(SetDamageAnimType, DAMAGE_FLAG_LARGE_BLOW)
                 act(TurnTowardAttacker, 0)
                 Replanning()
                 Fire("W_DamageLargeBlow")
                 return TRUE
             elseif IsExistAnime(ANIME_ID_DAMAGE_SMALL_BLOW) == TRUE then
-                act(GetPoise0)
+                act(RequestAIJumpInterupt)
                 act(SetDamageAnimType, DAMAGE_FLAG_SMALL_BLOW)
                 act(TurnTowardAttacker, 0)
                 Replanning()
                 Fire("W_DamageSmallBlow")
                 return TRUE
             elseif IsExistAnime(ANIME_ID_JUMP_DAMAGE_SMALL) == TRUE then
-                act(GetPoise0)
+                act(RequestAIJumpInterupt)
                 act(SetDamageAnimType, DAMAGE_FLAG_MIDDLE)
                 SetVariable("Int16Variable02", 0)
                 Replanning()
@@ -2289,14 +2291,14 @@ function ExecJumpDamage(damage_level, damage_type, is_damaged)
             end
         elseif damage_level == DAMAGE_LEVEL_LARGE or damage_level == DAMAGE_LEVEL_PUSH or damage_level == DAMAGE_LEVEL_FLING or damage_level == DAMAGE_LEVEL_SMALL_BLOW or damage_level == DAMAGE_LEVEL_UPPER or damage_level == DAMAGE_LEVEL_EX_BLAST or damage_level == DAMAGE_LEVEL_BREATH then
             if IsExistAnime(ANIME_ID_DAMAGE_SMALL_BLOW) == TRUE then
-                act(GetPoise0)
+                act(RequestAIJumpInterupt)
                 act(SetDamageAnimType, DAMAGE_FLAG_SMALL_BLOW)
                 act(TurnTowardAttacker, 0)
                 Replanning()
                 Fire("W_DamageSmallBlow")
                 return TRUE
             elseif IsExistAnime(ANIME_ID_JUMP_DAMAGE_SMALL) == TRUE then
-                act(GetPoise0)
+                act(RequestAIJumpInterupt)
                 act(SetDamageAnimType, DAMAGE_FLAG_MIDDLE)
                 SetVariable("Int16Variable02", 0)
                 Replanning()
@@ -2307,7 +2309,7 @@ function ExecJumpDamage(damage_level, damage_type, is_damaged)
             end
         elseif damage_level == DAMAGE_LEVEL_SMALL or damage_level == DAMAGE_LEVEL_MIDDLE or env(GetIsWeakPoint) == TRUE then
             if IsExistAnime(ANIME_ID_JUMP_DAMAGE_SMALL) == TRUE then
-                act(GetPoise0)
+                act(RequestAIJumpInterupt)
                 act(SetDamageAnimType, DAMAGE_FLAG_MIDDLE)
                 SetVariable("Int16Variable02", 0)
                 Replanning()
@@ -2502,7 +2504,7 @@ function ExecSleepResist(is_on_cancel)
         return FALSE
     end
     if env(GetSpEffectType, SP_EFFECT_TYPE_SLEEP) == TRUE and IsNodeActive("Sleep_Resist_CMSG") == FALSE and env(IsDamageMotionOff) == FALSE and env(IsLanding) == TRUE and env(GetSpEffectID, 5851) == TRUE and env(GetSpEffectID, 5852) == FALSE and env(GetSpEffectID, 5853) == FALSE and IsExistAnime(ANIME_ID_SLEEP_RESIST) == TRUE then
-        act(GetPoise0)
+        act(RequestAIJumpInterupt)
         Replanning()
         Fire("W_Sleep_Resist")
         return TRUE
@@ -4428,7 +4430,7 @@ function ExecPassiveTransition(judge_fall_type, is_weak, ignore_guard_block, ena
         return TRUE
     end
     if env(IsSummoningRide) == TRUE then
-        if env(Unknown502) == FALSE then
+        if env(IsMount) == FALSE then
             if env(IsMovingOnMount) == TRUE then
                 FireRideEvent("W_Ride_Enemy_On", "W_Ridden_Enemy_On", FALSE)
                 return TRUE
@@ -4445,7 +4447,7 @@ function ExecPassiveTransition(judge_fall_type, is_weak, ignore_guard_block, ena
     if ExecDeath() == TRUE then
         return TRUE
     end
-    if env(GetSpEffectID, 6060) == TRUE and env(Unknown363, 6) == FALSE then
+    if env(GetSpEffectID, 6060) == TRUE and env(IsPlayerInRangeOfMount, 6) == FALSE then
         Fire("W_PhantomIdle")
         return TRUE
     end
@@ -4572,12 +4574,12 @@ function ExecPassiveTransition(judge_fall_type, is_weak, ignore_guard_block, ena
     if ExecFallStart(judge_fall_type) == TRUE then
         return TRUE
     end
-    if enable_jump == TRUE and env(Unknown700) == TRUE then
-        act(GetPoise1)
+    if enable_jump == TRUE and env(IsAIJumpRequested) == TRUE then
+        act(NotifyAIOfJumpState)
         Fire("W_Jump")
         return TRUE
     end
-    act(Unknown3006)
+    act(AllowMounting)
     if ExecSpEffectEventAction() == TRUE then
         return TRUE
     end
@@ -4605,8 +4607,8 @@ function ExecActiveTransition(is_on_cancel, style, move_type, enable_turn)
 end
 
 function IdleCommonFunction(style, anim_id)
-    act(Unknown2050, 0, style)
-    act(Unknown2040)
+    act(NotifyAIOfBehaviourState, 0, style)
+    act(AllowBuddyWarp)
     if ExecPassiveTransition(JUDGE_FALL_TYPE_DEFAULT, FALSE, FALSE, TRUE) == TRUE then
         return TRUE
     end
@@ -4631,14 +4633,14 @@ function IdleCommonFunction(style, anim_id)
         return TRUE
     end
     if style == STYLE_DEFAULT then
-        act(Unknown3006)
+        act(AllowMounting)
     end
     return FALSE
 end
 
 function MoveCommonFunction(style, move_type)
-    act(Unknown2050, 0, style)
-    act(Unknown2040)
+    act(NotifyAIOfBehaviourState, 0, style)
+    act(AllowBuddyWarp)
     local fly_route_state = env(GetFlyRouteState)
     if ExecPassiveTransition(JUDGE_FALL_TYPE_DEFAULT, FALSE, FALSE, TRUE) == TRUE then
         return TRUE
@@ -4674,17 +4676,17 @@ function MoveCommonFunction(style, move_type)
         return TRUE
     end
     if style == STYLE_DEFAULT then
-        act(Unknown3006)
+        act(AllowMounting)
     end
     return FALSE
 end
 
 function TurnCommonFunction(style)
-    act(Unknown2050, 0, style)
+    act(NotifyAIOfBehaviourState, 0, style)
     act(SetIsTurnAnimInProgress)
-    act(Unknown2040)
+    act(AllowBuddyWarp)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveTransition(JUDGE_FALL_TYPE_DEFAULT, FALSE, FALSE, TRUE) == TRUE then
         return TRUE
@@ -4699,7 +4701,7 @@ function TurnCommonFunction(style)
 end
 
 function TransStyleCommonFunction(style)
-    act(Unknown2050, 0, style)
+    act(NotifyAIOfBehaviourState, 0, style)
     if ExecPassiveTransition(JUDGE_FALL_TYPE_DEFAULT, FALSE, FALSE, TRUE) == TRUE then
         return TRUE
     end
@@ -4757,7 +4759,7 @@ function AttackCommonFunction(action_number, style, ignore_guard_block)
 end
 
 function DamageCommonFunction(style, is_weak, judge_fall_type)
-    act(Unknown2050, 0, style)
+    act(NotifyAIOfBehaviourState, 0, style)
     if ExecPassiveTransition(judge_fall_type, is_weak, FALSE, TRUE) == TRUE then
         return TRUE
     end
@@ -6559,7 +6561,7 @@ end
 
 function Step6000_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6000, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -6572,7 +6574,7 @@ end
 
 function Step6001_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6001, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -6585,7 +6587,7 @@ end
 
 function Step6002_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6002, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -6598,7 +6600,7 @@ end
 
 function Step6003_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6003, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -6611,7 +6613,7 @@ end
 
 function Step6010_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6010, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -6624,7 +6626,7 @@ end
 
 function Step6011_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6011, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -6637,7 +6639,7 @@ end
 
 function Step6012_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6012, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -6650,7 +6652,7 @@ end
 
 function Step6013_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6013, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -6663,7 +6665,7 @@ end
 
 function Step6020_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6020, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -6676,7 +6678,7 @@ end
 
 function Step6021_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6021, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -6689,7 +6691,7 @@ end
 
 function Step6022_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6022, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -6702,7 +6704,7 @@ end
 
 function Step6023_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if AttackCommonFunction(6023, STYLE_DEFAULT, FALSE) == TRUE then
         return
@@ -8171,11 +8173,11 @@ function JumpCommonFunction(style)
 end
 
 function Jump_onActivate()
-    act(GetPoise2)
+    act(AIJumpState)
 end
 
 function Jump_onUpdate()
-    act(GetPoise2)
+    act(AIJumpState)
     if JumpCommonFunction(STYLE_DEFAULT) == TRUE then
         return
     end
@@ -8232,7 +8234,7 @@ end
 
 function Ride_Enemy_Deactivate()
     act(DebugLogOutput, "Ride_Enemy_Deactivate")
-    act(Unknown3005)
+    act(Dismount)
 end
 
 function Ridden_Enemy_Activate()
@@ -8241,12 +8243,12 @@ end
 
 function Ridden_Enemy_Deactivate()
     act(DebugLogOutput, "Ridden_Enemy_Deactivate")
-    act(Unknown3005)
+    act(Dismount)
 end
 
 function ExecRide()
-    if env(Unknown502) == FALSE and (env(GetAIActionType) == 90000 or env(GetAIAtkCancelType) == 90000 or env(GetAIChainStepType) == 90000) then
-        act(Unknown3000)
+    if env(IsMount) == FALSE and (env(GetAIActionType) == 90000 or env(GetAIAtkCancelType) == 90000 or env(GetAIChainStepType) == 90000) then
+        act(Mounting)
     end
     return FALSE
 end
@@ -8435,8 +8437,8 @@ function ExecPassiveRide(is_weak, enable_jump)
     if ExecRideFallStart() == TRUE then
         return TRUE
     end
-    if enable_jump == TRUE and env(Unknown700) == TRUE then
-        act(GetPoise1)
+    if enable_jump == TRUE and env(IsAIJumpRequested) == TRUE then
+        act(NotifyAIOfJumpState)
         FireRideEvent("W_Ride_Enemy_Jump", "W_Ridden_Enemy_Jump", FALSE)
         return TRUE
     end
@@ -8483,12 +8485,12 @@ function ExecRideDamage(is_weak)
 
     if env(GetSpEffectID, 89) == TRUE or env(GetMountSpEffectID, 89) == TRUE then
         if env(IsDamageMotionOff) == FALSE and ExecRideSaBreakDamage(damage_level, damage_level_under, is_damaged, is_damaged_under) == TRUE then
-            act(GetPoise0)
+            act(RequestAIJumpInterupt)
             return TRUE
         end
         if damage_level == DAMAGE_LEVEL_LARGE_BLOW or damage_level == DAMAGE_LEVEL_LARGE or damage_level == DAMAGE_LEVEL_PUSH or damage_level == DAMAGE_LEVEL_FLING or damage_level == DAMAGE_LEVEL_SMALL_BLOW or damage_level == DAMAGE_LEVEL_UPPER or damage_level == DAMAGE_LEVEL_EX_BLAST or damage_level == DAMAGE_LEVEL_BREATH or env(GetIsWeakPoint) == TRUE or damage_level_under == DAMAGE_LEVEL_LARGE_BLOW or damage_level_under == DAMAGE_LEVEL_LARGE or damage_level_under == DAMAGE_LEVEL_PUSH or damage_level_under == DAMAGE_LEVEL_FLING or damage_level_under == DAMAGE_LEVEL_SMALL_BLOW or damage_level_under == DAMAGE_LEVEL_UPPER or damage_level_under == DAMAGE_LEVEL_EX_BLAST or damage_level_under == DAMAGE_LEVEL_BREATH or env(GetMountIsWeakPoint) == TRUE then
             if IsExistRideAnime(ANIME_ID_JUMP_DAMAGE_SMALL) == TRUE then
-                act(GetPoise0)
+                act(RequestAIJumpInterupt)
                 act(ApplyDamageFlag, DAMAGE_FLAG_MIDDLE)
                 Replanning()
                 FireRideEvent("W_Ride_Enemy_JumpDamage_Start", "W_Ridden_Enemy_JumpDamage_Start", FALSE)
@@ -8657,7 +8659,7 @@ function ExecRideSleepResist(is_on_cancel)
         return FALSE
     end
     if (env(GetSpEffectType, SP_EFFECT_TYPE_SLEEP) == TRUE or env(GetMountStateInfo, SP_EFFECT_TYPE_SLEEP) == TRUE) and IsNodeActive("Ride_Enemy_Sleep_Resist_CMSG") == FALSE and env(IsDamageMotionOff) == FALSE and env(IsMountInFallLoop) == TRUE and env(GetSpEffectID, 5852) == FALSE and env(GetSpEffectID, 5853) == FALSE and env(GetMountSpEffectID, 5852) == FALSE and env(GetMountSpEffectID, 5853) == FALSE and IsExistRideAnime(ANIME_ID_SLEEP_RESIST) == TRUE then
-        act(GetPoise0)
+        act(RequestAIJumpInterupt)
         Replanning()
         FireRideEvent("W_Ride_Enemy_Sleep_Resist", "W_Ridden_Enemy_Sleep_Resist", FALSE)
         return TRUE
@@ -8736,7 +8738,7 @@ function RideRequestFunction(is_on_cancel, move_type, enable_turn, lower_only)
             return TRUE
         end
     else
-        act(Unknown3005)
+        act(Dismount)
         Fire("W_Idle")
         return TRUE
     end
@@ -9078,7 +9080,7 @@ end
 function Ride_Enemy_Off_onUpdate()
     if env(IsSummoningRide) == TRUE then
     elseif env(IsOnMount) == TRUE then
-        act(Unknown3005)
+        act(Dismount)
     end
     if env(GetSpEffectID, 5410) == TRUE then
     else
@@ -9951,7 +9953,7 @@ end
 function Ride_Enemy_TurnDefault_Left180_onUpdate()
     act(SetIsTurnAnimInProgress)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -9968,7 +9970,7 @@ end
 function Ride_Enemy_TurnDefault_Right180_onUpdate()
     act(SetIsTurnAnimInProgress)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -9985,7 +9987,7 @@ end
 function Ride_Enemy_TurnDefault_Left90_onUpdate()
     act(SetIsTurnAnimInProgress)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10002,7 +10004,7 @@ end
 function Ride_Enemy_TurnDefault_Right90_onUpdate()
     act(SetIsTurnAnimInProgress)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10019,7 +10021,7 @@ end
 function Ride_Enemy_TurnBattle_Left180_onUpdate()
     act(SetIsTurnAnimInProgress)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10036,7 +10038,7 @@ end
 function Ride_Enemy_TurnBattle_Right180_onUpdate()
     act(SetIsTurnAnimInProgress)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10053,7 +10055,7 @@ end
 function Ride_Enemy_TurnBattle_Left90_onUpdate()
     act(SetIsTurnAnimInProgress)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10070,7 +10072,7 @@ end
 function Ride_Enemy_TurnBattle_Right90_onUpdate()
     act(SetIsTurnAnimInProgress)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10085,11 +10087,11 @@ function Ride_Enemy_TurnBattle_Right90_onUpdate()
 end
 
 function Ride_Enemy_Jump_onActivate()
-    act(GetPoise2)
+    act(AIJumpState)
 end
 
 function Ride_Enemy_Jump_onUpdate()
-    act(GetPoise2)
+    act(AIJumpState)
     if ExecPassiveRide(FALSE, FALSE) == TRUE then
         return
     end
@@ -10164,7 +10166,7 @@ end
 
 function Ride_Enemy_DamageLarge_onUpdate()
     if env(GetSpEffectID, 5813) == TRUE then
-        act(Unknown3005)
+        act(Dismount)
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
             return
         end
@@ -10187,7 +10189,7 @@ end
 
 function Ride_Enemy_DamageExLarge_onUpdate()
     if env(GetSpEffectID, 5813) == TRUE then
-        act(Unknown3005)
+        act(Dismount)
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
             return
         end
@@ -10210,7 +10212,7 @@ end
 
 function Ride_Enemy_DamageWeakTop_onUpdate()
     if env(GetSpEffectID, 5813) == TRUE then
-        act(Unknown3005)
+        act(Dismount)
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
             return
         end
@@ -10233,7 +10235,7 @@ end
 
 function Ride_Enemy_DamageWeakUnder_onUpdate()
     if env(GetSpEffectID, 5813) == TRUE then
-        act(Unknown3005)
+        act(Dismount)
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
             return
         end
@@ -10261,11 +10263,11 @@ end
 function Ride_Enemy_Damage_Fall_onUpdate()
     act(AddSpEffect, 5801)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(GetSpEffectID, 5410) == TRUE then
     else
-        act(Unknown3005)
+        act(Dismount)
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
             return
         end
@@ -10283,11 +10285,11 @@ end
 function Ride_Enemy_DamageBackFall_onUpdate()
     act(AddSpEffect, 5801)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(GetSpEffectID, 5410) == TRUE then
     else
-        act(Unknown3005)
+        act(Dismount)
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
             return
         end
@@ -10299,14 +10301,14 @@ function Ride_Enemy_DamageBackFall_onUpdate()
 end
 
 function Ride_Enemy_Death_onUpdate()
-    act(Unknown3005)
+    act(Dismount)
     if ExecTransToDeathIdle(DEATH_TYPE_DEFAULT) == TRUE then
         return
     end
 end
 
 function Ride_Enemy_DeathOnlyTop_onUpdate()
-    act(Unknown3005)
+    act(Dismount)
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_DEFAULT_ONLY_TOP) == TRUE then
         return
     end
@@ -10318,11 +10320,11 @@ end
 
 function Ride_Enemy_DeathOnlyUnder_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(GetSpEffectID, 5410) == TRUE then
     else
-        act(Unknown3005)
+        act(Dismount)
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
             return
         end
@@ -10334,21 +10336,21 @@ function Ride_Enemy_DeathOnlyUnder_onUpdate()
 end
 
 function Ride_Enemy_FireDeathOnlyTop_onUpdate()
-    act(Unknown3005)
+    act(Dismount)
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_FIRE_ONLY_TOP) == TRUE then
         return
     end
 end
 
 function Ride_Enemy_WeakDeathOnlyTop_onUpdate()
-    act(Unknown3005)
+    act(Dismount)
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_WEAK_ONLY_TOP) == TRUE then
         return
     end
 end
 
 function Ride_Enemy_ExLargeDeathOnlyTop_onUpdate()
-    act(Unknown3005)
+    act(Dismount)
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_EXLARGE_ONLY_TOP) == TRUE then
         return
     end
@@ -10359,9 +10361,9 @@ function Ride_Enemy_ExLargeDeathOnlyUnder_onActivate()
 end
 
 function Ride_Enemy_ExLargeDeathOnlyUnder_onUpdate()
-    act(Unknown3005)
+    act(Dismount)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
         return
@@ -10404,7 +10406,7 @@ end
 function Ride_Enemy_Step6000_onUpdate()
     CallActionState(6000)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10424,7 +10426,7 @@ end
 function Ride_Enemy_Step6001_onUpdate()
     CallActionState(6001)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10444,7 +10446,7 @@ end
 function Ride_Enemy_Step6002_onUpdate()
     CallActionState(6002)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10464,7 +10466,7 @@ end
 function Ride_Enemy_Step6003_onUpdate()
     CallActionState(6003)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10484,7 +10486,7 @@ end
 function Ride_Enemy_Step6010_onUpdate()
     CallActionState(6010)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10504,7 +10506,7 @@ end
 function Ride_Enemy_Step6011_onUpdate()
     CallActionState(6011)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10524,7 +10526,7 @@ end
 function Ride_Enemy_Step6012_onUpdate()
     CallActionState(6012)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10544,7 +10546,7 @@ end
 function Ride_Enemy_Step6013_onUpdate()
     CallActionState(6013)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10564,7 +10566,7 @@ end
 function Ride_Enemy_Step6020_onUpdate()
     CallActionState(6020)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10584,7 +10586,7 @@ end
 function Ride_Enemy_Step6021_onUpdate()
     CallActionState(6021)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10604,7 +10606,7 @@ end
 function Ride_Enemy_Step6022_onUpdate()
     CallActionState(6022)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10624,7 +10626,7 @@ end
 function Ride_Enemy_Step6023_onUpdate()
     CallActionState(6023)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if ExecPassiveRide(FALSE, TRUE) == TRUE then
         return
@@ -10655,7 +10657,7 @@ function Ridden_Enemy_On_onUpdate()
 end
 
 function Ridden_Enemy_Off_onUpdate()
-    act(Unknown3006)
+    act(AllowMounting)
     if env(IsOnMount) == FALSE then
         if TransStyleCommonFunction(STYLE_DEFAULT) == TRUE then
             return TRUE
@@ -10790,11 +10792,11 @@ function Ridden_Enemy_TurnBattle_Right90_onUpdate()
 end
 
 function Ridden_Enemy_Jump_onActivate()
-    act(GetPoise2)
+    act(AIJumpState)
 end
 
 function Ridden_Enemy_Jump_onUpdate()
-    act(GetPoise2)
+    act(AIJumpState)
     if RideCommonFunction(RIDE_MOVE_TYPE_OTHER) == TRUE then
         return
     end
@@ -10850,7 +10852,7 @@ end
 
 function Ridden_Enemy_Damage_Fall_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(IsOnMount) == FALSE then
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
@@ -10869,7 +10871,7 @@ end
 
 function Ridden_Enemy_DamageBackFall_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(IsOnMount) == FALSE then
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
@@ -10894,7 +10896,7 @@ end
 
 function Ridden_Enemy_DeathOnlyTop_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(IsOnMount) == FALSE then
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
@@ -10915,7 +10917,7 @@ end
 
 function Ridden_Enemy_FireDeathOnlyTop_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(IsOnMount) == FALSE then
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
@@ -10930,7 +10932,7 @@ end
 
 function Ridden_Enemy_WeakDeathOnlyTop_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(IsOnMount) == FALSE then
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
@@ -10945,7 +10947,7 @@ end
 
 function Ridden_Enemy_ExLargeDeathOnlyTop_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(IsOnMount) == FALSE then
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
@@ -11495,14 +11497,14 @@ function Ride_Enemy_Fall_LandHeavy_onUpdate()
 end
 
 function Ride_Enemy_DeathLandDefault_onUpdate()
-    act(Unknown3005)
+    act(Dismount)
     if ExecTransToDeathIdle(DEATH_TYPE_LAND_DEFAULT) == TRUE then
         return
     end
 end
 
 function Ride_Enemy_DeathLandDefaultOnlyTop_onUpdate()
-    act(Unknown3005)
+    act(Dismount)
     if ExecTransToDeathIdle(DEATH_TYPE_RIDE_LAND_ONLY_TOP) == TRUE then
         return
     end
@@ -11514,11 +11516,11 @@ end
 
 function Ride_Enemy_DeathLandDefaultOnlyUnder_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(GetSpEffectID, 5410) == TRUE then
     else
-        act(Unknown3005)
+        act(Dismount)
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
             return
         end
@@ -11574,11 +11576,11 @@ function Ride_Enemy_DamageParryEnemy1_onUpdate()
     CallActionState(0)
     act(AddSpEffect, 5801)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(GetSpEffectID, 5410) == TRUE then
     else
-        act(Unknown3005)
+        act(Dismount)
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
             return
         end
@@ -11598,11 +11600,11 @@ function Ride_Enemy_DamageParryEnemy2_onUpdate()
     CallActionState(0)
     act(AddSpEffect, 5801)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(GetSpEffectID, 5410) == TRUE then
     else
-        act(Unknown3005)
+        act(Dismount)
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
             return
         end
@@ -11622,11 +11624,11 @@ function Ride_Enemy_Sleep_Resist_onUpdate()
     CallActionState(12020)
     act(AddSpEffect, 5801)
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(GetSpEffectID, 5410) == TRUE then
     else
-        act(Unknown3005)
+        act(Dismount)
         if SleepCommonFunction(12020) == TRUE then
             return
         end
@@ -11641,7 +11643,7 @@ end
 
 function Ridden_Enemy_DeathLandDefaultOnlyTop_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(IsOnMount) == FALSE then
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
@@ -11662,7 +11664,7 @@ end
 
 function Ridden_Enemy_DamageParryEnemy1_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(IsOnMount) == FALSE then
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
@@ -11681,7 +11683,7 @@ end
 
 function Ridden_Enemy_DamageParryEnemy2_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(IsOnMount) == FALSE then
         if DamageCommonFunction(STYLE_DEFAULT, FALSE, JUDGE_FALL_TYPE_DIRECTION) == TRUE then
@@ -11700,7 +11702,7 @@ end
 
 function Ridden_Enemy_Sleep_Resist_onUpdate()
     if env(GetSpEffectID, 5981) == FALSE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(IsOnMount) == FALSE then
         if SleepCommonFunction(12020) == TRUE then
@@ -11824,7 +11826,7 @@ function Update()
     g_FrameCount = g_FrameCount + 1
     act(Unknown9999)
     if env(GetSpEffectID, 5980) == TRUE then
-        act(Unknown2027)
+        act(FallPreventionAssist)
     end
     if env(IsSpeaking) == TRUE and GetVariable("LipSyncBlend00") <= 0 then
         SetVariable("LipSyncBlend00", 0.10000000149011612)
@@ -12505,24 +12507,24 @@ GetWeaponSwitchStatus = 359
 IsEquipmentMenuOpen = 360
 GetRemainingArrowCount = 361
 GetSpEffectType = 362 -- args: <enum> SP_EFFECT_TYPE_
-Unknown363 = 363
+IsPlayerInRangeOfMount = 363
 GetEventID = 364
-Unknown365 = 365
+IsMultiplayer = 365
 GetSpiritspringJumpHeight = 366
-Unknown368 = 368
+IsAutomaticTesting = 368
 
 GetPoise = 400
 GetMaxPoise = 402
 GetSpEffectEventAnimID = 403
-Unknown404 = 404
-Unknown405 = 405
+GetNpcAIAttackRequestID = 404
+GetNpcAIAttackRequestIDAfterBlend = 405
 GetRollAngle = 406
 GetJumpAngle = 407
 GetSwordArtsRollAngle = 408
 GetDamageSpecialAttribute = 409 -- args: <index>
 
 IsOnMount = 500
-Unknown502 = 502
+IsMount = 502
 IsSummoningRide = 504
 IsMovingOnMount = 505
 IsIdleOnMount = 506
@@ -12539,19 +12541,19 @@ GetMountSpecialAttribute = 543
 IsMountDead = 545
 GetMountIsWeakPoint = 546
 GetMountDamageAnimID = 547
-Unknown548 = 548
+InNoRidingArea = 548
 GetMountSpEffectID = 549
 GetMountSpEffectType = 550
 GetMountStateInfo = 551
-Unknown552 = 552
+IsNewRidingTest = 552
 GetMountBehaviorID = 553
 GetMountStatusEffect = 554
-Unknown555 = 555
+IsRidingPcMount = 555
 
 GetFlyRouteState = 600
 
-Unknown700 = 700
-Unknown701 = 701
+IsAIJumpRequested = 700
+IsAIJumping = 701
 
 GetHP = 1000
 GetStamina = 1001
@@ -12680,7 +12682,7 @@ InterruptAttack = 143
 SkyDeathWarp = 144
 ClearSlopeInfo = 145
 ReceiveStateInput = 146
-SetIsEquipmentChangeableFromMenu = 147
+SetCanChangeEquipmentOn = 147
 SetHavokVariable = 148 -- args: <string>, <value>
 AimAtSelfPosition = 149
 SetIsItemAnimationPlaying = 150
@@ -12695,8 +12697,8 @@ RequestAIReplanning = 158
 TurnTowardAttacker = 159
 SetThrowPossibilityState_Attacker = 160 -- args: <index>
 SetThrowPossibilityState_Defender = 161 -- args: <index>
-MarkOfGreedyPersonSlipDamageDisable = 162
-Unknown163 = 163
+NotifyAIMagicCast = 162
+SetCanChangeEquipmentOff = 163
 
 StateIdentifier = 200
 
@@ -12730,27 +12732,27 @@ LadderSlideDownCancel = 2021
 DisableMagicIDSwitching = 2022
 DisableToolIDSwitching = 2023
 UseItemDecision = 2024
-Unknown2025 = 2025 -- args: <value>
-Unknown2026 = 2026
-Unknown2027 = 2027
-Unknown2029 = 2029 -- args: <value>
+SetNpcAIAttackRequestIDAfterBlend = 2025 -- args: <value>
+DecideMagicUse = 2026
+FallPreventionAssist = 2027
+FaceDirection = 2029 -- args: <value>
 ChangeBuddyState = 2030
 PlayEventSync = 2031
-Unknown2040 = 2040
-Unknown2050 = 2050 -- args: <index>, <index> # IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE
+AllowBuddyWarp = 2040
+NotifyAIOfBehaviourState = 2050 -- args: <index>, <index> # IDX_AINOTE_STATETYPE, IDX_AINOTE_STATETYPE
 
-Unknown3000 = 3000
+Mounting = 3000
 Unknown3001 = 3001
 Unknown3002 = 3002
 PlayRideAnim = 3003
 ApplyRideBlend = 3004 -- args: <blend anim>, <rate>
-Unknown3005 = 3005
-Unknown3006 = 3006
+Dismount = 3005
+AllowMounting = 3006
 ApplyDamageFlag = 3007 -- args: <index>
 
-GetPoise0 = 4000
-GetPoise1 = 4001
-GetPoise2 = 4002
+RequestAIJumpInterupt = 4000
+NotifyAIOfJumpState = 4001
+AIJumpState = 4002
 
 DebugLogOutput = 9000
 Test_SpEffectDelete = 9001
