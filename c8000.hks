@@ -4,11 +4,12 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 1 for ER version 1.12.1
+-- Version 2 for ER version 1.15.1
 ------------------------------------------
 -- Changelog:
 -- 2023-02-14 - Vawser: Cleaned up and added.
 -- 2024-06-28 - Exelot: Recreated on raw decompiler. No functional changes present.
+-- 2024-10-03 - Exelot: Named almost all remaining acts and envs thanks to a list provided by ElaDiDu. Some of the existing ones have been renamed.
 ------------------------------------------
 function Event20000_onUpdate()
     if EventCommonFunction(20000) == TRUE then

@@ -3,7 +3,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 15 (For ER HKS last updated in 1.14)
+-- Version 16 (For ER HKS last updated in 1.15.1)
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -50,6 +50,8 @@
 --              - Added a new logic expansion section with a new function that allows for easy addition of new Weapon Catalysts.
 -- 2024-07-30 - Exelot: Updated to ER v1.13
 -- 2024-09-11 - Exelot: Updated to ER v1.14
+-- 2024-10-03 - Exelot: Updated to ER v1.14
+--              Also named almost all remaining acts and envs thanks to a list provided by ElaDiDu. Some of the existing ones have been renamed.
 
 ------------------------------------------
 -- Known issues:
@@ -13965,7 +13967,7 @@ end
 
 function QuickItemEnchantStep_Upper_onUpdate()
     local blend_type, lower_state = GetHalfBlendInfo()
-    
+
     if QuickItemCommonFunction(g_r1, g_r2, g_l1, g_l2, g_b1, g_b2, blend_type, QUICKTYPE_NORMAL) == TRUE then
         return
     end

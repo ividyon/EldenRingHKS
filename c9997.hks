@@ -4,12 +4,14 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 3 for ER version 1.13
+-- Version 4 for ER version 1.15.1
 ------------------------------------------
 -- Changelog:
 -- 2023-02-14 - Vawser: Cleaned up and added.
 -- 2024-06-28 - Exelot: Recreated to update to ER v1.12.1 [DLC Initial Release]
 -- 2024-07-30 - Exelot: Updated to ER v1.13
+-- 2024-10-03 - Exelot: Named almost all remaining acts and envs thanks to a list provided by ElaDiDu. Some of the existing ones have been renamed.
+
 ------------------------------------------
 -- Core: Functions
 ------------------------------------------
