@@ -3,7 +3,7 @@
 -- Refined from decompiles by Vawser
 -- Curated at: https://github.com/ividyon/EldenRingHKS
 ------------------------------------------
--- Version 16 (For ER HKS last updated in 1.15.1)
+-- Version 17 (For ER HKS last updated in 1.15.1)
 ------------------------------------------
 -- Changelog:
 -- 2022-12-15 - AshenOne: ExecMagic (line 2090), moving an if block so left-hand casting works as intended
@@ -12,10 +12,10 @@
 -- 2023-01-27 - Massive overhaul and improvements by Vawser from Vigil
 --              Properly fixes Torrent dash as well as flick animation issues
 --              proper act/env naming instead of IDs, proper spacing, useful comments
--- 2023-01-27 - Minor oversight fixes
--- 2023-01-27 - Put on GitHub via philiquaz' initiative
--- 2023-02-14 - Minor comment changes
--- 2023-03-19 - Support for custom Ashes of War
+-- 2023-01-27 - ivi: Minor oversight fixes
+-- 2023-01-27 - ivi: Put on GitHub via philiquaz' initiative
+-- 2023-02-14 - ivi: Minor comment changes
+-- 2023-03-19 - ivi: Support for custom Ashes of War
 -- 2023-09-22 - Halvard: updated for 1.10
 --              - fixed the function declaration of "ExecComboMagic", it was missing two parameters.
 --              - removed an "act(SetAttackType, -1)" from the function "DamageBind_onUpdate()",
@@ -53,6 +53,7 @@
 -- 2024-09-11 - Exelot: Updated to ER v1.14
 -- 2024-10-02 - ivi: Updated to ER v1.15
 -- 2024-10-03 - Exelot: Named almost all remaining acts and envs thanks to a list provided by ElaDiDu. Some of the existing ones have been renamed.
+-- 2024-10-10 - ivi: Support for custom spells
 ------------------------------------------
 -- Known issues:
 -- N/A
@@ -25765,6 +25766,202 @@ function GetSwordArtsPutOppositeWeapon()
             result = SwordArtPutOppositeWeapon[c_SwordArtsID][1] -- DLC special case
         else
             result = SwordArtPutOppositeWeapon[c_SwordArtsID][3] -- Left hand
+        end
+    end
+
+    return result
+end
+
+-- Table storing information about spells.
+-- Concerns playing a "weapon retrieval" animation after
+-- the spell was executed.
+--
+-- Table key: Magic ID (TAE ID minus 400)
+-- Value 1: Right hand, magic cast from right hand
+-- Value 2: Right hand, magic cast from left hand
+-- Value 3: Left hand
+--
+-- TRUE: Weapon was sheathed during animation, play retrieval animation.
+-- FALSE: Weapon was used to perform the magic, no retrieval animation.
+MagicPutOppositeWeapon = {
+    [0] = {TRUE, TRUE, TRUE},
+    [1] = {FALSE, FALSE, TRUE},
+    [2] = {FALSE, FALSE, TRUE},
+    [3] = {FALSE, FALSE, TRUE},
+    [4] = {FALSE, FALSE, TRUE},
+    [5] = {TRUE, TRUE, TRUE},
+    [6] = {TRUE, TRUE, TRUE},
+    [7] = {TRUE, TRUE, TRUE},
+    [8] = {FALSE, FALSE, TRUE},
+    [9] = {FALSE, FALSE, TRUE},
+    [10] = {FALSE, FALSE, TRUE},
+    [11] = {FALSE, FALSE, TRUE},
+    [12] = {FALSE, FALSE, TRUE},
+    [13] = {FALSE, FALSE, TRUE},
+    [14] = {TRUE, TRUE, TRUE},
+    [15] = {TRUE, TRUE, TRUE},
+    [16] = {FALSE, FALSE, TRUE},
+    [17] = {FALSE, FALSE, TRUE},
+    [18] = {FALSE, FALSE, TRUE},
+    [19] = {FALSE, FALSE, TRUE},
+    [20] = {FALSE, FALSE, TRUE},
+    [21] = {FALSE, FALSE, TRUE},
+    [22] = {TRUE, TRUE, TRUE},
+    [23] = {FALSE, FALSE, TRUE},
+    [24] = {TRUE, TRUE, TRUE},
+    [25] = {FALSE, FALSE, TRUE},
+    [26] = {FALSE, FALSE, TRUE},
+    [27] = {FALSE, FALSE, TRUE},
+    [28] = {FALSE, FALSE, TRUE},
+    [29] = {FALSE, FALSE, TRUE},
+    [30] = {FALSE, FALSE, TRUE},
+    [31] = {FALSE, FALSE, TRUE},
+    [32] = {FALSE, FALSE, TRUE},
+    [33] = {FALSE, FALSE, TRUE},
+    [34] = {FALSE, FALSE, TRUE},
+    [35] = {FALSE, FALSE, TRUE},
+    [36] = {FALSE, FALSE, TRUE},
+    [37] = {FALSE, FALSE, TRUE},
+    [38] = {FALSE, FALSE, TRUE},
+    [39] = {FALSE, FALSE, TRUE},
+    [40] = {FALSE, FALSE, TRUE},
+    [41] = {FALSE, FALSE, TRUE},
+    [42] = {FALSE, FALSE, TRUE},
+    [43] = {FALSE, FALSE, TRUE},
+    [44] = {FALSE, FALSE, TRUE},
+    [45] = {FALSE, FALSE, TRUE},
+    [46] = {FALSE, FALSE, TRUE},
+    [47] = {FALSE, FALSE, TRUE},
+    [48] = {TRUE, TRUE, TRUE},
+    [49] = {FALSE, FALSE, TRUE},
+    [50] = {TRUE, TRUE, TRUE},
+    [51] = {TRUE, TRUE, TRUE},
+    [52] = {FALSE, FALSE, TRUE},
+    [53] = {FALSE, FALSE, TRUE},
+    [54] = {TRUE, TRUE, TRUE},
+    [55] = {TRUE, TRUE, TRUE},
+    [56] = {TRUE, TRUE, TRUE},
+    [57] = {TRUE, TRUE, TRUE},
+    [58] = {TRUE, TRUE, TRUE},
+    [59] = {FALSE, FALSE, TRUE},
+    [60] = {TRUE, TRUE, TRUE},
+    [61] = {FALSE, FALSE, TRUE},
+    [62] = {FALSE, FALSE, TRUE},
+    [63] = {FALSE, FALSE, TRUE},
+    [64] = {FALSE, FALSE, TRUE},
+    [65] = {FALSE, FALSE, TRUE},
+    [66] = {FALSE, FALSE, TRUE},
+    [67] = {TRUE, TRUE, TRUE},
+    [68] = {FALSE, FALSE, TRUE},
+    [69] = {FALSE, FALSE, TRUE},
+    [70] = {FALSE, FALSE, TRUE},
+    [71] = {TRUE, TRUE, TRUE},
+    [72] = {FALSE, FALSE, TRUE},
+    [73] = {FALSE, FALSE, TRUE},
+    [74] = {TRUE, TRUE, TRUE},
+    [75] = {FALSE, FALSE, TRUE},
+    [76] = {FALSE, FALSE, TRUE},
+    [77] = {FALSE, FALSE, TRUE},
+    [78] = {FALSE, FALSE, TRUE},
+    [79] = {FALSE, FALSE, TRUE},
+    [80] = {FALSE, FALSE, TRUE},
+    [81] = {TRUE, TRUE, TRUE},
+    [82] = {TRUE, TRUE, TRUE},
+    [83] = {FALSE, FALSE, TRUE},
+    [84] = {FALSE, FALSE, TRUE},
+    [85] = {FALSE, FALSE, TRUE},
+    [86] = {TRUE, TRUE, TRUE},
+    [87] = {TRUE, TRUE, TRUE},
+    [88] = {TRUE, TRUE, TRUE},
+    [89] = {TRUE, TRUE, TRUE},
+    [90] = {TRUE, TRUE, TRUE},
+    [91] = {TRUE, TRUE, TRUE},
+    [92] = {FALSE, FALSE, TRUE},
+    [93] = {FALSE, FALSE, TRUE},
+    [94] = {FALSE, FALSE, TRUE},
+    [95] = {FALSE, FALSE, TRUE},
+    [96] = {FALSE, FALSE, TRUE},
+    [97] = {FALSE, FALSE, TRUE},
+    [98] = {TRUE, TRUE, TRUE},
+    [99] = {FALSE, FALSE, TRUE},
+    [100] = {FALSE, FALSE, TRUE},
+    [101] = {FALSE, FALSE, TRUE},
+    [102] = {TRUE, TRUE, TRUE},
+    [103] = {FALSE, FALSE, TRUE},
+    [104] = {FALSE, FALSE, TRUE},
+    [105] = {TRUE, TRUE, TRUE},
+    [106] = {FALSE, FALSE, TRUE},
+    [107] = {FALSE, FALSE, TRUE},
+    [108] = {FALSE, FALSE, TRUE},
+    [109] = {FALSE, FALSE, TRUE},
+    [110] = {FALSE, FALSE, TRUE},
+    [111] = {FALSE, FALSE, TRUE},
+    [112] = {FALSE, FALSE, TRUE},
+    [113] = {FALSE, FALSE, TRUE},
+    [114] = {FALSE, FALSE, TRUE},
+    [115] = {TRUE, TRUE, TRUE},
+    [116] = {TRUE, TRUE, TRUE},
+    [117] = {FALSE, FALSE, TRUE},
+    [118] = {FALSE, FALSE, TRUE},
+    [119] = {FALSE, FALSE, TRUE},
+    [120] = {TRUE, TRUE, TRUE},
+    [121] = {TRUE, TRUE, TRUE},
+    [122] = {TRUE, TRUE, TRUE},
+    [123] = {TRUE, TRUE, TRUE},
+    [124] = {FALSE, FALSE, TRUE},
+    [125] = {TRUE, TRUE, TRUE},
+    [126] = {FALSE, FALSE, TRUE},
+    [127] = {FALSE, FALSE, TRUE},
+    [128] = {TRUE, TRUE, TRUE},
+    [129] = {TRUE, TRUE, TRUE},
+    [130] = {TRUE, TRUE, TRUE},
+    [131] = {TRUE, TRUE, TRUE},
+    [132] = {FALSE, FALSE, TRUE},
+    [133] = {TRUE, TRUE, TRUE},
+    [134] = {FALSE, TRUE, TRUE},
+    [135] = {TRUE, TRUE, TRUE},
+    [136] = {TRUE, TRUE, TRUE},
+    [137] = {TRUE, TRUE, TRUE},
+    [138] = {FALSE, FALSE, TRUE},
+    [139] = {FALSE, FALSE, TRUE},
+    [140] = {FALSE, FALSE, TRUE},
+    [141] = {FALSE, FALSE, TRUE},
+    [142] = {FALSE, FALSE, TRUE},
+    [143] = {FALSE, FALSE, TRUE},
+    [144] = {TRUE, TRUE, TRUE},
+    [145] = {FALSE, FALSE, TRUE},
+    [146] = {TRUE, TRUE, TRUE},
+    [147] = {TRUE, TRUE, TRUE},
+    [148] = {FALSE, FALSE, TRUE},
+    [149] = {FALSE, FALSE, TRUE},
+    [150] = {TRUE, TRUE, TRUE},
+    [151] = {FALSE, FALSE, TRUE},
+    [152] = {TRUE, TRUE, TRUE},
+    [153] = {FALSE, FALSE, TRUE},
+    [154] = {FALSE, FALSE, TRUE},
+    [155] = {FALSE, FALSE, TRUE},
+    [156] = {TRUE, TRUE, TRUE},
+    [157] = {TRUE, TRUE, TRUE},
+    [158] = {FALSE, FALSE, TRUE},
+    [159] = {TRUE, TRUE, TRUE},
+    [160] = {FALSE, FALSE, TRUE},
+    [161] = {TRUE, TRUE, TRUE}
+}
+
+-- Decides whether to perform a "retrieve weapon" animation after finishing a magic spell.
+-- See the above table for reference.
+function GetMagicPutOppositeWeapon()
+    local result = FALSE
+
+    if MagicPutOppositeWeapon[g_MagicIndex] ~= nil then -- ivi: Sanity check for custom spells
+        if c_Style == HAND_RIGHT then
+            if g_Magichand == HAND_RIGHT then
+                result = MagicPutOppositeWeapon[g_MagicIndex][1]
+            else
+                result = MagicPutOppositeWeapon[g_MagicIndex][2]
+            end
+        else
+            result = MagicPutOppositeWeapon[g_MagicIndex][3]
         end
     end
 
